@@ -22,13 +22,18 @@ keywords = [
 license = "MIT"
 license-files = ["LICENSE.md"]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "cyclopts>=4.8.0",
+]
 
 [project.urls]
 homepage = "https://zen-do.seedcase-project.org"
 repository = "https://github.com/seedcase-project/zen-do"
 changelog = "https://github.com/seedcase-project/zen-do/blob/main/CHANGELOG.md"
 issues = "https://github.com/seedcase-project/zen-do/issues"
+
+[project.scripts]
+zen-do = "zen_do.cli:app"
 
 [build-system]
 requires = ["hatchling"]
