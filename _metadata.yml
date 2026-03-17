@@ -1,0 +1,10 @@
+gh:
+  repo: zen-do
+  org: seedcase-project
+
+titles:
+  full: "Tasks to get Zenodo to do from the command line"
+
+links:
+  github: "https://github.com/seedcase-project/zen-do"
+  site: "https://zen-do.seedcase-project.org"

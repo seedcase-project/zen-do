@@ -1,0 +1,33 @@
+title: "zen-do: Tasks to get Zenodo to do from the command line"
+abstract: |
+  Interact with the Zenodo API from the command line for common, high-level
+  tasks. The main aim is to make it easy to create a Zenodo deposit using
+  metadata from a file kept within a Git repository and upload one or more files
+  from the repository to that deposit. While the intended use of zen-do is to
+  integrate with a GitHub Action workflow for continuous deployment, it can also
+  be used locally from the command line for more interactive use. See
+  <a href="https://sprout.seedcase-project.org">https://sprout.seedcase-project.org</a>.
+authors:
+  - family-names: Johnston
+    given-names: Luke William
+    orcid: "https://orcid.org/0000-0003-4169-2616"
+    affiliation: "Steno Diabetes Center Aarhus"
+  - family-names: Vago
+    given-names: Marton
+    affiliation: "Steno Diabetes Center Aarhus"
+    orcid: "https://orcid.org/0009-0007-4628-655X"
+cff-version: 1.2.0
+# doi:
+# date-released: ""
+keywords:
+  - "zenodo api"
+  - "zenodo"
+  - "command-line interface"
+  - "cli"
+  - "continuous deployment"
+  - "dissemination"
+  - "open science"
+license: MIT
+message: "If you use this Python package, please cite it using these metadata."
+repository-code: "https://github.com/seedcase-project/zen-do"
+url: "https://zen-do.seedcase-project.org"
