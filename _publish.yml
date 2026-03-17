@@ -1,5 +1,4 @@
 - source: project
   netlify:
-    # TODO: Include correct ID and URL
-    - id: ""
+    - id: "18fa51d1-f7dd-4ea4-8f74-8a75000e0730"
       url: "https://seedcase-zen-do.netlify.app"
