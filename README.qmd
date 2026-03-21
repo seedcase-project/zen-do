@@ -8,12 +8,13 @@ metadata-files:
 
 {{< include /docs/includes/_badges.qmd >}}
 
-Interact with the Zenodo API from the command line for common, high-level tasks.
-The main aim is to make it easy to create a Zenodo deposit using metadata from a
-file kept within a Git repository and upload one or more files from the
-repository to that deposit. While the intended use of zen-do is to integrate
-with a GitHub Action workflow for continuous deployment, it can also be used
-locally from the command line for more interactive use.
+Interact with the Zenodo API from the command line for common,
+high-level tasks. The main aim is to make it easy to create a Zenodo
+deposit using metadata from a file kept within a Git repository and
+upload one or more files from the repository to that deposit. While the
+intended use of zen-do is to integrate with a GitHub Action workflow for
+continuous deployment, it can also be used locally from the command line
+for more interactive use.
 
 ::: callout-tip
 This Python package was generated from the
