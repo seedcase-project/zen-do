@@ -1,0 +1,180 @@
+---
+title: "Architecture"
+---
+
+This document contains the architectural design for zen-do. For design
+details of the Seedcase Project as a whole, see the
+[Seedcase Design](https://design.seedcase-project.org) documentation.
+
+The purpose of this description is to ensure that the team shares a
+common understanding about the implementation and to outline the design
+to anyone else interested in the internal workings of the package.
+
+## Naming
+
+This section contains a naming scheme and explanation for zen-do for the
+main actions and objects used throughout the package.
+
+| Object                  | Description                                                                                                                         |
+|-------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| deposit(s)              | A Zenodo deposit is the combined set of files and metadata that make up the content that will eventually form the published record. |
+| deposit ID (or just ID) | The unique ID given to a deposit.                                                                                                   |
+| record(s)               | A Zenodo record is a given published set of metadata and files for a specific DOI.                                                  |
+| metadata                | The metadata for a deposit, kept within a file `.zenodo.json`.                                                                      |
+| file(s)                 | The files to add to a deposit.                                                                                                      |
+| format                  | The file format for the Zenodo metadata file.                                                                                       |
+| token                   | The Zenodo personal access token to authenticate with the Zenodo API.                                                               |
+
+: Objects used throughout zen-do.
+
+| Action  | Description                                                                                                        |
+|---------|--------------------------------------------------------------------------------------------------------------------|
+| get     |                                                                                                                    |
+| convert | Convert metadata files to and from different formats.                                                              |
+| update  | Update an existing Zenodo deposit from a metadata file, as well as potentially adding new files.                   |
+| create  | Create a new Zenodo (draft) deposit from a metadata file and                                                       |
+| publish | Generate structured, human-readable output from a Data Package's properties using the configuration and templates. |
+
+: Actions used within Flower, including the CLI commands and Python API functions.
+
+## C4 Models
+
+This section contains diagrams inspired by
+[C4 Model](https://c4model.com/) for zen-do. The C4 Model is an
+established visualisation approach to describe the architecture of a
+software system. It breaks the system down into four levels of
+architectural abstraction: system context, containers, components, and
+code. For zen-do, we only use diagrams that are similar to the context
+and container models.
+
+### System context
+
+The system context diagram shows the users and external systems that
+interact with Flower.
+
+The users, described in the [User types](#user-types) section, provide
+Flower with their Data Package's metadata to convert it into structured,
+human-readable documents.
+
+```{mermaid}
+%%| label: fig-c4-context
+%%| fig-cap: "Diagram showing the interaction between user,  and external systems Flower interacts with."
+flowchart TB
+    user("User")
+    zen_do["zen-do<br>[CLI]"]
+    metadata("Metadata file<br>['.zenodo.toml']")
+    metadata_formats("Metadata formats<br>[e.g. 'CITATION.cff',<br>'.zenodo.json',<br>'pyproject.toml']")
+    deposit("Deposit<br>[Zenodo server]")
+    record("Record<br>[Zenodo server]")
+    file("File<br>[e.g. PDF]")
+
+    user -->|edit| metadata
+    metadata -->|read| zen_do
+    metadata <-.-> metadata_formats
+    user --> zen_do
+    zen_do -->|convert| metadata_formats
+    file -->|add| zen_do
+    user --> file
+    zen_do -->|create<br>update<get>| deposit
+    zen_do -->|publish| record
+    deposit -.-> record
+
+    %% Styling
+    style user fill:#FFFFFF, color:#000000
+    style deposit fill:#FFFFFF, color:#000000
+    style record fill:#FFFFFF, color:#000000
+    style metadata_formats fill:#FFFFFF, color:#000000
+```
+
+### Container
+
+In C4, a [container diagram](https://c4model.com/diagrams/container)
+zooms in on the system boundary to show the *containers* within it, such
+as web applications or databases. This diagram displays the main
+containers of Flower, their responsibilities, and how they interact,
+including the technologies used for each.
+
+Flower is primarily designed for use as a command-line interface (CLI),
+with its core functionality also exposed as a Python API.
+
+```{mermaid}
+%%| label: fig-c4-container
+%%| fig-cap: "C4 container diagram showing the core Python package in Flower and the command line interface."
+flowchart
+
+    user("User<br>[person]")
+    metadata("Metadata<br>[toml]")
+    metadata_formats("Metadata formats<br>[json, toml, cff]")
+    id
+    token
+
+    subgraph "zen-do"
+        get
+        convert
+        create
+        update
+        publish
+    end
+
+    %% Styling
+    style zen-do fill:#FFFFFF, color:#000000
+```
+
+### Component/code
+
+In the diagram below, we zoom in on the core Python package container to
+show its internal components. In C4, a
+[component](https://c4model.com/abstractions/component) is "a grouping
+of related functionality encapsulated behind a well-defined interface",
+like a class or a module, while
+[code](https://c4model.com/abstractions/code) is the basic building
+blocks, such as classes and functions.
+
+Because the core Python package is relatively small and simple, and
+because both component and code diagrams include classes, we combine the
+component and code levels of the C4 model into a single diagram as shown
+below. This diagram shows the main classes and functions within the
+Python package that represents the CLI.
+
+<!-- TODO: Switch to using a Properties class instead of dict? -->
+
+```{mermaid}
+%%| label: fig-c4-component
+%%| fig-cap: "C4 component diagram showing the parts of the Python package that contribute to the CLI and their connections."
+flowchart TB
+    subgraph package["Python code"]
+        subgraph cfg["Configuration"]
+            config("Config<br>[class]")
+            section("Section<br>[class]")
+        end
+
+        read_properties["read_properties()<br>[function]"]
+        properties["properties<br>[dict]"]
+        build("build()<br>[function]")
+        view("view()<br>[function]")
+
+        read_properties --> properties
+        properties --> build & view
+        cfg --> build & view
+    end
+
+    user("User<br>[person]")
+    templates("Templates<br>[folder with<br>Jinja files]")
+    output_files("Output<br>[files and<br>folders]")
+    output_screen("Output<br>[text in the<br>Terminal]")
+
+    user --"Gives<br>datapackage.json"--> read_properties
+    user --"Gives templates<br>in folder<br>(optional)"--> templates
+    user --"Gives configurations,<br>as file, Python classes,<br>or from CLI<br>(optional)"--> config
+    templates --"Sets output<br>structure and layout"--> section
+    build --"Populates template(s)<br>with metadata items"--> output_files
+    view --"Displays output<br>to screen"--> output_screen
+
+    %% Styling
+    style package fill:#FFFFFF, color:#000000
+    style cfg fill:#FFFFFF, color:#000000, stroke-dasharray: 5 5
+```
+
+For more details on the individual classes and functions, see the
+[interface documentation](/docs/design/interface/index.qmd) and the
+[reference documentation](/docs/reference/index.qmd).
