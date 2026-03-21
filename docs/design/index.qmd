@@ -30,12 +30,14 @@ Specifically, zen-do must:
 - Be usable "interactively" or through automation like continuous
   deployment (e.g. GitHub workflows).
 - Load a product's metadata for a Zenodo deposit from a file found
-  within the working directory (e.g. `.zenodo.json`) and through the
+  within the working directory (e.g. `.zenodo.toml`) and through the
   CLI.
 - Update a Zenodo deposit based on the product's metadata file.
 - Upload and/or replace files in a Zenodo deposit.
-- Publish a new Zenodo deposit or update an existing one.
+- Publish a Zenodo record (that contains the DOI) from a new or existing
+  deposit.
 - Simplify conversion between and loading from different metadata
-  formats (e.g. `.zenodo.json`, `CITATION.cff`, `pyproject.toml`).
+  formats (e.g. `.zenodo.json`, `CITATION.cff`, `pyproject.toml`,
+  `.zenodo.toml`, or `_quarto.yml`).
 - List all deposits for a given account.
 - Allow a GitHub repository to be linked to one or more Zenodo deposits.
