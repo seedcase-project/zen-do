@@ -12,169 +12,151 @@ to anyone else interested in the internal workings of the package.
 
 ## Naming
 
-This section contains a naming scheme and explanation for zen-do for the
-main actions and objects used throughout the package.
+This section describes the different actions and objects used throughout the package.
 
 | Object                  | Description                                                                                                                         |
 |-------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
 | deposit(s)              | A Zenodo deposit is the combined set of files and metadata that make up the content that will eventually form the published record. |
 | deposit ID (or just ID) | The unique ID given to a deposit.                                                                                                   |
 | record(s)               | A Zenodo record is a given published set of metadata and files for a specific DOI.                                                  |
-| metadata                | The metadata for a deposit, kept within a file `.zenodo.json`.                                                                      |
+| metadata                | The metadata for a deposit, kept within a file `.zenodo.toml`.                                                                      |
 | file(s)                 | The files to add to a deposit.                                                                                                      |
-| format                  | The file format for the Zenodo metadata file.                                                                                       |
+| format                  | The file formats for the Zenodo metadata file(s) to convert between.                                                                |
 | token                   | The Zenodo personal access token to authenticate with the Zenodo API.                                                               |
 
-: Objects used throughout zen-do.
+: Objects used in zen-do.
 
-| Action  | Description                                                                                                        |
-|---------|--------------------------------------------------------------------------------------------------------------------|
-| get     |                                                                                                                    |
-| convert | Convert metadata files to and from different formats.                                                              |
-| update  | Update an existing Zenodo deposit from a metadata file, as well as potentially adding new files.                   |
-| create  | Create a new Zenodo (draft) deposit from a metadata file and                                                       |
-| publish | Generate structured, human-readable output from a Data Package's properties using the configuration and templates. |
+| Action  | Description                                                                                      |
+|---------|--------------------------------------------------------------------------------------------------|
+| get     | Get a list of all the Zenodo deposits in an account.                                             |
+| convert | Convert metadata files to and from different formats.                                            |
+| update  | Update an existing Zenodo deposit from a metadata file and, potentially, updating the file(s).   |
+| create  | Create a new Zenodo (draft) deposit from a metadata file along with adding one or more files.    |
+| discard | Discard a draft of or update to a Zenodo deposit (but not record).                               |
+| delete  | Delete a Zenodo deposit (but not record).                                                        |
+| publish | Publish a new record from either a new deposit or create a new version from an existing deposit. |
 
-: Actions used within Flower, including the CLI commands and Python API functions.
+: Actions used in zen-do.
 
 ## C4 Models
 
-This section contains diagrams inspired by
-[C4 Model](https://c4model.com/) for zen-do. The C4 Model is an
-established visualisation approach to describe the architecture of a
-software system. It breaks the system down into four levels of
-architectural abstraction: system context, containers, components, and
-code. For zen-do, we only use diagrams that are similar to the context
-and container models.
+This section contains diagrams for zen-do that are inspired by the
+[C4 Model](https://c4model.com/). The C4 Model is an established
+visualisation approach to describe the architecture of a software
+system. It breaks the system down into four levels of architectural
+abstraction: system context, containers, components, and code. For
+zen-do, we only use diagrams that are similar to the context and
+container models.
 
 ### System context
 
 The system context diagram shows the users and external systems that
-interact with Flower.
-
-The users, described in the [User types](#user-types) section, provide
-Flower with their Data Package's metadata to convert it into structured,
-human-readable documents.
+interact with zen-do. The users provide zen-do with the metadata file,
+the file or files to add to a Zenodo deposit, the token for the Zenodo
+account, and potentially the ID to the Zenodo deposit.
 
 ```{mermaid}
 %%| label: fig-c4-context
-%%| fig-cap: "Diagram showing the interaction between user,  and external systems Flower interacts with."
+%%| fig-cap: "Diagram showing the interaction between user and external systems that zen-do interacts with. The parallogram boxes represent input, the rectangle represents the CLI, and the rounded boxes represent the start and end points of the flow. The gray boxes represent external systems, in this case, the Zenodo server."
+%%| fig-alt: "Flowchart diagram with boxes and arrows/connections for the different objects and actions. The user interacts with the metadata file, the metadata formats, the CLI, the file to add to a deposit, and the Zenodo server for both deposits and records."
 flowchart TB
-    user("User")
+    user("User<br>[person]"):::user
+    metadata[/"Metadata file<br>['.zenodo.toml']"/]
+    metadata_formats("Metadata formats<br>[e.g. 'cff', 'json',<br>'toml', 'yml']")
+    deposit("Deposit<br>[Zenodo server]"):::external
+    record("Record<br>[Zenodo server]"):::external
+    file[/"File<br>[e.g. PDF]"/]
+    token[/"Token<br>[authentication]"/]
     zen_do["zen-do<br>[CLI]"]
-    metadata("Metadata file<br>['.zenodo.toml']")
-    metadata_formats("Metadata formats<br>[e.g. 'CITATION.cff',<br>'.zenodo.json',<br>'pyproject.toml']")
-    deposit("Deposit<br>[Zenodo server]")
-    record("Record<br>[Zenodo server]")
-    file("File<br>[e.g. PDF]")
 
     user -->|edit| metadata
+    user -->|provide| token
     metadata -->|read| zen_do
-    metadata <-.-> metadata_formats
-    user --> zen_do
+    metadata <-.->|convert| metadata_formats
+    token --> zen_do
     zen_do -->|convert| metadata_formats
     file -->|add| zen_do
     user --> file
-    zen_do -->|create<br>update<get>| deposit
+    zen_do -->|create<br>update<br>get| deposit
     zen_do -->|publish| record
     deposit -.-> record
 
     %% Styling
-    style user fill:#FFFFFF, color:#000000
-    style deposit fill:#FFFFFF, color:#000000
-    style record fill:#FFFFFF, color:#000000
-    style metadata_formats fill:#FFFFFF, color:#000000
+    classDef user fill:#FFFFFF,color:#000000;
+    classDef external fill:#F5F5F5;
 ```
 
-### Container
+### Container/component
 
 In C4, a [container diagram](https://c4model.com/diagrams/container)
-zooms in on the system boundary to show the *containers* within it, such
-as web applications or databases. This diagram displays the main
-containers of Flower, their responsibilities, and how they interact,
-including the technologies used for each.
+zooms in on the system boundary to show the *containers* within it while
+a a [component diagram](https://c4model.com/abstractions/component) is
+"a grouping of related functionality encapsulated behind a well-defined
+interface", like a class or a module. For zen-do, we have a single
+container (the CLI) so we combine the container and component diagrams
+into one. The diagram below shows the main actions and objects within
+zen-do, how they interact with each other at a high level, and the
+technologies used for each.
 
-Flower is primarily designed for use as a command-line interface (CLI),
-with its core functionality also exposed as a Python API.
+The only allowed metadata format for input is the `.zenodo.toml` file,
+but it can be converted from (or to) other formats, such as
+`.zenodo.json`, `_quarto.yml`, `pyproject.toml`, and `CITATION.cff`.
 
 ```{mermaid}
 %%| label: fig-c4-container
-%%| fig-cap: "C4 container diagram showing the core Python package in Flower and the command line interface."
-flowchart
-
-    user("User<br>[person]")
-    metadata("Metadata<br>[toml]")
-    metadata_formats("Metadata formats<br>[json, toml, cff]")
-    id
-    token
-
-    subgraph "zen-do"
-        get
-        convert
-        create
-        update
-        publish
-    end
-
-    %% Styling
-    style zen-do fill:#FFFFFF, color:#000000
-```
-
-### Component/code
-
-In the diagram below, we zoom in on the core Python package container to
-show its internal components. In C4, a
-[component](https://c4model.com/abstractions/component) is "a grouping
-of related functionality encapsulated behind a well-defined interface",
-like a class or a module, while
-[code](https://c4model.com/abstractions/code) is the basic building
-blocks, such as classes and functions.
-
-Because the core Python package is relatively small and simple, and
-because both component and code diagrams include classes, we combine the
-component and code levels of the C4 model into a single diagram as shown
-below. This diagram shows the main classes and functions within the
-Python package that represents the CLI.
-
-<!-- TODO: Switch to using a Properties class instead of dict? -->
-
-```{mermaid}
-%%| label: fig-c4-component
-%%| fig-cap: "C4 component diagram showing the parts of the Python package that contribute to the CLI and their connections."
+%%| fig-cap: "Diagram showing the inputs, outputs, and actions within zen-do. Parallogram boxes represent input and output, the rectangles represents actions, and the rounded boxes represent the start and end points of the flow. The gray boxes represent external systems, in this case, the Zenodo server."
+%%| fig-alt: "Flowchart diagram with boxes and arrows/connections for the different objects and actions, focusing on the content of zen-do. The user interacts with the metadata file, the metadata formats, and the file(s) to add to a deposit while the zen-do CLI contains several actions to interact with the Zenodo server for both deposits and records."
 flowchart TB
-    subgraph package["Python code"]
-        subgraph cfg["Configuration"]
-            config("Config<br>[class]")
-            section("Section<br>[class]")
-        end
+    user("User<br>[person]"):::user
 
-        read_properties["read_properties()<br>[function]"]
-        properties["properties<br>[dict]"]
-        build("build()<br>[function]")
-        view("view()<br>[function]")
-
-        read_properties --> properties
-        properties --> build & view
-        cfg --> build & view
+    subgraph input ["Input"]
+        metadata[/"Metadata file<br>['.zenodo.toml']"/]
+        file[/"File<br>[e.g. PDF]"/]
+        token[/"Token<br>[authentication]"/]
+        id[/"ID<br>[Deposit ID]"/]
     end
 
-    user("User<br>[person]")
-    templates("Templates<br>[folder with<br>Jinja files]")
-    output_files("Output<br>[files and<br>folders]")
-    output_screen("Output<br>[text in the<br>Terminal]")
+    subgraph zen-do
+        get["get<br>[Python]"]
+        convert["convert<br>[Python]"]
+        create["create<br>[Python]"]
+        update["update<br>[Python]"]
+        publish["publish<br>[Python]"]
+        discard["discard<br>[Python]"]
+        delete["delete<br>[Python]"]
+        response_put[/"Response<br>[JSON]"/]
+        deposit[/"Deposit<br>[Zenodo server]"/]:::external
+        account[/"Account<br>[Zenodo server]"/]:::external
 
-    user --"Gives<br>datapackage.json"--> read_properties
-    user --"Gives templates<br>in folder<br>(optional)"--> templates
-    user --"Gives configurations,<br>as file, Python classes,<br>or from CLI<br>(optional)"--> config
-    templates --"Sets output<br>structure and layout"--> section
-    build --"Populates template(s)<br>with metadata items"--> output_files
-    view --"Displays output<br>to screen"--> output_screen
+        create & update & discard & delete -->|request| deposit
+        deposit -->|response| response_put
+        response_put -->|contains id| either_id
+        either_id{" "} -->|required| publish
+        get -->|request| account
+    end
+
+    subgraph output ["Output"]
+        record("Record<br>[Zenodo server]"):::external
+        metadata_formats("Metadata formats<br>[e.g. 'cff', 'json',<br>'toml', 'yml']")
+        deposit_list("List of deposits<br>[Zenodo API]")
+
+        account -->|response| deposit_list
+        convert --> metadata_formats
+        publish --> record
+    end
+
+    user --> input
+    token -->|required| zen-do
+    id -->|required| discard & delete
+    id -->|provide| either_id
+    metadata -->|required| create & update & convert
+    file -->|required| create
+    file -->|optional| update
 
     %% Styling
-    style package fill:#FFFFFF, color:#000000
-    style cfg fill:#FFFFFF, color:#000000, stroke-dasharray: 5 5
+    style zen-do fill:#FFFFFF,color:#000000;
+    style output fill:#FFFFFF,color:#000000;
+    style input fill:#FFFFFF,color:#000000;
+    classDef user fill:#FFFFFF,color:#000000;
+    classDef external fill:#F5F5F5;
 ```
-
-For more details on the individual classes and functions, see the
-[interface documentation](/docs/design/interface/index.qmd) and the
-[reference documentation](/docs/reference/index.qmd).
