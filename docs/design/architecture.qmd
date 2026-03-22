@@ -29,7 +29,7 @@ This section describes the different actions and objects used throughout the pac
 | Action  | Description                                                                                      |
 |---------|--------------------------------------------------------------------------------------------------|
 | init    | Create an empty metadata file to be filled in.                                                   |
-| get     | Get a list of all the Zenodo deposits in an account.                                             |
+| get     | Get a Zenodo deposit in an account from a metadata file.                                         |
 | convert | Convert metadata files to and from different formats.                                            |
 | update  | Update an existing Zenodo deposit from a metadata file and, potentially, updating the file(s).   |
 | create  | Create a new Zenodo (draft) deposit from a metadata file along with adding one or more files.    |
@@ -162,10 +162,10 @@ flowchart TB
         record("Record<br>[Zenodo server]"):::external
         metadata_formats("Metadata formats<br>[e.g. 'cff', 'json',<br>'toml', 'yml']")
         empty_metadata("Empty metadata file<br>['.zenodo.toml']")
-        deposit_list("List of deposits<br>[Zenodo API]")
+        deposit_output("Deposit<br>[JSON]")
 
         init -->|create| empty_metadata
-        account -->|response| deposit_list
+        account -->|response| deposit_output
         convert --> metadata_formats
         publish --> record
     end
@@ -174,7 +174,7 @@ flowchart TB
     token -->|required| zen-do
     id -->|required| discard & delete
     id -->|provide| either_id
-    metadata -->|required| create & update & convert
+    metadata -->|required| create & update & convert & get
     file -->|required| create
     file -->|optional| update
 
