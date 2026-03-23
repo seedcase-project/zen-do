@@ -1,3 +1,43 @@
 ---
 title: "Design"
 ---
+
+The purpose of these design documents is to describe the design of
+zen-do in enough detail to guide a sustainable implementation (i.e.,
+maintainable in the long term) and to ensure that the team has a shared
+understanding of the package's scope and architecture.
+
+zen-do's design builds on our overall Seedcase
+[design principles and patterns](https://design.seedcase-project.org/),
+and follows the same principles and patterns described there.
+
+## Purpose
+
+The main aim of zen-do is to simplify the process of creating and
+updating Zenodo deposits from a "product", which could be some generated
+content from a Git repository or within a folder in a Git repository.
+Specifically to:
+
+1. Take a product's metadata and create a new or update an existing
+   Zenodo deposit.
+2. Add one or more files to a Zenodo deposit.
+
+## Requirements
+
+Specifically, zen-do must:
+
+- Be usable as a command-line tool.
+- Be usable "interactively" or through automation like continuous
+  deployment (e.g. GitHub workflows).
+- Load a product's metadata for a Zenodo deposit from a file found
+  within the working directory (e.g. `.zenodo.toml`) and through the
+  CLI.
+- Update a Zenodo deposit based on the product's metadata file.
+- Upload and/or replace files in a Zenodo deposit.
+- Publish a Zenodo record (that contains the DOI) from a new or existing
+  deposit.
+- Simplify conversion between and loading from different metadata
+  formats (e.g. `.zenodo.json`, `CITATION.cff`, `pyproject.toml`,
+  `.zenodo.toml`, or `_quarto.yml`).
+- List all deposits for a given account.
+- Allow a GitHub repository to be linked to one or more Zenodo deposits.
