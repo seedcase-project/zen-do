@@ -111,7 +111,7 @@ def zenodo_get_record(token: str) -> Optional[ZenodoRecord]:
     Returns:
         The Zenodo record for the repo if it exists, None otherwise.
     """
-    repo_url = _get_repo_url()
+    urn = _get_urn()
 
     response = requests.get(
         "https://zenodo.org/api/deposit/depositions",
@@ -125,15 +125,15 @@ def zenodo_get_record(token: str) -> Optional[ZenodoRecord]:
         lambda record: bool(
             _filter(
                 record.metadata.related_identifiers,
-                lambda id: id.relation == "IsDerivedFrom" and id.identifier == repo_url,
+                lambda id: _is_urn(id) and id.identifier == urn,
             )
         ),
     )
 
     if len(matching_records) > 1:
         raise ValueError(
-            "There are multiple records on Zenodo with the repository URL"
-            f"{repo_url!r} as a 'related identifier'. We only allow one."
+            "There are multiple records on Zenodo with the URN "
+            f"{urn!r} as a `related identifier`. We only allow one."
         )
     if not matching_records:
         return None
@@ -163,17 +163,18 @@ def _load_zenodo_json() -> ZenodoMetadata:
     return ZenodoMetadata.model_validate_json(Path(".zenodo.json").read_text())
 
 
-def _get_repo_url() -> str:
+def _is_urn(id: ZenodoRelatedIdentifier) -> bool:
+    return id.relation == "isIdenticalTo" and id.scheme == "urn"
+
+
+def _get_urn() -> str:
     metadata = _load_zenodo_json()
-    ids = _filter(
-        metadata.related_identifiers,
-        lambda id: id.relation == "IsDerivedFrom",
-    )
+    ids = _filter(metadata.related_identifiers, _is_urn)
     if len(ids) != 1:
         raise ValueError(
-            "Expected one (1) `IsDerivedFrom` related identifier in `.zenodo.json` "
-            f"but found {len(ids)}. The identifier is used to find the matching "
-            "Zenodo record and should contain the repository URL."
+            "Expected exactly one `isIdenticalTo` URN in `.zenodo.json` under "
+            f"`related_identifiers`, but found {len(ids)}. Ensure there is a single "
+            "unique URN, as it is used to identify the corresponding record on Zenodo."
         )
 
     return ids[0].identifier

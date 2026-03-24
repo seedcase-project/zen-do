@@ -22,9 +22,10 @@ def example_metadata(title: str = "Test Poster") -> ZenodoMetadata:
         ],
         related_identifiers=[
             ZenodoRelatedIdentifier(
-                identifier="https://github.com/test-repo",
-                relation="IsDerivedFrom",
+                identifier="urn:my-org:project:book",
+                relation="isIdenticalTo",
                 resource_type="other",
+                scheme="urn",
             )
         ],
     )
@@ -36,16 +37,17 @@ def example_record(
     state: ZenodoRecordState = "done",
     submitted: bool = True,
     bucket: Optional[str] = "https://path.com/path/wrwee-324-23f-sdf",
-    repo_url: str = "https://github.com/test-repo",
+    urn: str = "urn:my-org:project:book",
 ) -> ZenodoRecord:
     """An example Zenodo record."""
     metadata = metadata.model_copy(
         update={
             "related_identifiers": [
                 ZenodoRelatedIdentifier(
-                    identifier=repo_url,
-                    relation="IsDerivedFrom",
+                    identifier=urn,
+                    relation="isIdenticalTo",
                     resource_type="other",
+                    scheme="urn",
                 )
             ]
         }
