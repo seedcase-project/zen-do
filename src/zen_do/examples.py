@@ -10,7 +10,7 @@ from zen_do.zenodo import (
 )
 
 
-def example_metadata(title: str = "Test Poster") -> ZenodoMetadata:
+def example_metadata(title: str = "Test Book") -> ZenodoMetadata:
     """A set of example Zenodo metadata."""
     return ZenodoMetadata(
         title=title,

@@ -1,8 +1,9 @@
+import re
 from pathlib import Path
-from typing import Literal, Optional, Union
+from typing import Literal, Optional, Self, Union
 
 import requests
-from pydantic import BaseModel, ConfigDict, TypeAdapter
+from pydantic import BaseModel, ConfigDict, TypeAdapter, model_validator
 
 from zen_do.internals import _filter, _map
 
@@ -42,6 +43,15 @@ class ZenodoRelatedIdentifier(ZenodoModel):
     relation: str
     resource_type: str
     scheme: Optional[str] = None
+
+    @model_validator(mode="after")
+    def _check_urn(self) -> Self:
+
+        if self.scheme == "urn" and not re.match(r"urn:.", self.identifier):
+            raise ValueError(
+                f"Missing 'urn:' prefix or body in URN identifier {self.identifier!r}."
+            )
+        return self
 
 
 class ZenodoMetadata(ZenodoModel):

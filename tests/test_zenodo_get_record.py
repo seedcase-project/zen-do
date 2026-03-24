@@ -1,7 +1,8 @@
+import json
 from http import HTTPStatus
 from pathlib import Path
 
-from pytest import MonkeyPatch, fixture, raises
+from pytest import MonkeyPatch, fixture, mark, raises
 from requests import HTTPError
 from requests_mock import ANY
 
@@ -118,6 +119,17 @@ def test_raises_error_if_zenodo_json_has_multiple_repo_urls(monkeypatch, tmp_pat
         )
     )
     (tmp_path / ".zenodo.json").write_text(metadata.model_dump_json())
+
+    with raises(ValueError):
+        zenodo_get_record("token")
+
+
+@mark.parametrize("urn", ["", "not a URN", "urn:"])
+def test_flags_incorrect_urn(monkeypatch, tmp_path, urn):
+    metadata_json = example_metadata().model_dump()
+    metadata_json["related_identifiers"][0]["identifier"] = urn
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / ".zenodo.json").write_text(json.dumps(metadata_json))
 
     with raises(ValueError):
         zenodo_get_record("token")
