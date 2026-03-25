@@ -22,7 +22,7 @@ def example_metadata(title: str = "Test Book") -> ZenodoMetadata:
         ],
         related_identifiers=[
             ZenodoRelatedIdentifier(
-                identifier="urn:my-org:project:book",
+                identifier="urn:my-org/project:book",
                 relation="isIdenticalTo",
                 resource_type="other",
                 scheme="urn",
@@ -37,7 +37,7 @@ def example_record(
     state: ZenodoRecordState = "done",
     submitted: bool = True,
     bucket: Optional[str] = "https://path.com/path/wrwee-324-23f-sdf",
-    urn: str = "urn:my-org:project:book",
+    urn: str = "urn:my-org/project:book",
 ) -> ZenodoRecord:
     """An example Zenodo record."""
     metadata = metadata.model_copy(
