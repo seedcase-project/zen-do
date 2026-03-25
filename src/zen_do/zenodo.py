@@ -239,13 +239,13 @@ class ZenodoClient:
         return self._resolve(response, ZenodoRecord)
 
     def create(self, metadata: ZenodoMetadata) -> ZenodoRecord:
-        """Creates a new record in editable state.
+        """Creates a new deposition in editable state.
 
         Args:
-            metadata: The metadata of the new record.
+            metadata: The metadata of the new deposition.
 
         Returns:
-            The newly created record.
+            The newly created deposition.
         """
         response = requests.post(
             self.depositions,
