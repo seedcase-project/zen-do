@@ -238,40 +238,40 @@ class ZenodoClient:
         )
         return self._resolve(response, ZenodoRecord)
 
-    def make_editable(self, record: ZenodoRecord) -> ZenodoRecord:
-        """Makes the record editable.
+    def make_editable(self, deposition: ZenodoRecord) -> ZenodoRecord:
+        """Makes the deposition editable.
 
         Args:
-            record: The record.
+            deposition: The deposition.
 
         Returns:
-            The record in editable state.
+            The deposition in editable state.
         """
-        if record.editable:
-            return record
+        if deposition.editable:
+            return deposition
 
         response = requests.post(
-            f"{self.depositions}/{record.id}/actions/edit",
+            f"{self.depositions}/{deposition.id}/actions/edit",
             headers=self.headers,
             timeout=self.timeout,
         )
         return self._resolve(response, ZenodoRecord)
 
-    def discard(self, record: ZenodoRecord) -> None:
-        """Puts the record in a non-editable state by discarding all changes.
+    def discard(self, deposition: ZenodoRecord) -> None:
+        """Puts the deposition in a non-editable state by discarding all changes.
 
-        If the record's state is `unsubmitted`, the record is deleted.
-        If the record's state is `inprogress`, the record is restored to
+        If the deposition's state is `unsubmitted`, the deposition is deleted.
+        If the deposition's state is `inprogress`, the deposition is restored to
         the state when it was last published.
 
         Args:
-            record: The record.
+            deposition: The deposition.
         """
-        if not record.editable:
+        if not deposition.editable:
             return None
 
         response = requests.post(
-            f"{self.depositions}/{record.id}/actions/discard",
+            f"{self.depositions}/{deposition.id}/actions/discard",
             headers=self.headers,
             timeout=self.timeout,
         )

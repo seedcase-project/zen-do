@@ -58,12 +58,23 @@ def mock_get_record(requests_mock):
 
 @pytest.fixture
 def mock_make_editable(requests_mock):
-    record = example_record()
+    deposition = example_record()
 
-    def _mock(json=record.model_dump(), id=record.id, status_code=201):
+    def _mock(json=deposition.model_dump(), id=deposition.id, status_code=201):
         return requests_mock.post(
             f"{sandbox_client.depositions}/{id}/actions/edit",
             json=json,
+            status_code=status_code,
+        )
+
+    return _mock
+
+
+@pytest.fixture
+def mock_discard(requests_mock):
+    def _mock(id=example_record().id, status_code=204):
+        return requests_mock.post(
+            f"{sandbox_client.depositions}/{id}/actions/discard",
             status_code=status_code,
         )
 
@@ -78,17 +89,6 @@ def mock_publish(requests_mock):
         return requests_mock.post(
             f"{sandbox_client.depositions}/{id}/actions/publish",
             json=json,
-            status_code=status_code,
-        )
-
-    return _mock
-
-
-@pytest.fixture
-def mock_discard(requests_mock):
-    def _mock(id=example_record().id, status_code=204):
-        return requests_mock.post(
-            f"{sandbox_client.depositions}/{id}/actions/discard",
             status_code=status_code,
         )
 
@@ -150,34 +150,34 @@ def test_get_record_failure(mock_get_record):
 
 @mark.parametrize("state", ["inprogress", "unsubmitted"])
 def test_make_editable_success_when_editable(mock_make_editable, state):
-    record = example_record(state=state)
+    deposition = example_record(state=state)
     mock = mock_make_editable()
 
-    result = sandbox_client.make_editable(record)
+    result = sandbox_client.make_editable(deposition)
 
     assert not mock.called
-    assert result.id == record.id
+    assert result.id == deposition.id
 
 
 def test_make_editable_success_when_not_editable(mock_make_editable):
-    record = example_record(state="done")
+    deposition = example_record(state="done")
     mock = mock_make_editable()
 
-    result = sandbox_client.make_editable(record)
+    result = sandbox_client.make_editable(deposition)
 
     assert_headers_correct(mock)
-    assert result.id == record.id
+    assert result.id == deposition.id
 
 
 def test_make_editable_failure(mock_make_editable):
-    record = example_record()
+    deposition = example_record()
     mock_make_editable(status_code=400)
     with raises(requests.HTTPError):
-        sandbox_client.make_editable(record)
+        sandbox_client.make_editable(deposition)
 
     mock_make_editable({"unexpected": "response"})
     with raises(pydantic.ValidationError):
-        sandbox_client.make_editable(record)
+        sandbox_client.make_editable(deposition)
 
 
 # discard
