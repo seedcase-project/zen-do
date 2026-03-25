@@ -238,7 +238,7 @@ class ZenodoClient:
         )
         return self._resolve(response, ZenodoRecord)
 
-    def create_record(self, metadata: ZenodoMetadata) -> ZenodoRecord:
+    def create(self, metadata: ZenodoMetadata) -> ZenodoRecord:
         """Creates a new record in editable state.
 
         Args:

@@ -57,7 +57,7 @@ def mock_get_record(requests_mock):
 
 
 @pytest.fixture
-def mock_create_record(requests_mock):
+def mock_create(requests_mock):
     def _mock(json=example_record().model_dump(), status_code=201):
         return requests_mock.post(
             sandbox_client.depositions, json=json, status_code=status_code
@@ -130,29 +130,29 @@ def test_get_record_failure(mock_get_record):
         sandbox_client.get_record(123)
 
 
-# create_record
+# create
 
 
-def test_create_record_success(mock_create_record):
+def test_create_success(mock_create):
     metadata = example_metadata()
-    mock = mock_create_record()
+    mock = mock_create()
 
-    result = sandbox_client.create_record(metadata)
+    result = sandbox_client.create(metadata)
 
     assert_headers_correct(mock)
     assert result.id == 123
     assert mock.last_request.json()["metadata"] == metadata.model_dump()
 
 
-def test_create_record_failure(mock_create_record):
+def test_create_failure(mock_create):
     metadata = example_metadata()
-    mock_create_record(status_code=400)
+    mock_create(status_code=400)
     with raises(requests.HTTPError):
-        sandbox_client.create_record(metadata)
+        sandbox_client.create(metadata)
 
-    mock_create_record({"unexpected": "response"})
+    mock_create({"unexpected": "response"})
     with raises(pydantic.ValidationError):
-        sandbox_client.create_record(metadata)
+        sandbox_client.create(metadata)
 
 
 # publish
