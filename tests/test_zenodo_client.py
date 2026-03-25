@@ -85,7 +85,7 @@ def mock_publish(requests_mock):
 
 
 @pytest.fixture
-def mock_discard_draft(requests_mock):
+def mock_discard(requests_mock):
     def _mock(id=example_record().id, status_code=204):
         return requests_mock.post(
             f"{sandbox_client.depositions}/{id}/actions/discard",
@@ -180,30 +180,30 @@ def test_make_editable_failure(mock_make_editable):
         sandbox_client.make_editable(record)
 
 
-# discard_draft
+# discard
 
 
 @mark.parametrize("state", ["inprogress", "unsubmitted"])
-def test_discard_draft_success_when_editable(mock_discard_draft, state):
-    mock = mock_discard_draft()
+def test_discard_success_when_editable(mock_discard, state):
+    mock = mock_discard()
 
-    sandbox_client.discard_draft(example_record(state=state))
+    sandbox_client.discard(example_record(state=state))
 
     assert_headers_correct(mock)
 
 
-def test_discard_draft_success_when_not_editable(mock_discard_draft):
-    mock = mock_discard_draft()
+def test_discard_success_when_not_editable(mock_discard):
+    mock = mock_discard()
 
-    sandbox_client.discard_draft(example_record(state="done"))
+    sandbox_client.discard(example_record(state="done"))
 
     assert not mock.called
 
 
-def test_discard_draft_failure(mock_discard_draft):
-    mock_discard_draft(status_code=400)
+def test_discard_failure(mock_discard):
+    mock_discard(status_code=400)
     with raises(requests.HTTPError):
-        sandbox_client.discard_draft(example_record(state="inprogress"))
+        sandbox_client.discard(example_record(state="inprogress"))
 
 
 # publish

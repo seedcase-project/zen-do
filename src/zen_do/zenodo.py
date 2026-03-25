@@ -257,7 +257,7 @@ class ZenodoClient:
         )
         return self._resolve(response, ZenodoRecord)
 
-    def discard_draft(self, record: ZenodoRecord) -> None:
+    def discard(self, record: ZenodoRecord) -> None:
         """Puts the record in a non-editable state by discarding all changes.
 
         If the record's state is `unsubmitted`, the record is deleted.
