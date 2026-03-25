@@ -141,10 +141,10 @@ def test_get_record_failure(mock_get_record):
 def test_upload_file_success(mock_upload_file, tmp_path):
     file_path = tmp_path / "data.txt"
     file_path.write_text("This is my file.")
-    record = example_record(submitted=False, state="unsubmitted")
+    deposition = example_record(submitted=False, state="unsubmitted")
     mock = mock_upload_file()
 
-    result = sandbox_client.upload_file(record, file_path=file_path)
+    result = sandbox_client.upload_file(deposition, file_path=file_path)
 
     assert_headers_correct(mock)
     assert mock.last_request.body.name == str(file_path)
@@ -154,14 +154,14 @@ def test_upload_file_success(mock_upload_file, tmp_path):
 def test_upload_file_failure_api(mock_upload_file, tmp_path):
     file_path = tmp_path / "data.txt"
     file_path.write_text("This is my file.")
-    record = example_record(submitted=False, state="unsubmitted")
+    deposition = example_record(submitted=False, state="unsubmitted")
     mock_upload_file(status_code=400)
     with raises(requests.HTTPError):
-        sandbox_client.upload_file(record, file_path=file_path)
+        sandbox_client.upload_file(deposition, file_path=file_path)
 
     mock_upload_file(json=[{"unexpected": "response"}])
     with raises(pydantic.ValidationError):
-        sandbox_client.upload_file(record, file_path=file_path)
+        sandbox_client.upload_file(deposition, file_path=file_path)
 
 
 def test_upload_file_failure_file_not_found():

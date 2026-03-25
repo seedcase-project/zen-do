@@ -242,32 +242,32 @@ class ZenodoClient:
         )
         return self._resolve(response, ZenodoRecord)
 
-    def upload_file(self, record: ZenodoRecord, file_path: Path) -> ZenodoFile:
-        """Uploads a file to a record. The record must be unpublished.
+    def upload_file(self, deposition: ZenodoRecord, file_path: Path) -> ZenodoFile:
+        """Uploads a file to a deposition. The deposition must be unpublished.
 
         Args:
-            record: The record.
+            deposition: The deposition.
             file_path: The path to the file.
 
         Returns:
-            The updated record.
+            The updated deposition.
         """
-        if record.submitted:
+        if deposition.submitted:
             raise ValueError(
-                f"Cannot upload new file to record {record.id} because the record "
-                "has already been published. You must first create a new version "
-                "of the record and upload the files there."
+                f"Cannot upload new file to deposition {deposition.id} because the "
+                "deposition has already been published. You must first create a new "
+                "version of the deposition and upload the files there."
             )
 
-        if not record.links.bucket:
+        if not deposition.links.bucket:
             raise ValueError(
-                f"Cannot upload new file to record {record.id} because the record "
-                "does not have a file-upload (bucket) link. "
+                f"Cannot upload new file to deposition {deposition.id} because the "
+                "deposition does not have a file-upload (bucket) link. "
             )
 
         with file_path.open("rb") as file_stream:
             response = requests.put(
-                f"{record.links.bucket}/{file_path.name}",
+                f"{deposition.links.bucket}/{file_path.name}",
                 data=file_stream,
                 headers=self.headers,
                 timeout=self.timeout,
