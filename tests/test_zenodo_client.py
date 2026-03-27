@@ -82,6 +82,20 @@ def mock_discard(requests_mock):
 
 
 @pytest.fixture
+def mock_new_version(requests_mock):
+    deposition = example_record()
+
+    def _mock(json=deposition.model_dump(), id=deposition.id, status_code=201):
+        return requests_mock.post(
+            f"{sandbox_client.depositions}/{id}/actions/newversion",
+            json=json,
+            status_code=status_code,
+        )
+
+    return _mock
+
+
+@pytest.fixture
 def mock_publish(requests_mock):
     record = example_record()
 
@@ -204,6 +218,47 @@ def test_discard_failure(mock_discard):
     mock_discard(status_code=400)
     with raises(requests.HTTPError):
         sandbox_client.discard(example_record(state="inprogress"))
+
+
+# new_version
+
+
+def test_new_version_success(mock_discard, mock_new_version, mock_get_record):
+    mock_discard()
+    new_version_response = example_record(
+        id=88,
+        latest_draft="https://sandbox.zenodo.org/api/deposit/depositions/88",
+    )
+    mock_new_version = mock_new_version(new_version_response.model_dump())
+    mock_get = mock_get_record(
+        example_record(id=new_version_response.id).model_dump(),
+        id=new_version_response.id,
+    )
+
+    result = sandbox_client.new_version(example_record(submitted=True))
+
+    assert_headers_correct(mock_new_version)
+    assert mock_get.called
+    assert result.id == new_version_response.id
+
+
+def test_new_version_flags_non_published(mock_discard, mock_new_version):
+    mock_discard()
+    mock_new_version()
+    with raises(ValueError):
+        sandbox_client.new_version(example_record(submitted=False))
+
+
+def test_new_version_api_failure(mock_discard, mock_new_version):
+    mock_discard()
+
+    mock_new_version(status_code=400)
+    with raises(requests.HTTPError):
+        sandbox_client.new_version(example_record())
+
+    mock_new_version({"unexpected": "response"})
+    with raises(pydantic.ValidationError):
+        sandbox_client.new_version(example_record())
 
 
 # publish

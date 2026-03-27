@@ -277,6 +277,32 @@ class ZenodoClient:
         )
         response.raise_for_status()
 
+    def new_version(self, deposition: ZenodoRecord) -> ZenodoRecord:
+        """Creates a new, unpublished version of a published deposition.
+
+        Args:
+            deposition: The deposition.
+
+        Returns:
+            The new version of the deposition.
+        """
+        if not deposition.submitted:
+            raise ValueError(
+                f"Cannot create new version for deposition {deposition.id} because it "
+                "has not yet been published."
+            )
+
+        self.discard(deposition)
+        response = requests.post(
+            f"{self.depositions}/{deposition.id}/actions/newversion",
+            headers=self.headers,
+            timeout=self.timeout,
+        )
+        deposition = self._resolve(response, ZenodoRecord)
+
+        new_deposition_id = Path(deposition.links.latest_draft).name
+        return self.get_record(new_deposition_id)
+
     def publish(self, record: ZenodoRecord) -> ZenodoRecord:
         """Publishes a record.
 

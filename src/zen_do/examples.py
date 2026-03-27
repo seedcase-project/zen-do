@@ -36,6 +36,7 @@ def example_record(
     state: ZenodoRecordState = "done",
     submitted: bool = True,
     bucket: Optional[str] = "https://path.com/path/wrwee-324-23f-sdf",
+    latest_draft: str = "https://path.com/path/9999",
     repo_url: str = "https://github.com/test-repo",
 ) -> ZenodoRecord:
     """An example Zenodo record."""
@@ -55,5 +56,5 @@ def example_record(
         metadata=metadata,
         state=state,
         submitted=submitted,
-        links=ZenodoLinks(latest_draft="https://path.com/path/9999", bucket=bucket),
+        links=ZenodoLinks(latest_draft=latest_draft, bucket=bucket),
     )
