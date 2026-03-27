@@ -5,7 +5,7 @@ import pytest
 import requests
 from pytest import mark, raises
 
-from zen_do.examples import example_record
+from zen_do.examples import example_metadata, example_record
 from zen_do.zenodo import ZenodoClient
 
 sandbox_client = ZenodoClient(sandbox=True, token="token")
@@ -75,6 +75,20 @@ def mock_discard(requests_mock):
     def _mock(id=example_record().id, status_code=204):
         return requests_mock.post(
             f"{sandbox_client.depositions}/{id}/actions/discard",
+            status_code=status_code,
+        )
+
+    return _mock
+
+
+@pytest.fixture
+def mock_update_metadata(requests_mock):
+    deposition = example_record()
+
+    def _mock(json=deposition.model_dump(), id=deposition.id, status_code=200):
+        return requests_mock.put(
+            f"{sandbox_client.depositions}/{id}",
+            json=json,
             status_code=status_code,
         )
 
@@ -204,6 +218,36 @@ def test_discard_failure(mock_discard):
     mock_discard(status_code=400)
     with raises(requests.HTTPError):
         sandbox_client.discard(example_record(state="inprogress"))
+
+
+# update_metadata
+
+
+@mark.parametrize("state", ["inprogress", "unsubmitted", "done"])
+def test_update_metadata_success(mock_update_metadata, mock_make_editable, state):
+    deposition = example_record(state=state)
+    new_metadata = example_metadata(title="New Title")
+    mock_make_editable()
+    mock = mock_update_metadata()
+
+    result = sandbox_client.update_metadata(deposition, new_metadata)
+
+    assert_headers_correct(mock)
+    assert result.id == deposition.id
+    assert mock.last_request.json() == {"metadata": new_metadata.model_dump()}
+
+
+def test_update_metadata_failure(mock_update_metadata, mock_make_editable):
+    deposition = example_record()
+    mock_make_editable()
+
+    mock_update_metadata(status_code=400)
+    with raises(requests.HTTPError):
+        sandbox_client.update_metadata(deposition, example_metadata())
+
+    mock_update_metadata({"unexpected": "response"})
+    with raises(pydantic.ValidationError):
+        sandbox_client.update_metadata(deposition, example_metadata())
 
 
 # publish
