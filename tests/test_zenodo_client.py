@@ -223,22 +223,14 @@ def test_discard_failure(mock_discard):
 # new_version
 
 
-def test_new_version_success(mock_discard, mock_new_version, mock_get_record):
+def test_new_version_success(mock_discard, mock_new_version):
     mock_discard()
-    new_version_response = example_record(
-        id=88,
-        latest_draft="https://sandbox.zenodo.org/api/deposit/depositions/88",
-    )
+    new_version_response = example_record(id=88)
     mock_new_version = mock_new_version(new_version_response.model_dump())
-    mock_get = mock_get_record(
-        example_record(id=new_version_response.id).model_dump(),
-        id=new_version_response.id,
-    )
 
     result = sandbox_client.new_version(example_record(submitted=True))
 
     assert_headers_correct(mock_new_version)
-    assert mock_get.called
     assert result.id == new_version_response.id
 
 

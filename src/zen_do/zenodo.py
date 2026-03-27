@@ -65,12 +65,10 @@ class ZenodoLinks(ZenodoModel):
 
     Attributes:
         bucket: The file upload link for the record.
-        latest_draft: Link to the latest draft or the record.
     """
 
     # Published records cannot receive new file uploads
     bucket: Optional[str] = None
-    latest_draft: str
 
 
 type ZenodoRecordState = Literal["done", "inprogress", "error", "unsubmitted"]
@@ -298,10 +296,7 @@ class ZenodoClient:
             headers=self.headers,
             timeout=self.timeout,
         )
-        deposition = self._resolve(response, ZenodoRecord)
-
-        new_deposition_id = Path(deposition.links.latest_draft).name
-        return self.get_record(new_deposition_id)
+        return self._resolve(response, ZenodoRecord)
 
     def publish(self, record: ZenodoRecord) -> ZenodoRecord:
         """Publishes a record.
