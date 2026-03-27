@@ -17,7 +17,6 @@ This section describes the different actions and objects used throughout the pac
 | Object                  | Description                                                                                                                         |
 |-------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
 | deposit(s)              | A Zenodo deposit is the combined set of files and metadata that make up the content that will eventually form the published record. |
-| deposit ID (or just ID) | The unique ID given to a deposit.                                                                                                   |
 | record(s)               | A Zenodo record is a given published set of metadata and files for a specific DOI.                                                  |
 | metadata                | The metadata for a deposit, kept within a file `.zenodo.toml`.                                                                      |
 | file(s)                 | The files to add to a deposit.                                                                                                      |
@@ -26,16 +25,15 @@ This section describes the different actions and objects used throughout the pac
 
 : Objects used in zen-do.
 
-| Action  | Description                                                                                      |
-|---------|--------------------------------------------------------------------------------------------------|
-| init    | Create an empty metadata file to be filled in.                                                   |
-| get     | Get a Zenodo deposit in an account from a metadata file.                                         |
-| convert | Convert metadata files to and from different formats.                                            |
-| update  | Update an existing Zenodo deposit from a metadata file and, potentially, updating the file(s).   |
-| create  | Create a new Zenodo (draft) deposit from a metadata file along with adding one or more files.    |
-| discard | Discard a draft of or update to a Zenodo deposit (but not record).                               |
-| delete  | Delete a Zenodo deposit (but not record).                                                        |
-| publish | Publish a new record from either a new deposit or create a new version from an existing deposit. |
+| Action  | Description                                                                                                                                       |
+|---------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| init    | Create an empty metadata file to be filled in.                                                                                                    |
+| list    | List all Zenodo deposits in an account.                                                                                                           |
+| get     | Get a Zenodo deposit in an account from a metadata file.                                                                                          |
+| convert | Convert metadata files to and from different formats.                                                                                             |
+| update  | Updates an existing Zenodo deposit's metadata only (not file) based on the contents of a metadata file.                                           |
+| publish | Publish a new Zenodo record from an existing or new Zenodo deposit based on the metadata file and, if given, updating the file(s) in the deposit. |
+| discard | Discard a draft of or update to a Zenodo deposit (but not record).                                                                                |
 
 : Actions used in zen-do.
 
@@ -78,8 +76,8 @@ container models.
 
 The system context diagram shows the users and external systems that
 interact with zen-do. The users provide zen-do with the metadata file,
-the file or files to add to a Zenodo deposit, the token for the Zenodo
-account, and potentially the ID to the Zenodo deposit.
+the file or files to add to a Zenodo deposit, and the token for the
+Zenodo account.
 
 ```{mermaid}
 %%| label: fig-c4-context
@@ -103,9 +101,8 @@ flowchart TB
     zen_do -->|convert| metadata_formats
     file -->|add| zen_do
     user --> file
-    zen_do -->|create<br>update<br>get| deposit
-    zen_do -->|publish| record
-    deposit -.-> record
+    zen_do -->|publish<br>update<br>discard<br>list<br>get| deposit
+    deposit -.->|publish| record
 
     %% Styling
     classDef user fill:#FFFFFF,color:#000000;
@@ -135,48 +132,40 @@ flowchart TB
         metadata[/"Metadata file<br>['.zenodo.toml']"/]
         file[/"File<br>[e.g. PDF]"/]
         token[/"Token<br>[authentication]"/]
-        id[/"ID<br>[Deposit ID]"/]
     end
 
     subgraph zen-do
         init["init<br>[Python]"]
         get["get<br>[Python]"]
+        list["list<br>[Python]"]
         convert["convert<br>[Python]"]
-        create["create<br>[Python]"]
         update["update<br>[Python]"]
         publish["publish<br>[Python]"]
         discard["discard<br>[Python]"]
-        delete["delete<br>[Python]"]
-        response_put[/"Response<br>[JSON]"/]
         deposit[/"Deposit<br>[Zenodo server]"/]:::external
         account[/"Account<br>[Zenodo server]"/]:::external
 
-        create & update & discard & delete -->|request| deposit
-        deposit -->|response| response_put
-        response_put -->|contains id| either_id
-        either_id{" "} -->|required| publish
-        get -->|request| account
+        update & discard & publish -->|request| deposit
+        get & list -->|request| account
     end
 
     subgraph output ["Output"]
         record("Record<br>[Zenodo server]"):::external
         metadata_formats("Metadata formats<br>[e.g. 'cff', 'json',<br>'toml', 'yml']")
         empty_metadata("Empty metadata file<br>['.zenodo.toml']")
-        deposit_output("Deposit<br>[JSON]")
-
-        init -->|create| empty_metadata
-        account -->|response| deposit_output
-        convert --> metadata_formats
-        publish --> record
+        deposit_get("Deposit<br>[JSON]")
+        deposits_list("List of deposits<br>[JSON]")
     end
 
+    deposit -.->|publish| record
+    account -->|response| deposit_get
+    account -->|response| deposits_list
+    convert --> metadata_formats
+    init -->|create| empty_metadata
     user --> input
-    token -->|required| zen-do
-    id -->|required| discard & delete
-    id -->|provide| either_id
-    metadata -->|required| create & update & convert & get
-    file -->|required| create
-    file -->|optional| update
+    token -->|required<br>except init<br>and convert| zen-do
+    metadata -->|required<br>except init<br>and list| zen-do
+    file -->|required| publish
 
     %% Styling
     style zen-do fill:#FFFFFF,color:#000000;
