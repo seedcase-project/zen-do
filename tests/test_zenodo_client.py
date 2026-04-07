@@ -71,6 +71,7 @@ def mock_upload_file(requests_mock):
     return _mock
 
 
+@pytest.fixture
 def mock_create(requests_mock):
     def _mock(json=example_record().model_dump(), status_code=201):
         return requests_mock.post(
