@@ -238,6 +238,23 @@ class ZenodoClient:
         )
         return self._resolve(response, ZenodoRecord)
 
+    def create(self, metadata: ZenodoMetadata) -> ZenodoRecord:
+        """Creates a new deposition in editable state.
+
+        Args:
+            metadata: The metadata of the new deposition.
+
+        Returns:
+            The newly created deposition.
+        """
+        response = requests.post(
+            self.depositions,
+            headers=self.headers,
+            json={"metadata": metadata.model_dump()},
+            timeout=self.timeout,
+        )
+        return self._resolve(response, ZenodoRecord)
+
     def publish(self, record: ZenodoRecord) -> ZenodoRecord:
         """Publishes a record.
 
