@@ -6,7 +6,7 @@ import pytest
 import requests
 from pytest import mark, raises
 
-from zen_do.examples import example_record
+from zen_do.examples import example_metadata, example_record
 from zen_do.zenodo import ZenodoClient
 
 sandbox_client = ZenodoClient(sandbox=True, token="token")
@@ -66,6 +66,15 @@ def mock_upload_file(requests_mock):
             url,
             json=json,
             status_code=status_code,
+        )
+
+    return _mock
+
+
+def mock_create(requests_mock):
+    def _mock(json=example_record().model_dump(), status_code=201):
+        return requests_mock.post(
+            sandbox_client.depositions, json=json, status_code=status_code
         )
 
     return _mock
@@ -186,6 +195,31 @@ def test_upload_file_failure_no_bucket():
             example_record(submitted=False, state="unsubmitted", bucket=None),
             file_path=Path("data.txt"),
         )
+
+
+# create
+
+
+def test_create_success(mock_create):
+    metadata = example_metadata()
+    mock = mock_create()
+
+    result = sandbox_client.create(metadata)
+
+    assert_headers_correct(mock)
+    assert result.id == 123
+    assert mock.last_request.json()["metadata"] == metadata.model_dump()
+
+
+def test_create_failure(mock_create):
+    metadata = example_metadata()
+    mock_create(status_code=400)
+    with raises(requests.HTTPError):
+        sandbox_client.create(metadata)
+
+    mock_create({"unexpected": "response"})
+    with raises(pydantic.ValidationError):
+        sandbox_client.create(metadata)
 
 
 # publish
