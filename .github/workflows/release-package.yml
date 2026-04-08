@@ -20,42 +20,42 @@ jobs:
     secrets:
       update-version-gh-token: ${{ secrets.UPDATE_VERSION_TOKEN }}
 
-  pypi-publish:
-    name: Publish to PyPI
-    runs-on: ubuntu-latest
-    # Only give permissions for this job.
-    permissions:
-      # IMPORTANT: mandatory for trusted publishing.
-      id-token: write
-    environment:
-      name: pypi
-    needs:
-      - release
-    if: ${{ needs.release.outputs.previous_version != needs.release.outputs.current_version }}
-    steps:
-      - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
-        with:
-          egress-policy: audit
+  # pypi-publish:
+  #   name: Publish to PyPI
+  #   runs-on: ubuntu-latest
+  #   # Only give permissions for this job.
+  #   permissions:
+  #     # IMPORTANT: mandatory for trusted publishing.
+  #     id-token: write
+  #   environment:
+  #     name: pypi
+  #   needs:
+  #     - release
+  #   if: ${{ needs.release.outputs.previous_version != needs.release.outputs.current_version }}
+  #   steps:
+  #     - name: Harden the runner (Audit all outbound calls)
+  #       uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
+  #       with:
+  #         egress-policy: audit
 
-      - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          # Need to explicitly get the current version, otherwise it defaults to current commit
-          # (which is not the same as the release/version commit).
-          ref: ${{ needs.release.outputs.current_version }}
+  #     - name: Checkout
+  #       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+  #       with:
+  #         # Need to explicitly get the current version, otherwise it defaults to current commit
+  #         # (which is not the same as the release/version commit).
+  #         ref: ${{ needs.release.outputs.current_version }}
 
-      # This workflow and the publish workflows are based on:
-      # - https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
-      # - https://www.andrlik.org/dispatches/til-use-uv-for-build-and-publish-github-actions/
-      # - https://github.com/astral-sh/trusted-publishing-examples
-      - name: Set up uv
-        uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57 # v8.0.0
+  #     # This workflow and the publish workflows are based on:
+  #     # - https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
+  #     # - https://www.andrlik.org/dispatches/til-use-uv-for-build-and-publish-github-actions/
+  #     # - https://github.com/astral-sh/trusted-publishing-examples
+  #     - name: Set up uv
+  #       uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57 # v8.0.0
 
-      - name: Build distributions
-        # Builds dists from source and stores them in the dist/ directory.
-        run: uv build
+  #     - name: Build distributions
+  #       # Builds dists from source and stores them in the dist/ directory.
+  #       run: uv build
 
-      - name: Publish 📦 to PyPI
-        # Only publish if the option is explicitly set in the calling workflow.
-        run: uv publish --trusted-publishing always
+  #     - name: Publish 📦 to PyPI
+  #       # Only publish if the option is explicitly set in the calling workflow.
+  #       run: uv publish --trusted-publishing always
