@@ -10,8 +10,8 @@ other outputs that support that final output.
 
 The Zenodo record is the published version of the deposit at a given
 state that generates a DOI. This record can either be from an new
-deposit or an update to an existing deposit. The output returned from
-the API `POST` request is the raw JSON that provides information on the
+deposit or an update to an existing deposit. The response returned by the API
+to the publish `POST` request is the raw JSON that provides information on the
 published record.
 
 ## An empty, but fully formed, `.zenodo.toml` file
@@ -24,11 +24,11 @@ out what fields are needed and what they mean, an empty but fully formed
 ## Metadata file formats
 
 While the `.zenodo.toml` file is the main input, there are many other
-formats that provide some of the same, but not exact, information as
-what Zenodo needs. Or, like the `.zenodo.json` file, it contains the
+formats that provide some of the information that Zenodo needs. Or,
+like the `.zenodo.json` file, that contain the
 exact same information but in a different format. Even though Zenodo
-officially describes using the JSON file in its documentation, JSON is
-also not pleasant to manually edit and use, while TOML is. So if a user
+uses a JSON file in its official documentation, JSON is
+not pleasant to manually edit and use, while TOML is. So if a user
 has a `.zenodo.json` file already, being able to convert to the TOML
 version is useful.
 
