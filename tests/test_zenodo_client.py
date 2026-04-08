@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any
 
 import pydantic
@@ -5,7 +6,7 @@ import pytest
 import requests
 from pytest import mark, raises
 
-from zen_do.examples import example_record
+from zen_do.examples import example_metadata, example_record
 from zen_do.zenodo import ZenodoClient
 
 sandbox_client = ZenodoClient(sandbox=True, token="token")
@@ -57,6 +58,16 @@ def mock_get_record(requests_mock):
 
 
 @pytest.fixture
+def mock_create(requests_mock):
+    def _mock(json=example_record().model_dump(), status_code=201):
+        return requests_mock.post(
+            sandbox_client.depositions, json=json, status_code=status_code
+        )
+
+    return _mock
+
+
+@pytest.fixture
 def mock_make_editable(requests_mock):
     deposition = example_record()
 
@@ -88,6 +99,20 @@ def mock_new_version(requests_mock):
     def _mock(json=deposition.model_dump(), id=deposition.id, status_code=201):
         return requests_mock.post(
             f"{sandbox_client.depositions}/{id}/actions/newversion",
+            json=json,
+            status_code=status_code,
+        )
+
+    return _mock
+
+
+@pytest.fixture
+def mock_upload_file(requests_mock):
+    def _mock(url=None, json={}, file_path=Path("data.txt"), status_code=200):
+        if url is None:
+            url = f"{example_record().links.bucket}/{file_path.name}"
+        return requests_mock.put(
+            url,
             json=json,
             status_code=status_code,
         )
@@ -157,6 +182,31 @@ def test_get_record_failure(mock_get_record):
     mock_get_record({"unexpected": "response"})
     with raises(pydantic.ValidationError):
         sandbox_client.get_record(123)
+
+
+# create
+
+
+def test_create_success(mock_create):
+    metadata = example_metadata()
+    mock = mock_create()
+
+    result = sandbox_client.create(metadata)
+
+    assert_headers_correct(mock)
+    assert result.id == 123
+    assert mock.last_request.json()["metadata"] == metadata.model_dump()
+
+
+def test_create_failure(mock_create):
+    metadata = example_metadata()
+    mock_create(status_code=400)
+    with raises(requests.HTTPError):
+        sandbox_client.create(metadata)
+
+    mock_create({"unexpected": "response"})
+    with raises(pydantic.ValidationError):
+        sandbox_client.create(metadata)
 
 
 # make_editable
@@ -251,6 +301,59 @@ def test_new_version_api_failure(mock_discard, mock_new_version):
     mock_new_version({"unexpected": "response"})
     with raises(pydantic.ValidationError):
         sandbox_client.new_version(example_record())
+
+
+# upload_file
+
+
+def test_upload_file_success(mock_upload_file, tmp_path):
+    file_path = tmp_path / "data.txt"
+    file_path.write_text("This is my file.")
+    deposition = example_record(submitted=False, state="unsubmitted")
+    mock = mock_upload_file()
+
+    result = sandbox_client.upload_file(deposition, file_path=file_path)
+
+    assert_headers_correct(mock)
+    assert mock.last_request.body.name == str(file_path)
+    assert result
+
+
+def test_upload_file_failure_api(mock_upload_file, tmp_path):
+    file_path = tmp_path / "data.txt"
+    file_path.write_text("This is my file.")
+    deposition = example_record(submitted=False, state="unsubmitted")
+    mock_upload_file(status_code=400)
+    with raises(requests.HTTPError):
+        sandbox_client.upload_file(deposition, file_path=file_path)
+
+    mock_upload_file(json=[{"unexpected": "response"}])
+    with raises(pydantic.ValidationError):
+        sandbox_client.upload_file(deposition, file_path=file_path)
+
+
+def test_upload_file_failure_file_not_found():
+    with raises(FileNotFoundError):
+        sandbox_client.upload_file(
+            example_record(submitted=False, state="unsubmitted"),
+            file_path=Path("data.txt"),
+        )
+
+
+def test_upload_file_failure_published():
+    with raises(ValueError):
+        sandbox_client.upload_file(
+            example_record(submitted=True),
+            file_path=Path("data.txt"),
+        )
+
+
+def test_upload_file_failure_no_bucket():
+    with raises(ValueError):
+        sandbox_client.upload_file(
+            example_record(submitted=False, state="unsubmitted", bucket=None),
+            file_path=Path("data.txt"),
+        )
 
 
 # publish
