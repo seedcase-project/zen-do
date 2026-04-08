@@ -83,6 +83,10 @@ class ZenodoLinks(ZenodoModel):
     latest_draft: str
 
 
+class ZenodoFile(ZenodoModel):
+    """Model representing a file on a Zenodo record."""
+
+
 type ZenodoRecordState = Literal["done", "inprogress", "error", "unsubmitted"]
 
 
@@ -248,6 +252,38 @@ class ZenodoClient:
             timeout=self.timeout,
         )
         return self._resolve(response, ZenodoRecord)
+
+    def upload_file(self, deposition: ZenodoRecord, file_path: Path) -> ZenodoFile:
+        """Uploads a file to a deposition. The deposition must be unpublished.
+
+        Args:
+            deposition: The deposition.
+            file_path: The path to the file.
+
+        Returns:
+            The updated deposition.
+        """
+        if deposition.submitted:
+            raise ValueError(
+                f"Cannot upload new file to deposition {deposition.id} because the "
+                "deposition has already been published. You must first create a new "
+                "version of the deposition and upload the files there."
+            )
+
+        if not deposition.links.bucket:
+            raise ValueError(
+                f"Cannot upload new file to deposition {deposition.id} because the "
+                "deposition does not have a file-upload (bucket) link. "
+            )
+
+        with file_path.open("rb") as file_stream:
+            response = requests.put(
+                f"{deposition.links.bucket}/{file_path.name}",
+                data=file_stream,
+                headers=self.headers,
+                timeout=self.timeout,
+            )
+        return self._resolve(response, ZenodoFile)
 
     def create(self, metadata: ZenodoMetadata) -> ZenodoRecord:
         """Creates a new deposition in editable state.
