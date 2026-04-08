@@ -9,7 +9,7 @@ other outputs that support that final output.
 ## Zenodo record
 
 The Zenodo record is the published version of the deposit at a given
-state that generates a DOI. This record can either be from an new
+"snapshot" or time point, resulting in archiving that snapshot and generating a DOI for it. This record can either be from an new
 deposit or an update to an existing deposit. The response returned by the API
 to the publish `POST` request is the raw JSON that provides information on the
 published record.
