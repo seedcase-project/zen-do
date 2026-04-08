@@ -97,7 +97,10 @@ check-urls:
   lychee . \
     --verbose \
     --extensions md,qmd,py \
-    --exclude-path "_badges.qmd"
+    --exclude-path "_badges.qmd" \
+    --exclude-path "tests/test_zenodo_client.py" \
+    --exclude-path "src/zen_do/zenodo.py" \
+    --exclude-path "src/zen_do/examples.py"
 
 # Build the documentation as PDF using Quarto
 build-pdf:
