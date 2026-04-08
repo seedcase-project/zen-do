@@ -58,12 +58,22 @@ def mock_get_record(requests_mock):
 
 
 @pytest.fixture
-def mock_upload_file(requests_mock):
-    def _mock(url=None, json={}, file_path=Path("data.txt"), status_code=200):
-        if url is None:
-            url = f"{example_record().links.bucket}/{file_path.name}"
-        return requests_mock.put(
-            url,
+def mock_create(requests_mock):
+    def _mock(json=example_record().model_dump(), status_code=201):
+        return requests_mock.post(
+            sandbox_client.depositions, json=json, status_code=status_code
+        )
+
+    return _mock
+
+
+@pytest.fixture
+def mock_make_editable(requests_mock):
+    deposition = example_record()
+
+    def _mock(json=deposition.model_dump(), id=deposition.id, status_code=201):
+        return requests_mock.post(
+            f"{sandbox_client.depositions}/{id}/actions/edit",
             json=json,
             status_code=status_code,
         )
@@ -72,10 +82,25 @@ def mock_upload_file(requests_mock):
 
 
 @pytest.fixture
-def mock_create(requests_mock):
-    def _mock(json=example_record().model_dump(), status_code=201):
+def mock_discard(requests_mock):
+    def _mock(id=example_record().id, status_code=204):
         return requests_mock.post(
-            sandbox_client.depositions, json=json, status_code=status_code
+            f"{sandbox_client.depositions}/{id}/actions/discard",
+            status_code=status_code,
+        )
+
+    return _mock
+
+
+@pytest.fixture
+def mock_upload_file(requests_mock):
+    def _mock(url=None, json={}, file_path=Path("data.txt"), status_code=200):
+        if url is None:
+            url = f"{example_record().links.bucket}/{file_path.name}"
+        return requests_mock.put(
+            url,
+            json=json,
+            status_code=status_code,
         )
 
     return _mock
@@ -145,6 +170,92 @@ def test_get_record_failure(mock_get_record):
         sandbox_client.get_record(123)
 
 
+# create
+
+
+def test_create_success(mock_create):
+    metadata = example_metadata()
+    mock = mock_create()
+
+    result = sandbox_client.create(metadata)
+
+    assert_headers_correct(mock)
+    assert result.id == 123
+    assert mock.last_request.json()["metadata"] == metadata.model_dump()
+
+
+def test_create_failure(mock_create):
+    metadata = example_metadata()
+    mock_create(status_code=400)
+    with raises(requests.HTTPError):
+        sandbox_client.create(metadata)
+
+    mock_create({"unexpected": "response"})
+    with raises(pydantic.ValidationError):
+        sandbox_client.create(metadata)
+
+
+# make_editable
+
+
+@mark.parametrize("state", ["inprogress", "unsubmitted"])
+def test_make_editable_success_when_editable(mock_make_editable, state):
+    deposition = example_record(state=state)
+    mock = mock_make_editable()
+
+    result = sandbox_client.make_editable(deposition)
+
+    assert not mock.called
+    assert result.id == deposition.id
+
+
+def test_make_editable_success_when_not_editable(mock_make_editable):
+    deposition = example_record(state="done")
+    mock = mock_make_editable()
+
+    result = sandbox_client.make_editable(deposition)
+
+    assert_headers_correct(mock)
+    assert result.id == deposition.id
+
+
+def test_make_editable_failure(mock_make_editable):
+    deposition = example_record()
+    mock_make_editable(status_code=400)
+    with raises(requests.HTTPError):
+        sandbox_client.make_editable(deposition)
+
+    mock_make_editable({"unexpected": "response"})
+    with raises(pydantic.ValidationError):
+        sandbox_client.make_editable(deposition)
+
+
+# discard
+
+
+@mark.parametrize("state", ["inprogress", "unsubmitted"])
+def test_discard_success_when_editable(mock_discard, state):
+    mock = mock_discard()
+
+    sandbox_client.discard(example_record(state=state))
+
+    assert_headers_correct(mock)
+
+
+def test_discard_success_when_not_editable(mock_discard):
+    mock = mock_discard()
+
+    sandbox_client.discard(example_record(state="done"))
+
+    assert not mock.called
+
+
+def test_discard_failure(mock_discard):
+    mock_discard(status_code=400)
+    with raises(requests.HTTPError):
+        sandbox_client.discard(example_record(state="inprogress"))
+
+
 # upload_file
 
 
@@ -196,31 +307,6 @@ def test_upload_file_failure_no_bucket():
             example_record(submitted=False, state="unsubmitted", bucket=None),
             file_path=Path("data.txt"),
         )
-
-
-# create
-
-
-def test_create_success(mock_create):
-    metadata = example_metadata()
-    mock = mock_create()
-
-    result = sandbox_client.create(metadata)
-
-    assert_headers_correct(mock)
-    assert result.id == 123
-    assert mock.last_request.json()["metadata"] == metadata.model_dump()
-
-
-def test_create_failure(mock_create):
-    metadata = example_metadata()
-    mock_create(status_code=400)
-    with raises(requests.HTTPError):
-        sandbox_client.create(metadata)
-
-    mock_create({"unexpected": "response"})
-    with raises(pydantic.ValidationError):
-        sandbox_client.create(metadata)
 
 
 # publish

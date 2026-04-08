@@ -253,6 +253,62 @@ class ZenodoClient:
         )
         return self._resolve(response, ZenodoRecord)
 
+    def create(self, metadata: ZenodoMetadata) -> ZenodoRecord:
+        """Creates a new deposition in editable state.
+
+        Args:
+            metadata: The metadata of the new deposition.
+
+        Returns:
+            The newly created deposition.
+        """
+        response = requests.post(
+            self.depositions,
+            headers=self.headers,
+            json={"metadata": metadata.model_dump()},
+            timeout=self.timeout,
+        )
+        return self._resolve(response, ZenodoRecord)
+
+    def make_editable(self, deposition: ZenodoRecord) -> ZenodoRecord:
+        """Makes the deposition editable.
+
+        Args:
+            deposition: The deposition.
+
+        Returns:
+            The deposition in editable state.
+        """
+        if deposition.editable:
+            return deposition
+
+        response = requests.post(
+            f"{self.depositions}/{deposition.id}/actions/edit",
+            headers=self.headers,
+            timeout=self.timeout,
+        )
+        return self._resolve(response, ZenodoRecord)
+
+    def discard(self, deposition: ZenodoRecord) -> None:
+        """Puts the deposition in a non-editable state by discarding all changes.
+
+        If the deposition's state is `unsubmitted`, the deposition is deleted.
+        If the deposition's state is `inprogress`, the deposition is restored to
+        the state when it was last published.
+
+        Args:
+            deposition: The deposition.
+        """
+        if not deposition.editable:
+            return None
+
+        response = requests.post(
+            f"{self.depositions}/{deposition.id}/actions/discard",
+            headers=self.headers,
+            timeout=self.timeout,
+        )
+        response.raise_for_status()
+
     def upload_file(self, deposition: ZenodoRecord, file_path: Path) -> ZenodoFile:
         """Uploads a file to a deposition. The deposition must be unpublished.
 
@@ -284,23 +340,6 @@ class ZenodoClient:
                 timeout=self.timeout,
             )
         return self._resolve(response, ZenodoFile)
-
-    def create(self, metadata: ZenodoMetadata) -> ZenodoRecord:
-        """Creates a new deposition in editable state.
-
-        Args:
-            metadata: The metadata of the new deposition.
-
-        Returns:
-            The newly created deposition.
-        """
-        response = requests.post(
-            self.depositions,
-            headers=self.headers,
-            json={"metadata": metadata.model_dump()},
-            timeout=self.timeout,
-        )
-        return self._resolve(response, ZenodoRecord)
 
     def publish(self, record: ZenodoRecord) -> ZenodoRecord:
         """Publishes a record.
