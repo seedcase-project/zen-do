@@ -1,0 +1,49 @@
+---
+title: "Outputs"
+---
+
+There are a few different outputs that zen-do produces. The main one is
+the Zenodo record, which is the main aim of zen-do. But there are also
+other outputs that support that final output.
+
+## Zenodo record
+
+The Zenodo record is the published version of the deposit at a given
+state that generates a DOI. This record can either be from an new
+deposit or an update to an existing deposit. The output returned from
+the API `POST` request is the raw JSON that provides information on the
+published record.
+
+## An empty, but fully formed, `.zenodo.toml` file
+
+Having a template to start working from and filling in is incredibly
+useful. Rather than reading through documentation and trying to figure
+out what fields are needed and what they mean, an empty but fully formed
+`.zenodo.toml` file is a helpful starting point.
+
+## Metadata file formats
+
+While the `.zenodo.toml` file is the main input, there are many other
+formats that provide some of the same, but not exact, information as
+what Zenodo needs. Or, like the `.zenodo.json` file, it contains the
+exact same information but in a different format. Even though Zenodo
+officially describes using the JSON file in its documentation, JSON is
+also not pleasant to manually edit and use, while TOML is. So if a user
+has a `.zenodo.json` file already, being able to convert to the TOML
+version is useful.
+
+Likewise, because there are so many different formats for storing
+project metadata (e.g.
+[`CITATION.cff`](https://citation-file-format.github.io/),
+[`codemeta.json`](https://codemeta.github.io/)) that contain some of the
+necessary information for a Zenodo deposit (but not all), the aim is to
+minimise how many files a user needs to maintain and edit manually when
+something changes.
+
+## Zenodo deposit information
+
+Finding and listing information on deposits in a user's Zenodo account
+is a common task. In particular, we need to check if a deposit already
+exists for a given `.zenodo.toml` file before we can create a new
+deposit or update an existing one. This output is the raw JSON output
+from a `GET` request to the Zenodo API.

@@ -1,0 +1,44 @@
+---
+title: "Inputs"
+---
+
+Most of zen-do's functionality takes one or more of these main inputs:
+
+## `.zenodo.toml` metadata file
+
+This file contains the metadata for the deposit. It should represent the
+"source of truth", as any action taken by zen-do when interacting with
+the Zenodo API will use this file and overwrite anything in the Zenodo
+deposit. Users can't directly give zen-do this file, as any
+functionality that depends on it will look for the file in the current
+working directory.
+
+::: callout-note
+For the `convert` command, the input is actually formats other than the
+`.zenodo.toml` file, such as the `.zenodo.json` file. But the same or
+similar metadata is contained with those other formats.
+:::
+
+## Zenodo access token
+
+This is required in order to interact with the Zenodo API. And like the
+`.zenodo.toml` file, users also can't directly give zen-do this token.
+For security purposes, zen-do doesn't accept the token as an argument
+since that would be visible in the terminal history and process list.
+Instead, zen-do will look for a token with the name `ZENODO_TOKEN` (or
+`ZENODO_SANDBOX_TOKEN`) in the system keyring first and, if not found,
+in the environment variables.
+
+We only allow the use of an environment variable because continuous
+deployment platforms like GitHub Actions have built-in support for
+secret environment variables, and this is a common way to store and use
+secrets in these type of pipelines. Outside of these deployment
+platforms, we recommend users to store their token in their system
+keyring, which is a more secure way to store secrets.
+
+## Files
+
+This is the only file that users can directly give to zen-do. These one
+or more files will be be uploaded along with the metadata in
+`.zenodo.toml` to the Zenodo deposit. Any file is accepted that is
+uploadable to Zenodo.

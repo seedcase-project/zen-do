@@ -1,0 +1,15 @@
+---
+title: "Interface"
+---
+
+This section covers the design of zen-do's interface and the reasoning
+behind some key design decisions. It is organised into the following
+documents:
+
+- [Inputs](inputs.qmd): The metadata (as `.toml`), file(s), and token
+  accepted.
+- [Outputs](outputs.qmd): The outputs produced, including other file
+  formats for the metadata, a Zenodo record (or at least the post to
+  their servers), and Zenodo deposit information from an account.
+- [Command Line Interface](cli.qmd): The main entry point for using
+  zen-do and interacting with Zenodo.
