@@ -45,6 +45,7 @@ website:
           contents:
             - docs/design/interface/inputs.qmd
             - docs/design/interface/outputs.qmd
+            - docs/design/interface/cli.qmd
     - id: guide
       contents:
         - section: "Guide"
