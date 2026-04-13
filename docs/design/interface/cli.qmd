@@ -4,8 +4,8 @@ title: "Command line"
 
 This documents the command-line interface (CLI) and its Python
 counterparts, including some function signatures and explanation of the
-choices we've made. This document is primarily to help us (the developers) stay focused
-on the package's scope.
+choices we've made. This document is primarily to help us (the
+developers) stay focused on the package's scope.
 
 {{< include /docs/includes/_design-status.qmd >}}
 
@@ -17,10 +17,10 @@ zen-do init --verbose
 
 This will create an empty `.zenodo.toml` file in the working directory
 that contains all the metadata fields available for a Zenodo deposit,
-but with no values filled in, excluding a partially filled in URN
-for the project. This simple command is helpful to get
-started with making a new Zenodo deposit, as well as standardizing the
-name and structure of the file.
+but with no values filled in, excluding a partially filled in URN for
+the project. This simple command is helpful to get started with making a
+new Zenodo deposit, as well as standardizing the name and structure of
+the file.
 
 ```python
 @app.command()

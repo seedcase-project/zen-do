@@ -12,7 +12,8 @@ to anyone else interested in the internal workings of the package.
 
 ## Actions and objects
 
-This section describes the different actions and objects used throughout the package.
+This section describes the different actions and objects used throughout
+the package.
 
 | Object                  | Description                                                                                                                         |
 |-------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
