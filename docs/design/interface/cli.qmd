@@ -17,7 +17,8 @@ zen-do init --verbose
 
 This will create an empty `.zenodo.toml` file in the working directory
 that contains all the metadata fields available for a Zenodo deposit,
-but with no values filled in. This simple command is helpful to get
+but with no values filled in, excluding a partially filled in URN
+for the project. This simple command is helpful to get
 started with making a new Zenodo deposit, as well as standardizing the
 name and structure of the file.
 
