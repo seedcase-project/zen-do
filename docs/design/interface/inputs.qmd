@@ -35,11 +35,7 @@ So instead of using the ID created by Zenodo, we define our own ID and
 list it in the `related_identifiers` of the metadata. We do not use the
 repository URL as the ID because we want to be able to create multiple
 deposits for the same repository, e.g., one for the source code and one
-for the documentation.
-
-So, given the way Zenodo works and how we want zen-do to be used, we
-need some way to uniquely identify the metadata to accurately determine
-whether a deposit exists or not. We decided on using a URN ID that looks
+for the documentation. We decided on using a URN ID that looks
 like:
 
 ```text
