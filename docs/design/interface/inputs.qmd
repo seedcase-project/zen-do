@@ -21,11 +21,10 @@ similar metadata is contained in those other formats.
 
 ### Unique ID between metadata and deposit
 
-The way we envision how we use zen-do depends on being able to determine
-whether a given metadata file has an existing Zenodo deposit on their
-servers or not. However, if a metadata file doesn't have a connected
-Zenodo deposit on their servers, there is no way for Zenodo (or us) to
-uniquely determine whether a deposit exists or not.
+The functionality of zen-do depends on being able to determine
+whether a given metadata file has a corresponding Zenodo deposit on their
+servers or not. This is only possible if one local metadata file is clearly
+and unambiguously connected to one Zenodo deposit on the server.
 
 While Zenodo will create a unique deposit ID once a deposit has been
 created, that means that the user (or us) would have to create the
@@ -50,7 +49,7 @@ urn:zenodo:<unique-id>:<optional-sub-id>
 ```
 
 The only required parts are the `urn:zenodo` prefix and the
-`<unique-id>`. But if the user wanted to have multiple deposits for the
+`<unique-id>`. But if the user wants to have multiple deposits for the
 same `<unique-id>`, they should use the optional `<optional-sub-id>` to
 distinguish between those outputs. If the metadata file is hosted on a
 GitHub repository, we recommend:
@@ -65,7 +64,7 @@ documentation as a PDF as a deposit, it might look like
 deposit for the same repository but for the source code instead, it
 might look like `urn:zenodo:seedcase-project:zen-do:source`. The final
 `<output_type>` part is used to distinguish between different types of
-deposits for the same repository and are arbitrary and up to the user to
+deposits for the same repository and is arbitrary and up to the user to
 decide on the name.
 
 Because we depend on this URN, all metadata files must have this URN in
