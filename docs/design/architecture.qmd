@@ -59,7 +59,7 @@ directory) for many of the actions to work. There must also be a unique
 ["related identifier"](https://developers.zenodo.org/#representation)
 for this (new or existing) deposit added to this `.zenodo.toml` file in
 order to identify it within the list of deposits of a user's account.
-This is described in more detail in the [interface](interface.qmd)
+This is described in more detail in the [interface](interface/index.qmd)
 documentation.
 
 ## C4 Models
