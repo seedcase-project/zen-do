@@ -4,8 +4,8 @@ title: "Command line"
 
 This documents the command-line interface (CLI) and its Python
 counterparts, including some function signatures and explanation of the
-choices we've made. This document is primarily to help us (the developers) stay focused
-on the package's scope.
+choices we've made. This document is primarily to help us (the
+developers) stay focused on the package's scope.
 
 {{< include /docs/includes/_design-status.qmd >}}
 
@@ -17,10 +17,10 @@ zen-do init --verbose
 
 This will create an empty `.zenodo.toml` file in the working directory
 that contains all the metadata fields available for a Zenodo deposit,
-but with no values filled in, excluding a partially filled in URN
-for the project. This simple command is helpful to get
-started with making a new Zenodo deposit, as well as standardizing the
-name and structure of the file.
+but with no values filled in, excluding a partially filled in URN for
+the project. This simple command is helpful to get started with making a
+new Zenodo deposit, as well as standardizing the name and structure of
+the file.
 
 ```python
 @app.command()
@@ -36,4 +36,37 @@ def init(verbose: bool = False) -> None:
     # OR...
     # Take an internal class of the metadata fields and convert into TOML
     print_if_verbose(verbose, "Created an empty `.zenodo.toml` file.")
+```
+
+## {{< var planned >}} `list`
+
+```bash
+zen-do list --sandbox
+```
+
+The `list` command fetches the stored Zenodo token and gets all Zenodo
+deposits listed in the account connected to that token. Both the CLI and
+the internal Python interface are used in other functions like
+`publish()` to find whether a deposit exists or not.
+
+The Python interface, with some implementation comments and docstring,
+will be:
+
+```python
+@app.command()
+def list(sandbox: bool = False) -> None:
+    """List all Zenodo deposits in an account as raw JSON (from the Zenodo servers).
+
+    Args:
+        sandbox: Whether to use the Zenodo sandbox environment for testing purposes.
+
+    Returns:
+        The Zenodo API response in JSON format.
+    """
+    # Fetch token from system keyring or environment variable.
+    # token: Token = get_token(sandbox=sandbox)
+    # Get request to Zenodo servers.
+    # TODO: Either dict or a custom class for the deposit, e.g. `Deposit`?
+    # deposits: list[Deposit] = list_deposits(sandbox=sandbox, token=token)
+    pretty_print(deposits)
 ```
