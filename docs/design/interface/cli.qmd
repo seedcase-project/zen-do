@@ -4,8 +4,8 @@ title: "Command line"
 
 This documents the command-line interface (CLI) and its Python
 counterparts, including some function signatures and explanation of the
-choices we've made. This document is primarily to help us stay focused
-(the developers) on the package's scope.
+choices we've made. This document is primarily to help us (the developers) stay focused
+on the package's scope.
 
 {{< include /docs/includes/_design-status.qmd >}}
 
