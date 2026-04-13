@@ -37,3 +37,43 @@ def init(verbose: bool = False) -> None:
     # Take an internal class of the metadata fields and convert into TOML
     print_if_verbose(verbose, "Created an empty `.zenodo.toml` file.")
 ```
+
+## {{< var planned >}} `get`
+
+```bash
+zen-do get [METADATA_FILE] --sandbox
+```
+
+The `get` command will get the Zenodo deposit JSON based on the metadata
+file provided. If the deposit doesn't exist, it will output an empty
+JSON object. This is useful for checking if a deposit already exists for
+a given set of metadata, and if so, getting the deposit information to
+use for updating or publishing it. Internally uses the Python functions
+within `list()` to get the list of deposits and uses that to find the
+deposit that matches the content of the metadata file using the URN ID.
+
+The Python interface, with some implementation comments and docstring,
+will be:
+
+```python
+@app.command()
+def get(metadata_file: Path = Path(".zenodo.toml"), \, *, sandbox: bool = False) -> None:
+    """Get the Zenodo deposit JSON based on the metadata file.
+
+    Args:
+        metadata_file: The path to the metadata file.
+        sandbox: Whether to use the Zenodo sandbox environment for testing purposes.
+
+    Returns:
+        The Zenodo API response in JSON format.
+    """
+    # Read metadata file (checking if the URN exists or not).
+    # metadata: Metadata = read_metadata(path=metadata_file)
+    # Fetch token from system keyring or environment variable.
+    # token: Token = get_token(sandbox=sandbox)
+    # Get request to Zenodo servers.
+    # TODO: Either dict or a custom class for the deposit, e.g. `Deposit`?
+    # deposits: list[Deposit] = list_deposits(sandbox=sandbox, token=token)
+    # deposit: Deposit = find_deposit(deposits=deposits, metadata=metadata)
+    pretty_print(deposit)
+```
