@@ -31,13 +31,11 @@ created, that means that the user (or us) would have to create the
 deposit first and then add the deposit ID to the metadata file. This is
 not how we want zen-do to behave.
 
-Likewise, without a unique identifier, we would have to compare the
-contents of the metadata file with all the metadata contents from each
-deposit returned from Zenodo. We couldn't rely on searching for an
-identifier within `related_identifiers` using, for example, the GitHub
-repository URL or something similar identifier because we also want to
-be able to create multiple deposits for the same repository, e.g. one
-for the source code and one for the documentation.
+So instead of using the ID created by Zenodo, we define our own ID and
+list it in the `related_identifiers` of the metadata. We do not use the
+repository URL as the ID because we want to be able to create multiple
+deposits for the same repository, e.g., one for the source code and one
+for the documentation.
 
 So, given the way Zenodo works and how we want zen-do to be used, we
 need some way to uniquely identify the metadata to accurately determine
