@@ -9,9 +9,7 @@ Most of zen-do's functionality takes one or more of these main inputs:
 This file contains the metadata for the deposit. It should represent the
 "source of truth", as any action taken by zen-do when interacting with
 the Zenodo API will use this file and overwrite anything in the Zenodo
-deposit. Users can't directly give zen-do this file, as any
-functionality that depends on it will look for the file in the current
-working directory.
+deposit.
 
 ::: callout-note
 For the `convert` command, the input is actually a format other than the
@@ -19,26 +17,45 @@ For the `convert` command, the input is actually a format other than the
 similar metadata is contained in those other formats.
 :::
 
+For repositories that have or will have multiple deposits, then there
+will also be multiple `.zenodo.toml` files, one for each deposit. For
+most use-cases, you would store the `.zenodo.toml` file in the folder
+that links it to the file that will be uploaded to the deposit. For
+example, for a research project repository, there may be a deposit for
+the paper with the metadata kept in `docs/paper/.zenodo.toml` alongside
+the paper PDF in `docs/paper/paper.pdf` and a deposit for the data with
+the metadata kept in `data/.zenodo.toml` for the data files in `data/`.
+This way, the metadata is kept close to the content it describes.
+
+However, sometimes multiple deposits might describe content in the same
+folder. For example, in the case of a repository with teaching material
+that builds into a website (as HTML) and as a PDF, the metadata file for
+the repository source files would be `.zenodo.toml` in the root of the
+repository, while the metadata for the PDF (that's rendered from the
+root source files) could be either stored in another folder or be called
+`.pdf.zenodo.toml` (or `.book.zenodo.toml` if the output is a book) in
+the root of the repository. In this case, the metadata files are kept in
+the same location but with different names to reflect their contents.
+
 ## Zenodo access token
 
-This is required in order to interact with the Zenodo API. Like the
-`.zenodo.toml` file, users also can't directly give zen-do this token.
-For security purposes, zen-do doesn't accept the token as an argument
-since that would be visible in the terminal history and process list.
-Instead, zen-do will look for a token with the name `ZENODO_TOKEN` (or
-`ZENODO_SANDBOX_TOKEN`) in the system keyring first and, if not found,
-in the environment variables.
+This is required in order to interact with the Zenodo API. Users can't
+directly give zen-do this token. For security purposes, zen-do doesn't
+accept the token as an argument since that would be visible in the
+terminal history and process list. Instead, zen-do will look for a token
+with the name `ZENODO_TOKEN` (or `ZENODO_SANDBOX_TOKEN`) in the system
+keyring first and, if not found, in the environment variables.
 
 We only allow the use of an environment variable because continuous
 deployment platforms like GitHub Actions have built-in support for
 secret environment variables, and this is a common way to store and use
-secrets in these type of pipelines. Outside of these deployment
+secrets in these types of pipelines. Outside of these deployment
 platforms, we recommend users to store their token in their system
 keyring, which is a more secure way to store secrets.
 
 ## Files
 
-The only files users can directly give to zen-do are files that make up the content
-of the Zenodo deposition. These files will be be uploaded along with the metadata in
-`.zenodo.toml` to the Zenodo deposit. Any file is accepted that is
-uploadable to Zenodo.
+These are the files that will be attached to a Zenodo deposit that the
+metadata is describing. These files will be be uploaded along with the
+metadata in `.zenodo.toml` to the Zenodo deposit. Any file that is
+uploadable to Zenodo can be accepted.
