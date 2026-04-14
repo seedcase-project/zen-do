@@ -21,10 +21,10 @@ similar metadata is contained in those other formats.
 
 ### Unique ID between metadata and deposit
 
-The functionality of zen-do depends on being able to determine
-whether a given metadata file has a corresponding Zenodo deposit on their
-servers or not. This is only possible if one local metadata file is clearly
-and unambiguously connected to one Zenodo deposit on the server.
+The functionality of zen-do depends on being able to determine whether a
+given metadata file has a corresponding Zenodo deposit on their servers
+or not. This is only possible if one local metadata file is clearly and
+unambiguously connected to one Zenodo deposit on the server.
 
 While Zenodo will create a unique deposit ID once a deposit has been
 created, that means that the user (or us) would have to create the
@@ -35,8 +35,7 @@ So instead of using the ID created by Zenodo, we define our own ID and
 list it in the `related_identifiers` of the metadata. We do not use the
 repository URL as the ID because we want to be able to create multiple
 deposits for the same repository, e.g., one for the source code and one
-for the documentation. We decided on using a URN ID that looks
-like:
+for the documentation. We decided on using a URN ID that looks like:
 
 ```text
 urn:zenodo:<unique-id>:<optional-sub-id>
