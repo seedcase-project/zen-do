@@ -43,7 +43,7 @@ def get_token(sandbox: bool = False) -> str:
         RuntimeError: If no token is found.
     """
     token_name = "ZENODO_SANDBOX_TOKEN" if sandbox else "ZENODO_TOKEN"
-    token = keyring.get_password("system", token_name) or os.getenv(token_name)
+    token = keyring.get_password("zen-do", token_name) or os.getenv(token_name)
     if not token:
         raise RuntimeError(
             f"No value found for {token_name!r} in the system "
