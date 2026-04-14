@@ -17,7 +17,7 @@ def test_gets_token_from_keyring(monkeypatch, mocker, sandbox, token_name):
     mock = mocker.patch("keyring.get_password", return_value=f"{token_name}_keyring")
 
     assert get_token(sandbox) == f"{token_name}_keyring"
-    mock.assert_called_once_with("zen-do", token_name)
+    mock.assert_called_once_with(service_name="zen-do", username=token_name)
 
 
 @mark.parametrize(
