@@ -63,9 +63,6 @@ def get(metadata_file: Path = Path(".zenodo.toml"), \, *, sandbox: bool = False)
     Args:
         metadata_file: The path to the metadata file.
         sandbox: Whether to use the Zenodo sandbox environment for testing purposes.
-
-    Returns:
-        The Zenodo API response in JSON format.
     """
     # Read metadata file (checking if the URN exists or not).
     # metadata: Metadata = read_metadata(path=metadata_file)
