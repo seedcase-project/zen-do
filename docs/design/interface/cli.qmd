@@ -45,12 +45,13 @@ zen-do get [METADATA_FILE] --sandbox
 ```
 
 The `get` command will get the Zenodo deposit JSON based on the metadata
-file provided. If the deposit doesn't exist, it will output an empty
-JSON object. This is useful for checking if a deposit already exists for
-a given set of metadata, and if so, getting the deposit information to
-use for updating or publishing it. Internally uses the Python functions
-within `list()` to get the list of deposits and uses that to find the
-deposit that matches the content of the metadata file using the URN ID.
+file provided. If the deposit doesn't exist, it will output a message
+about not finding a match. This is useful for checking if a deposit
+already exists for a given set of metadata, and if so, getting the
+deposit information to use for updating or publishing it. Internally
+uses the Python functions within `list()` to get the list of deposits
+and uses that to find the deposit that matches the content of the
+metadata file using the URN ID.
 
 The Python interface, with some implementation comments and docstring,
 will be:
