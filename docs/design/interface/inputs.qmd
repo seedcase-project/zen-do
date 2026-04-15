@@ -37,6 +37,52 @@ root source files) could be either stored in another folder or be called
 the root of the repository. In this case, the metadata files are kept in
 the same location but have different names to reflect their contents.
 
+### Unique ID between metadata and deposit
+
+The functionality of zen-do depends on being able to determine whether a
+given metadata file has a corresponding Zenodo deposit on their servers
+or not. This is only possible if one local metadata file is clearly and
+unambiguously connected to one Zenodo deposit on the server.
+
+While Zenodo will create a unique deposit ID once a deposit has been
+created, that means that the user (or us) would have to create the
+deposit first and then add the deposit ID to the metadata file. This is
+not how we want zen-do to behave.
+
+So instead of using the ID created by Zenodo, we define our own ID and
+list it in the `related_identifiers` of the metadata. We do not use the
+repository URL as the ID because we want to be able to create multiple
+deposits for the same repository, e.g., one for the source code and one
+for the documentation. We decided on using a URN ID that looks like:
+
+```text
+urn:zenodo:<unique-id>:<optional-sub-id>
+```
+
+The only required parts are the `urn:zenodo` prefix and the
+`<unique-id>`. But if the user wants to have multiple deposits for the
+same `<unique-id>`, they should use the optional `<optional-sub-id>` to
+distinguish between those outputs. If the metadata file is hosted on a
+GitHub repository, we recommend:
+
+```text
+urn:zenodo:<github-username>:<repo-name>:<output-type>
+```
+
+So if we made a metadata file for the zen-do repository to upload the
+documentation as a PDF as a deposit, it might look like
+`urn:zenodo:seedcase-project:zen-do:docs`. If we wanted to make a
+deposit for the same repository but for the source code instead, it
+might look like `urn:zenodo:seedcase-project:zen-do:source`. The final
+`<output_type>` part is used to distinguish between different types of
+deposits for the same repository and is arbitrary and up to the user to
+decide on the name.
+
+Because we depend on this URN, all metadata files must have this URN in
+the `related_identifiers` field in the `.zenodo.toml` file. This also
+means that the user needs to manually add it and manually decide on an
+ID that is unique enough for their purposes.
+
 ## Zenodo access token
 
 This is required in order to interact with the Zenodo API. Users can't

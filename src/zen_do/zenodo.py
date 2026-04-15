@@ -47,9 +47,13 @@ class ZenodoRelatedIdentifier(ZenodoModel):
     @model_validator(mode="after")
     def _check_urn(self) -> Self:
 
-        if self.scheme == "urn" and not re.match(r"urn:.", self.identifier):
+        if self.scheme == "urn" and not re.fullmatch(
+            r"urn:zenodo(:[^/:]+)+", self.identifier
+        ):
             raise ValueError(
-                f"Missing 'urn:' prefix or body in URN identifier {self.identifier!r}."
+                f"The URN {self.identifier!r} does not have the expected format. URNs "
+                "must be in the format 'urn:zenodo:<unique-id>(:<optional-sub-id>)'. "
+                "We recommend 'urn:zenodo:<github-username>:<repo-name>:<output-type>'."
             )
         return self
 
