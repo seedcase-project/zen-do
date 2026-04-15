@@ -1,6 +1,7 @@
+from keyring.errors import NoKeyringError
 from pytest import mark, raises
 
-from zen_do.cli import get_token
+from zen_do.cli import SERVICE_NAME, get_token
 
 
 @mark.parametrize("sandbox", [False, True])
@@ -17,7 +18,7 @@ def test_gets_token_from_keyring(monkeypatch, mocker, sandbox, token_name):
     mock = mocker.patch("keyring.get_password", return_value=f"{token_name}_keyring")
 
     assert get_token(sandbox) == f"{token_name}_keyring"
-    mock.assert_called_once_with(service_name="zen-do", username=token_name)
+    mock.assert_called_once_with(service_name=SERVICE_NAME, username=token_name)
 
 
 @mark.parametrize(
@@ -28,3 +29,9 @@ def test_gets_token_from_env_vars_if_not_in_keyring(monkeypatch, sandbox, token_
     monkeypatch.setenv("ZENODO_SANDBOX_TOKEN", "ZENODO_SANDBOX_TOKEN_value")
 
     assert get_token(sandbox) == f"{token_name}_value"
+
+
+def test_gets_token_from_env_vars_if_keyring_raises(monkeypatch, mocker):
+    monkeypatch.setenv("ZENODO_TOKEN", "ZENODO_TOKEN_value")
+    mocker.patch("keyring.get_password", side_effect=NoKeyringError)
+    assert get_token(False) == "ZENODO_TOKEN_value"

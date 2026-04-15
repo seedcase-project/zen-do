@@ -2,6 +2,7 @@ import os
 
 import keyring
 from cyclopts import App
+from keyring.errors import NoKeyringError
 
 from zen_do.zenodo import (
     zenodo_create_record,
@@ -30,6 +31,9 @@ def zenodo_publish(sandbox: bool = False) -> None:
         print("New Zenodo record created successfully!")
 
 
+SERVICE_NAME = "zen-do"
+
+
 def get_token(sandbox: bool = False) -> str:
     """Gets the Zenodo token from the system keyring or environment variables.
 
@@ -43,9 +47,13 @@ def get_token(sandbox: bool = False) -> str:
         RuntimeError: If no token is found.
     """
     token_name = "ZENODO_SANDBOX_TOKEN" if sandbox else "ZENODO_TOKEN"
-    token = keyring.get_password(
-        service_name="zen-do", username=token_name
-    ) or os.getenv(token_name)
+    try:
+        token = keyring.get_password(service_name=SERVICE_NAME, username=token_name)
+    except NoKeyringError:
+        token = None
+
+    token = token or os.getenv(token_name)
+
     if not token:
         raise RuntimeError(
             f"No value found for {token_name!r} in the system "
