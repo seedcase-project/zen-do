@@ -59,9 +59,6 @@ def list(sandbox: bool = False) -> None:
 
     Args:
         sandbox: Whether to use the Zenodo sandbox environment for testing purposes.
-
-    Returns:
-        The Zenodo API response in JSON format.
     """
     # Fetch token from system keyring or environment variable.
     # token: Token = get_token(sandbox=sandbox)
