@@ -17,11 +17,11 @@ For the `convert` command, the input is actually a format other than the
 similar metadata is contained in those other formats.
 :::
 
-For repositories that have or will have multiple deposits, then there
+For repositories that have or will have multiple deposits, there
 will also be multiple `.zenodo.toml` files, one for each deposit. For
-most use-cases, you would store the `.zenodo.toml` file in the folder
-that links it to the file that will be uploaded to the deposit. For
-example, for a research project repository, there may be a deposit for
+most use-cases, you would store the `.zenodo.toml` file in the same folder
+as the file that will be uploaded to the deposit as its content. For
+example, in a research project repository, there may be a deposit for
 the paper with the metadata kept in `docs/paper/.zenodo.toml` alongside
 the paper PDF in `docs/paper/paper.pdf` and a deposit for the data with
 the metadata kept in `data/.zenodo.toml` for the data files in `data/`.
@@ -35,7 +35,7 @@ repository, while the metadata for the PDF (that's rendered from the
 root source files) could be either stored in another folder or be called
 `.pdf.zenodo.toml` (or `.book.zenodo.toml` if the output is a book) in
 the root of the repository. In this case, the metadata files are kept in
-the same location but with different names to reflect their contents.
+the same location but have different names to reflect their contents.
 
 ## Zenodo access token
 
@@ -58,4 +58,4 @@ keyring, which is a more secure way to store secrets.
 These are the files that will be attached to a Zenodo deposit that the
 metadata is describing. These files will be be uploaded along with the
 metadata in `.zenodo.toml` to the Zenodo deposit. Any file that is
-uploadable to Zenodo can be accepted.
+uploadable to Zenodo is accepted.
