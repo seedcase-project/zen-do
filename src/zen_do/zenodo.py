@@ -357,6 +357,8 @@ class ZenodoClient:
                 "has not yet been published."
             )
 
+        # Discard any changes on the old version to avoid the situation where we
+        # create a new version but leave unpublished changes on the old one.
         self.discard(deposition)
         response = requests.post(
             f"{self.depositions}/{deposition.id}/actions/newversion",
