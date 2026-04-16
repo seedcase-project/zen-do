@@ -28,7 +28,8 @@ def get_token(sandbox: bool = False) -> str:
 
     if not token:
         raise RuntimeError(
-            f"No value found for {token_name!r} in the system "
-            "keyring or the environment variables."
+            f"No Zenodo access token found for {token_name!r} in the system "
+            "keyring or the environment variables. You need to add it in order "
+            "to access the Zenodo API."
         )
     return token
