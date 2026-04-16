@@ -2,9 +2,9 @@ from cyclopts import App
 
 from zen_do.get_token import get_token
 from zen_do.zenodo import (
-    zenodo_create_record,
-    zenodo_get_record,
-    zenodo_update_record,
+    zenodo_create_deposit,
+    zenodo_get_deposit,
+    zenodo_update_deposit,
 )
 
 app = App(
@@ -20,9 +20,9 @@ app = App(
 def zenodo_publish(sandbox: bool = False) -> None:
     """Publish a new version of the repository on Zenodo."""
     token = get_token(sandbox)
-    if record := zenodo_get_record(token):
-        zenodo_update_record(token, record.id)
-        print("Zenodo record updated successfully!")
+    if deposit := zenodo_get_deposit(token):
+        zenodo_update_deposit(token, deposit.id)
+        print("Zenodo deposit updated successfully!")
     else:
-        zenodo_create_record(token)
-        print("New Zenodo record created successfully!")
+        zenodo_create_deposit(token)
+        print("New Zenodo deposit created successfully!")

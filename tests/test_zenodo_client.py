@@ -5,7 +5,7 @@ import pytest
 import requests
 from pytest import mark, raises
 
-from zen_do.examples import example_metadata, example_record
+from zen_do.examples import example_deposit, example_metadata
 from zen_do.zenodo import ZenodoClient
 
 sandbox_client = ZenodoClient(sandbox=True, token="token")
@@ -33,7 +33,7 @@ def assert_headers_correct(mock: Any) -> None:
 
 
 @pytest.fixture
-def mock_get_records(requests_mock):
+def mock_get_deposits(requests_mock):
     def _mock(json=[], status_code=200):
         return requests_mock.get(
             sandbox_client.depositions, json=json, status_code=status_code
@@ -43,10 +43,10 @@ def mock_get_records(requests_mock):
 
 
 @pytest.fixture
-def mock_get_record(requests_mock):
-    record = example_record()
+def mock_get_deposit(requests_mock):
+    deposit = example_deposit()
 
-    def _mock(json=record.model_dump(), id=record.id, status_code=200):
+    def _mock(json=deposit.model_dump(), id=deposit.id, status_code=200):
         return requests_mock.get(
             f"{sandbox_client.depositions}/{id}",
             json=json,
@@ -58,7 +58,7 @@ def mock_get_record(requests_mock):
 
 @pytest.fixture
 def mock_create(requests_mock):
-    def _mock(json=example_record().model_dump(), status_code=201):
+    def _mock(json=example_deposit().model_dump(), status_code=201):
         return requests_mock.post(
             sandbox_client.depositions, json=json, status_code=status_code
         )
@@ -68,7 +68,7 @@ def mock_create(requests_mock):
 
 @pytest.fixture
 def mock_make_editable(requests_mock):
-    deposition = example_record()
+    deposition = example_deposit()
 
     def _mock(json=deposition.model_dump(), id=deposition.id, status_code=201):
         return requests_mock.post(
@@ -82,7 +82,7 @@ def mock_make_editable(requests_mock):
 
 @pytest.fixture
 def mock_discard(requests_mock):
-    def _mock(id=example_record().id, status_code=204):
+    def _mock(id=example_deposit().id, status_code=204):
         return requests_mock.post(
             f"{sandbox_client.depositions}/{id}/actions/discard",
             status_code=status_code,
@@ -93,7 +93,7 @@ def mock_discard(requests_mock):
 
 @pytest.fixture
 def mock_update_metadata(requests_mock):
-    deposition = example_record()
+    deposition = example_deposit()
 
     def _mock(json=deposition.model_dump(), id=deposition.id, status_code=200):
         return requests_mock.put(
@@ -109,7 +109,7 @@ def mock_update_metadata(requests_mock):
 def mock_upload_file(requests_mock):
     def _mock(url=None, json={}, file_path=Path("data.txt"), status_code=200):
         if url is None:
-            url = f"{example_record().links.bucket}/{file_path.name}"
+            url = f"{example_deposit().links.bucket}/{file_path.name}"
         return requests_mock.put(
             url,
             json=json,
@@ -121,9 +121,9 @@ def mock_upload_file(requests_mock):
 
 @pytest.fixture
 def mock_publish(requests_mock):
-    record = example_record()
+    deposit = example_deposit()
 
-    def _mock(json=record.model_dump(), id=record.id, status_code=202):
+    def _mock(json=deposit.model_dump(), id=deposit.id, status_code=202):
         return requests_mock.post(
             f"{sandbox_client.depositions}/{id}/actions/publish",
             json=json,
@@ -136,72 +136,72 @@ def mock_publish(requests_mock):
 # _resolve and _resolve_list
 
 
-def test_resolve_does_not_check_response_properties(mock_get_record):
-    mock_get_record({"unexpected": "response"})
+def test_resolve_does_not_check_response_properties(mock_get_deposit):
+    mock_get_deposit({"unexpected": "response"})
 
-    assert sandbox_client.get_record(123)
-
-
-def test_resolve_list_does_not_check_response_properties(mock_get_records):
-    mock_get_records([{"unexpected": "response"}])
-
-    assert sandbox_client.get_records()
+    assert sandbox_client.get_deposit(123)
 
 
-def test_resolve_flags_unexpected_type(mock_get_record):
-    mock_get_record([{"not": "a dict"}])
+def test_resolve_list_does_not_check_response_properties(mock_get_deposits):
+    mock_get_deposits([{"unexpected": "response"}])
 
-    with raises(TypeError):
-        sandbox_client.get_record(123)
+    assert sandbox_client.get_deposits()
 
 
-def test_resolve_list_flags_unexpected_type(mock_get_records):
-    mock_get_records({"not": "a list"})
+def test_resolve_flags_unexpected_type(mock_get_deposit):
+    mock_get_deposit([{"not": "a dict"}])
 
     with raises(TypeError):
-        sandbox_client.get_records()
+        sandbox_client.get_deposit(123)
 
 
-# get_records
+def test_resolve_list_flags_unexpected_type(mock_get_deposits):
+    mock_get_deposits({"not": "a list"})
+
+    with raises(TypeError):
+        sandbox_client.get_deposits()
 
 
-def test_get_records_success(mock_get_records):
-    mock_get_records([])
-    result = sandbox_client.get_records()
+# get_deposits
+
+
+def test_get_deposits_success(mock_get_deposits):
+    mock_get_deposits([])
+    result = sandbox_client.get_deposits()
     assert result == []
 
-    mock = mock_get_records(
-        [example_record(1).model_dump(), example_record(2).model_dump()]
+    mock = mock_get_deposits(
+        [example_deposit(1).model_dump(), example_deposit(2).model_dump()]
     )
-    result = sandbox_client.get_records()
+    result = sandbox_client.get_deposits()
     assert_headers_correct(mock)
     assert len(result) == 2
     assert result[0].id == 1
     assert result[1].id == 2
 
 
-def test_get_records_failure(mock_get_records):
-    mock_get_records(status_code=500)
+def test_get_deposits_failure(mock_get_deposits):
+    mock_get_deposits(status_code=500)
     with raises(requests.HTTPError):
-        sandbox_client.get_records()
+        sandbox_client.get_deposits()
 
 
-# get_record
+# get_deposit
 
 
-def test_get_record_success(mock_get_record):
-    mock = mock_get_record()
+def test_get_deposit_success(mock_get_deposit):
+    mock = mock_get_deposit()
 
-    result = sandbox_client.get_record(123)
+    result = sandbox_client.get_deposit(123)
 
     assert_headers_correct(mock)
     assert result.id == 123
 
 
-def test_get_record_failure(mock_get_record):
-    mock_get_record(status_code=500)
+def test_get_deposit_failure(mock_get_deposit):
+    mock_get_deposit(status_code=500)
     with raises(requests.HTTPError):
-        sandbox_client.get_record(123)
+        sandbox_client.get_deposit(123)
 
 
 # create
@@ -230,7 +230,7 @@ def test_create_failure(mock_create):
 
 @mark.parametrize("state", ["inprogress", "unsubmitted"])
 def test_make_editable_success_when_editable(mock_make_editable, state):
-    deposition = example_record(state=state)
+    deposition = example_deposit(state=state)
     mock = mock_make_editable()
 
     result = sandbox_client.make_editable(deposition)
@@ -240,7 +240,7 @@ def test_make_editable_success_when_editable(mock_make_editable, state):
 
 
 def test_make_editable_success_when_not_editable(mock_make_editable):
-    deposition = example_record(state="done")
+    deposition = example_deposit(state="done")
     mock = mock_make_editable()
 
     result = sandbox_client.make_editable(deposition)
@@ -250,7 +250,7 @@ def test_make_editable_success_when_not_editable(mock_make_editable):
 
 
 def test_make_editable_failure(mock_make_editable):
-    deposition = example_record()
+    deposition = example_deposit()
     mock_make_editable(status_code=400)
     with raises(requests.HTTPError):
         sandbox_client.make_editable(deposition)
@@ -263,7 +263,7 @@ def test_make_editable_failure(mock_make_editable):
 def test_discard_success_when_editable(mock_discard, state):
     mock = mock_discard()
 
-    sandbox_client.discard(example_record(state=state))
+    sandbox_client.discard(example_deposit(state=state))
 
     assert_headers_correct(mock)
 
@@ -271,7 +271,7 @@ def test_discard_success_when_editable(mock_discard, state):
 def test_discard_success_when_not_editable(mock_discard):
     mock = mock_discard()
 
-    sandbox_client.discard(example_record(state="done"))
+    sandbox_client.discard(example_deposit(state="done"))
 
     assert not mock.called
 
@@ -279,7 +279,7 @@ def test_discard_success_when_not_editable(mock_discard):
 def test_discard_failure(mock_discard):
     mock_discard(status_code=400)
     with raises(requests.HTTPError):
-        sandbox_client.discard(example_record(state="inprogress"))
+        sandbox_client.discard(example_deposit(state="inprogress"))
 
 
 # update_metadata
@@ -287,7 +287,7 @@ def test_discard_failure(mock_discard):
 
 @mark.parametrize("state", ["inprogress", "unsubmitted", "done"])
 def test_update_metadata_success(mock_update_metadata, mock_make_editable, state):
-    deposition = example_record(state=state)
+    deposition = example_deposit(state=state)
     new_metadata = example_metadata(title="New Title")
     mock_make_editable()
     mock = mock_update_metadata()
@@ -300,7 +300,7 @@ def test_update_metadata_success(mock_update_metadata, mock_make_editable, state
 
 
 def test_update_metadata_failure(mock_update_metadata, mock_make_editable):
-    deposition = example_record()
+    deposition = example_deposit()
     mock_make_editable()
 
     mock_update_metadata(status_code=400)
@@ -314,7 +314,7 @@ def test_update_metadata_failure(mock_update_metadata, mock_make_editable):
 def test_upload_file_success(mock_upload_file, tmp_path):
     file_path = tmp_path / "data.txt"
     file_path.write_text("This is my file.")
-    deposition = example_record(submitted=False, state="unsubmitted")
+    deposition = example_deposit(submitted=False, state="unsubmitted")
     mock = mock_upload_file()
 
     result = sandbox_client.upload_file(deposition, file_path=file_path)
@@ -327,7 +327,7 @@ def test_upload_file_success(mock_upload_file, tmp_path):
 def test_upload_file_failure_api(mock_upload_file, tmp_path):
     file_path = tmp_path / "data.txt"
     file_path.write_text("This is my file.")
-    deposition = example_record(submitted=False, state="unsubmitted")
+    deposition = example_deposit(submitted=False, state="unsubmitted")
     mock_upload_file(status_code=400)
     with raises(requests.HTTPError):
         sandbox_client.upload_file(deposition, file_path=file_path)
@@ -336,7 +336,7 @@ def test_upload_file_failure_api(mock_upload_file, tmp_path):
 def test_upload_file_failure_file_not_found():
     with raises(FileNotFoundError):
         sandbox_client.upload_file(
-            example_record(submitted=False, state="unsubmitted"),
+            example_deposit(submitted=False, state="unsubmitted"),
             file_path=Path("data.txt"),
         )
 
@@ -344,7 +344,7 @@ def test_upload_file_failure_file_not_found():
 def test_upload_file_failure_published():
     with raises(ValueError):
         sandbox_client.upload_file(
-            example_record(submitted=True),
+            example_deposit(submitted=True),
             file_path=Path("data.txt"),
         )
 
@@ -352,7 +352,7 @@ def test_upload_file_failure_published():
 def test_upload_file_failure_no_bucket():
     with raises(ValueError):
         sandbox_client.upload_file(
-            example_record(submitted=False, state="unsubmitted", bucket=None),
+            example_deposit(submitted=False, state="unsubmitted", bucket=None),
             file_path=Path("data.txt"),
         )
 
@@ -361,16 +361,16 @@ def test_upload_file_failure_no_bucket():
 
 
 @mark.parametrize(
-    "record",
+    "deposit",
     [
-        example_record(submitted=False, state="unsubmitted"),
-        example_record(submitted=True, state="inprogress"),
+        example_deposit(submitted=False, state="unsubmitted"),
+        example_deposit(submitted=True, state="inprogress"),
     ],
 )
-def test_publish_success_unpublished(mock_publish, record):
+def test_publish_success_unpublished(mock_publish, deposit):
     mock = mock_publish()
 
-    result = sandbox_client.publish(record)
+    result = sandbox_client.publish(deposit)
 
     assert_headers_correct(mock)
     assert result.id == 123
@@ -379,14 +379,14 @@ def test_publish_success_unpublished(mock_publish, record):
 def test_publish_success_published(mock_publish):
     mock = mock_publish()
 
-    result = sandbox_client.publish(example_record(submitted=True, state="done"))
+    result = sandbox_client.publish(example_deposit(submitted=True, state="done"))
 
     assert not mock.called
     assert result.id == 123
 
 
 def test_publish_failure(mock_publish):
-    record = example_record(submitted=True, state="inprogress")
+    deposit = example_deposit(submitted=True, state="inprogress")
     mock_publish(status_code=500)
     with raises(requests.HTTPError):
-        sandbox_client.publish(record)
+        sandbox_client.publish(deposit)

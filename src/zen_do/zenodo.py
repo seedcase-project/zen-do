@@ -15,7 +15,7 @@ class ZenodoModel(BaseModel):
 
 
 class ZenodoCreator(ZenodoModel):
-    """Model representing the creator of a Zenodo record.
+    """Model representing the creator of a Zenodo deposit.
 
     Attributes:
         name: The name of the creator.
@@ -29,11 +29,11 @@ class ZenodoCreator(ZenodoModel):
 
 
 class ZenodoRelatedIdentifier(ZenodoModel):
-    """Model representing an identifier related to a Zenodo record.
+    """Model representing an identifier related to a Zenodo deposit.
 
     Attributes:
         identifier: The value of the identifier.
-        relation: The relationship between the record and the other piece of work
+        relation: The relationship between the deposit and the other piece of work
             identified by the identifier.
         resource_type: The type of the work identified by the identifier.
         scheme: The scheme followed by the identifier.
@@ -62,10 +62,10 @@ class ZenodoMetadata(ZenodoModel):
     """Model representing Zenodo metadata.
 
     Attributes:
-        title: The title of the record.
-        upload_type: The type of the record.
-        creators: The creators of the record.
-        related_identifiers: Identifiers related to the record.
+        title: The title of the deposit.
+        upload_type: The type of the deposit.
+        creators: The creators of the deposit.
+        related_identifiers: Identifiers related to the deposit.
     """
 
     title: str
@@ -78,47 +78,47 @@ class ZenodoLinks(ZenodoModel):
     """Model representing the group of links in Zenodo metadata.
 
     Attributes:
-        bucket: The file upload link for the record.
-        latest_draft: Link to the latest draft or the record.
+        bucket: The file upload link for the deposit.
+        latest_draft: Link to the latest draft or the deposit.
     """
 
-    # Published records cannot receive new file uploads
+    # Published deposits cannot receive new file uploads
     bucket: Optional[str] = None
     latest_draft: str
 
 
 class ZenodoFile(ZenodoModel):
-    """Model representing a file on a Zenodo record."""
+    """Model representing a file on a Zenodo deposit."""
 
 
-type ZenodoRecordState = Literal["done", "inprogress", "error", "unsubmitted"]
+type ZenodoDepositState = Literal["done", "inprogress", "error", "unsubmitted"]
 
 
-class ZenodoRecord(ZenodoModel):
-    """Model representing a Zenodo record.
+class ZenodoDeposit(ZenodoModel):
+    """Model representing a Zenodo deposit.
 
     Attributes:
-        id: The ID of the record.
-        metadata: The metadata the record.
-        links: Links to record assets and API endpoints.
-        state: The state of the record.
-        submitted: Whether the record has been published.
+        id: The ID of the deposit.
+        metadata: The metadata the deposit.
+        links: Links to deposit assets and API endpoints.
+        state: The state of the deposit.
+        submitted: Whether the deposit has been published.
     """
 
     id: int
     metadata: ZenodoMetadata
     links: ZenodoLinks
-    state: ZenodoRecordState
+    state: ZenodoDepositState
     submitted: bool
 
     @property
     def editable(self) -> bool:
-        """Whether the record can be edited."""
+        """Whether the deposit can be edited."""
         return self.state in ["inprogress", "unsubmitted"]
 
 
-def zenodo_get_record(token: str) -> Optional[ZenodoRecord]:
-    """Gets the Zenodo record for the repository if it exists.
+def zenodo_get_deposit(token: str) -> Optional[ZenodoDeposit]:
+    """Gets the Zenodo deposit for the repository if it exists.
 
     Gets the repository URL from the `.zenodo.json` file. If one
     doesn't exist, this function will not work.
@@ -127,7 +127,7 @@ def zenodo_get_record(token: str) -> Optional[ZenodoRecord]:
         token: Zenodo API access token.
 
     Returns:
-        The Zenodo record for the repo if it exists, None otherwise.
+        The Zenodo deposit for the repo if it exists, None otherwise.
     """
     urn = _get_urn()
 
@@ -137,29 +137,29 @@ def zenodo_get_record(token: str) -> Optional[ZenodoRecord]:
         timeout=10,
     )
     response.raise_for_status()
-    records: list[ZenodoRecord] = _map(response.json(), ZenodoRecord.model_validate)
-    matching_records = _filter(
-        records,
-        lambda record: bool(
+    deposits: list[ZenodoDeposit] = _map(response.json(), ZenodoDeposit.model_validate)
+    matching_deposits = _filter(
+        deposits,
+        lambda deposit: bool(
             _filter(
-                record.metadata.related_identifiers,
+                deposit.metadata.related_identifiers,
                 lambda id: _is_urn(id) and id.identifier == urn,
             )
         ),
     )
 
-    if len(matching_records) > 1:
+    if len(matching_deposits) > 1:
         raise ValueError(
-            "There are multiple records on Zenodo with the URN "
+            "There are multiple deposits on Zenodo with the URN "
             f"{urn!r} as a `related identifier`. We only allow one."
         )
-    if not matching_records:
+    if not matching_deposits:
         return None
-    return matching_records[0]
+    return matching_deposits[0]
 
 
-def zenodo_create_record(token: str) -> None:
-    """Create a new Zenodo concept record and publish the first version.
+def zenodo_create_deposit(token: str) -> None:
+    """Create a new Zenodo concept deposit and publish the first version.
 
     Args:
         token: Zenodo API access token.
@@ -167,12 +167,12 @@ def zenodo_create_record(token: str) -> None:
     ...
 
 
-def zenodo_update_record(token: str, id: int) -> None:
-    """Publish a new version of an existing Zenodo concept record.
+def zenodo_update_deposit(token: str, id: int) -> None:
+    """Publish a new version of an existing Zenodo concept deposit.
 
     Args:
         token: Zenodo API access token.
-        id: Zenodo record ID.
+        id: Zenodo deposit ID.
     """
     ...
 
@@ -192,7 +192,7 @@ def _get_urn() -> str:
         raise ValueError(
             "Expected exactly one `isIdenticalTo` URN in `.zenodo.json` under "
             f"`related_identifiers`, but found {len(ids)}. Ensure there is a single "
-            "unique URN, as it is used to identify the corresponding record on Zenodo."
+            "unique URN, as it is used to identify the corresponding deposit on Zenodo."
         )
 
     return ids[0].identifier
@@ -237,37 +237,37 @@ class ZenodoClient:
         response.raise_for_status()
         return _map(response.json(), lambda item: response_type.model_construct(**item))
 
-    def get_records(self) -> list[ZenodoRecord]:
-        """Gets all records.
+    def get_deposits(self) -> list[ZenodoDeposit]:
+        """Gets all deposits.
 
         Returns:
-            The list of all records.
+            The list of all deposits.
         """
         response = requests.get(
             self.depositions, headers=self.headers, timeout=self.timeout
         )
-        return self._resolve_list(response, ZenodoRecord)
+        return self._resolve_list(response, ZenodoDeposit)
 
-    def get_record(self, record_id: Union[int, str]) -> ZenodoRecord:
-        """Gets the record with the given ID.
+    def get_deposit(self, deposit_id: Union[int, str]) -> ZenodoDeposit:
+        """Gets the deposit with the given ID.
 
         Args:
-            record_id: The ID of the record.
+            deposit_id: The ID of the deposit.
 
         Returns:
-            The record.
+            The deposit.
 
         Raises:
-            requests.exceptions.HTTPError: If there is no record with the given ID.
+            requests.exceptions.HTTPError: If there is no deposit with the given ID.
         """
         response = requests.get(
-            f"{self.depositions}/{record_id}",
+            f"{self.depositions}/{deposit_id}",
             headers=self.headers,
             timeout=self.timeout,
         )
-        return self._resolve(response, ZenodoRecord)
+        return self._resolve(response, ZenodoDeposit)
 
-    def create(self, metadata: ZenodoMetadata) -> ZenodoRecord:
+    def create(self, metadata: ZenodoMetadata) -> ZenodoDeposit:
         """Creates a new deposition in editable state.
 
         Args:
@@ -282,9 +282,9 @@ class ZenodoClient:
             json={"metadata": metadata.model_dump()},
             timeout=self.timeout,
         )
-        return self._resolve(response, ZenodoRecord)
+        return self._resolve(response, ZenodoDeposit)
 
-    def make_editable(self, deposition: ZenodoRecord) -> ZenodoRecord:
+    def make_editable(self, deposition: ZenodoDeposit) -> ZenodoDeposit:
         """Makes the deposition editable.
 
         Args:
@@ -301,9 +301,9 @@ class ZenodoClient:
             headers=self.headers,
             timeout=self.timeout,
         )
-        return self._resolve(response, ZenodoRecord)
+        return self._resolve(response, ZenodoDeposit)
 
-    def discard(self, deposition: ZenodoRecord) -> None:
+    def discard(self, deposition: ZenodoDeposit) -> None:
         """Puts the deposition in a non-editable state by discarding all changes.
 
         If the deposition's state is `unsubmitted`, the deposition is deleted.
@@ -324,8 +324,8 @@ class ZenodoClient:
         response.raise_for_status()
 
     def update_metadata(
-        self, deposition: ZenodoRecord, metadata: ZenodoMetadata
-    ) -> ZenodoRecord:
+        self, deposition: ZenodoDeposit, metadata: ZenodoMetadata
+    ) -> ZenodoDeposit:
         """Updates the metadata of a deposition.
 
         Args:
@@ -342,9 +342,9 @@ class ZenodoClient:
             json={"metadata": metadata.model_dump()},
             timeout=self.timeout,
         )
-        return self._resolve(response, ZenodoRecord)
+        return self._resolve(response, ZenodoDeposit)
 
-    def upload_file(self, deposition: ZenodoRecord, file_path: Path) -> ZenodoFile:
+    def upload_file(self, deposition: ZenodoDeposit, file_path: Path) -> ZenodoFile:
         """Uploads a file to a deposition. The deposition must be unpublished.
 
         Args:
@@ -376,21 +376,21 @@ class ZenodoClient:
             )
         return self._resolve(response, ZenodoFile)
 
-    def publish(self, record: ZenodoRecord) -> ZenodoRecord:
-        """Publishes a record.
+    def publish(self, deposit: ZenodoDeposit) -> ZenodoDeposit:
+        """Publishes a deposit.
 
         Args:
-            record: The record.
+            deposit: The deposit.
 
         Returns:
-            The published record.
+            The published deposit.
         """
-        if record.submitted and record.state == "done":
-            return record
+        if deposit.submitted and deposit.state == "done":
+            return deposit
 
         response = requests.post(
-            f"{self.depositions}/{record.id}/actions/publish",
+            f"{self.depositions}/{deposit.id}/actions/publish",
             headers=self.headers,
             timeout=self.timeout,
         )
-        return self._resolve(response, ZenodoRecord)
+        return self._resolve(response, ZenodoDeposit)
