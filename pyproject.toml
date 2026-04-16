@@ -1,6 +1,6 @@
 [project]
 name = "zen-do"
-version = "0.6.1"
+version = "0.7.0"
 description = "Tasks to get Zenodo to do from the command line"
 authors = [
   { name = "Luke W. Johnston", email = "lwjohnst@gmail.com" },
@@ -24,6 +24,7 @@ license-files = ["LICENSE.md"]
 requires-python = ">=3.12"
 dependencies = [
     "cyclopts>=4.8.0",
+    "keyring>=25.7.0",
     "pydantic>=2.12.5",
     "requests>=2.32.5",
 ]

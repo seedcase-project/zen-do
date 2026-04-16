@@ -321,6 +321,27 @@ class ZenodoClient:
         )
         response.raise_for_status()
 
+    def update_metadata(
+        self, deposition: ZenodoRecord, metadata: ZenodoMetadata
+    ) -> ZenodoRecord:
+        """Updates the metadata of a deposition.
+
+        Args:
+            deposition: The deposition.
+            metadata: The new metadata.
+
+        Returns:
+            The updated deposition.
+        """
+        deposition = self.make_editable(deposition)
+        response = requests.put(
+            f"{self.depositions}/{deposition.id}",
+            headers=self.headers,
+            json={"metadata": metadata.model_dump()},
+            timeout=self.timeout,
+        )
+        return self._resolve(response, ZenodoRecord)
+
     def new_version(self, deposition: ZenodoRecord) -> ZenodoRecord:
         """Creates a new, unpublished version of a published deposition.
 

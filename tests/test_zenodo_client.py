@@ -92,6 +92,20 @@ def mock_discard(requests_mock):
 
 
 @pytest.fixture
+def mock_update_metadata(requests_mock):
+    deposition = example_record()
+
+    def _mock(json=deposition.model_dump(), id=deposition.id, status_code=200):
+        return requests_mock.put(
+            f"{sandbox_client.depositions}/{id}",
+            json=json,
+            status_code=status_code,
+        )
+
+    return _mock
+
+
+@pytest.fixture
 def mock_new_version(requests_mock):
     deposition = example_record()
 
@@ -280,6 +294,32 @@ def test_discard_failure(mock_discard):
     mock_discard(status_code=400)
     with raises(requests.HTTPError):
         sandbox_client.discard(example_record(state="inprogress"))
+
+
+# update_metadata
+
+
+@mark.parametrize("state", ["inprogress", "unsubmitted", "done"])
+def test_update_metadata_success(mock_update_metadata, mock_make_editable, state):
+    deposition = example_record(state=state)
+    new_metadata = example_metadata(title="New Title")
+    mock_make_editable()
+    mock = mock_update_metadata()
+
+    result = sandbox_client.update_metadata(deposition, new_metadata)
+
+    assert_headers_correct(mock)
+    assert result.id == deposition.id
+    assert mock.last_request.json() == {"metadata": new_metadata.model_dump()}
+
+
+def test_update_metadata_failure(mock_update_metadata, mock_make_editable):
+    deposition = example_record()
+    mock_make_editable()
+
+    mock_update_metadata(status_code=400)
+    with raises(requests.HTTPError):
+        sandbox_client.update_metadata(deposition, example_metadata())
 
 
 # new_version
