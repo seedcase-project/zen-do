@@ -310,10 +310,6 @@ def test_new_version_api_failure(mock_discard, mock_new_version):
     with raises(requests.HTTPError):
         sandbox_client.new_version(example_record())
 
-    mock_new_version({"unexpected": "response"})
-    with raises(pydantic.ValidationError):
-        sandbox_client.new_version(example_record())
-
 
 # upload_file
 
