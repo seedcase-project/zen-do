@@ -14,6 +14,7 @@ from zen_do.zenodo import (
 app = setup_cli(
     name="zen-do",
     help="zen-do simplifies interacting with Zenodo for common publishing tasks.",
+    # TODO: Replace/remove this once Soil has been updated so config_name is optional.
     config_name="",
 )
 
