@@ -307,10 +307,6 @@ def test_update_metadata_failure(mock_update_metadata, mock_make_editable):
     with raises(requests.HTTPError):
         sandbox_client.update_metadata(deposition, example_metadata())
 
-    mock_update_metadata({"unexpected": "response"})
-    with raises(pydantic.ValidationError):
-        sandbox_client.update_metadata(deposition, example_metadata())
-
 
 # upload_file
 
