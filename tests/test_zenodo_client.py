@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Any
 
-import pydantic
 import pytest
 import requests
 from pytest import mark, raises
@@ -134,6 +133,35 @@ def mock_publish(requests_mock):
     return _mock
 
 
+# _resolve and _resolve_list
+
+
+def test_resolve_does_not_check_response_properties(mock_get_record):
+    mock_get_record({"unexpected": "response"})
+
+    assert sandbox_client.get_record(123)
+
+
+def test_resolve_list_does_not_check_response_properties(mock_get_records):
+    mock_get_records([{"unexpected": "response"}])
+
+    assert sandbox_client.get_records()
+
+
+def test_resolve_flags_unexpected_type(mock_get_record):
+    mock_get_record([{"not": "a dict"}])
+
+    with raises(TypeError):
+        sandbox_client.get_record(123)
+
+
+def test_resolve_list_flags_unexpected_type(mock_get_records):
+    mock_get_records({"not": "a list"})
+
+    with raises(TypeError):
+        sandbox_client.get_records()
+
+
 # get_records
 
 
@@ -157,10 +185,6 @@ def test_get_records_failure(mock_get_records):
     with raises(requests.HTTPError):
         sandbox_client.get_records()
 
-    mock_get_records([{"unexpected": "response"}])
-    with raises(pydantic.ValidationError):
-        sandbox_client.get_records()
-
 
 # get_record
 
@@ -177,10 +201,6 @@ def test_get_record_success(mock_get_record):
 def test_get_record_failure(mock_get_record):
     mock_get_record(status_code=500)
     with raises(requests.HTTPError):
-        sandbox_client.get_record(123)
-
-    mock_get_record({"unexpected": "response"})
-    with raises(pydantic.ValidationError):
         sandbox_client.get_record(123)
 
 
@@ -202,10 +222,6 @@ def test_create_failure(mock_create):
     metadata = example_metadata()
     mock_create(status_code=400)
     with raises(requests.HTTPError):
-        sandbox_client.create(metadata)
-
-    mock_create({"unexpected": "response"})
-    with raises(pydantic.ValidationError):
         sandbox_client.create(metadata)
 
 
@@ -237,10 +253,6 @@ def test_make_editable_failure(mock_make_editable):
     deposition = example_record()
     mock_make_editable(status_code=400)
     with raises(requests.HTTPError):
-        sandbox_client.make_editable(deposition)
-
-    mock_make_editable({"unexpected": "response"})
-    with raises(pydantic.ValidationError):
         sandbox_client.make_editable(deposition)
 
 
@@ -324,10 +336,6 @@ def test_upload_file_failure_api(mock_upload_file, tmp_path):
     with raises(requests.HTTPError):
         sandbox_client.upload_file(deposition, file_path=file_path)
 
-    mock_upload_file(json=[{"unexpected": "response"}])
-    with raises(pydantic.ValidationError):
-        sandbox_client.upload_file(deposition, file_path=file_path)
-
 
 def test_upload_file_failure_file_not_found():
     with raises(FileNotFoundError):
@@ -385,8 +393,4 @@ def test_publish_failure(mock_publish):
     record = example_record(submitted=True, state="inprogress")
     mock_publish(status_code=500)
     with raises(requests.HTTPError):
-        sandbox_client.publish(record)
-
-    mock_publish({"unexpected": "response"})
-    with raises(pydantic.ValidationError):
         sandbox_client.publish(record)
