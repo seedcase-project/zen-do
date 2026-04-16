@@ -17,10 +17,10 @@ For the `convert` command, the input is actually a format other than the
 similar metadata is contained in those other formats.
 :::
 
-For repositories that have or will have multiple deposits, there
-will also be multiple `.zenodo.toml` files, one for each deposit. For
-most use-cases, you would store the `.zenodo.toml` file in the same folder
-as the file that will be uploaded to the deposit as its content. For
+For repositories that have or will have multiple deposits, there will
+also be multiple `.zenodo.toml` files, one for each deposit. For most
+use-cases, you would store the `.zenodo.toml` file in the same folder as
+the file that will be uploaded to the deposit as its content. For
 example, in a research project repository, there may be a deposit for
 the paper with the metadata kept in `docs/paper/.zenodo.toml` alongside
 the paper PDF in `docs/paper/paper.pdf` and a deposit for the data with
