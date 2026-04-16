@@ -38,6 +38,36 @@ def init(verbose: bool = False) -> None:
     print_if_verbose(verbose, "Created an empty `.zenodo.toml` file.")
 ```
 
+## {{< var planned >}} `list`
+
+```bash
+zen-do list --sandbox
+```
+
+The `list` command fetches the stored Zenodo token and gets all Zenodo
+deposits listed in the account connected to that token. Both the CLI and
+the internal Python interface are used in other functions like
+`publish()` to find whether a deposit exists or not.
+
+The Python interface, with some implementation comments and docstring,
+will be:
+
+```python
+@app.command()
+def list(sandbox: bool = False) -> None:
+    """List all Zenodo deposits in an account as raw JSON (from the Zenodo servers).
+
+    Args:
+        sandbox: Whether to use the Zenodo sandbox environment for testing purposes.
+    """
+    # Fetch token from system keyring or environment variable.
+    # token: Token = get_token(sandbox=sandbox)
+    # Get request to Zenodo servers.
+    # TODO: Either dict or a custom class for the deposit, e.g. `Deposit`?
+    # deposits: list[Deposit] = list_deposits(sandbox=sandbox, token=token)
+    pretty_print(deposits)
+```
+
 ## {{< var planned >}} `get`
 
 ```bash
