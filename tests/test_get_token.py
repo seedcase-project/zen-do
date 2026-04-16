@@ -1,7 +1,7 @@
 from keyring.errors import NoKeyringError
 from pytest import mark, raises
 
-from zen_do.cli import SERVICE_NAME, get_token
+from zen_do.get_token import SERVICE_NAME, get_token
 
 
 @mark.parametrize("sandbox", [False, True])
