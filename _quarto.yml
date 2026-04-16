@@ -40,6 +40,12 @@ website:
         - text: "Design"
           href: docs/design/index.qmd
         - docs/design/architecture.qmd
+        - section: "Interface"
+          href: docs/design/interface/index.qmd
+          contents:
+            - docs/design/interface/inputs.qmd
+            - docs/design/interface/outputs.qmd
+            - docs/design/interface/cli.qmd
     - id: guide
       contents:
         - section: "Guide"

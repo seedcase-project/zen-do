@@ -26,7 +26,7 @@ def test_returns_record_if_matching_record_has_exactly_one_matching_identifier(
         url=ANY,
         json=[
             example_record(id=12).model_dump(),
-            example_record(urn="urn:my-org/project:poster").model_dump(),
+            example_record(urn="urn:zenodo:my-org:project:poster").model_dump(),
         ],
     )
 
@@ -46,7 +46,7 @@ def test_returns_record_if_matching_record_has_at_least_one_matching_identifier(
             fetched_record.metadata.related_identifiers[0],
             # Different identifier
             ZenodoRelatedIdentifier(
-                identifier="urn:my-org/project:poster",
+                identifier="urn:zenodo:my-org:project:poster",
                 relation="isIdenticalTo",
                 resource_type="other",
                 scheme="urn",
@@ -82,7 +82,7 @@ def test_returns_none_if_no_records_on_zenodo(requests_mock, _zenodo_json):
 def test_returns_none_if_no_matching_records(requests_mock, _zenodo_json):
     requests_mock.get(
         url=ANY,
-        json=[example_record(urn="urn:my-org/project:poster").model_dump()],
+        json=[example_record(urn="urn:zenodo:my-org:project:poster").model_dump()],
     )
 
     record = zenodo_get_record("token")
@@ -112,7 +112,7 @@ def test_raises_error_if_zenodo_json_has_multiple_repo_urls(monkeypatch, tmp_pat
     monkeypatch.chdir(tmp_path)
     metadata.related_identifiers.append(
         ZenodoRelatedIdentifier(
-            identifier="urn:my-org/project:poster",
+            identifier="urn:zenodo:my-org:project:poster",
             relation="isIdenticalTo",
             resource_type="other",
             scheme="urn",
@@ -124,7 +124,20 @@ def test_raises_error_if_zenodo_json_has_multiple_repo_urls(monkeypatch, tmp_pat
         zenodo_get_record("token")
 
 
-@mark.parametrize("urn", ["", "not a URN", "urn:"])
+@mark.parametrize(
+    "urn",
+    [
+        "",
+        "not a URN",
+        "urn",
+        "urn:",
+        "urn:unknown",
+        "urn:zenodo",
+        "urn:zenodo:",
+        "urn:zenodo:a:",
+        "urn:zenodo:a/b",
+    ],
+)
 def test_flags_incorrect_urn(monkeypatch, tmp_path, urn):
     metadata_json = example_metadata().model_dump()
     metadata_json["related_identifiers"][0]["identifier"] = urn
