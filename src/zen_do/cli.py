@@ -1,4 +1,8 @@
-from cyclopts import App
+from seedcase_soil import (
+    # print_if_verbose,
+    run_without_tracebacks,
+    setup_cli,
+)
 
 from zen_do.get_token import get_token
 from zen_do.zenodo import (
@@ -7,12 +11,10 @@ from zen_do.zenodo import (
     zenodo_update_record,
 )
 
-app = App(
+app = setup_cli(
     name="zen-do",
-    help=(
-        "The `zen_do` package contains GitHub reusable workflows and "
-        "actions used in the Seedcase Project."
-    ),
+    help="zen-do simplifies interacting with Zenodo for common publishing tasks.",
+    config_name="",
 )
 
 
@@ -26,3 +28,8 @@ def zenodo_publish(sandbox: bool = False) -> None:
     else:
         zenodo_create_record(token)
         print("New Zenodo record created successfully!")
+
+
+def main() -> None:
+    """Create an entry point to run the cli without tracebacks."""
+    run_without_tracebacks(app)

@@ -23,10 +23,11 @@ license = "MIT"
 license-files = ["LICENSE.md"]
 requires-python = ">=3.12"
 dependencies = [
-    "cyclopts>=4.8.0",
-    "keyring>=25.7.0",
-    "pydantic>=2.12.5",
-    "requests>=2.32.5",
+  "cyclopts>=4.8.0",
+  "keyring>=25.7.0",
+  "pydantic>=2.12.5",
+  "requests>=2.32.5",
+  "seedcase-soil",
 ]
 
 [project.urls]
@@ -36,7 +37,7 @@ changelog = "https://github.com/seedcase-project/zen-do/blob/main/CHANGELOG.md"
 issues = "https://github.com/seedcase-project/zen-do/issues"
 
 [project.scripts]
-zen-do = "zen_do.cli:app"
+zen-do = "zen_do.cli:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -61,3 +62,6 @@ dev = [
   "typos>=1.44.0",
   "vulture>=2.15",
 ]
+
+[tool.uv.sources]
+seedcase-soil = { git = "https://github.com/seedcase-project/seedcase-soil.git" }
