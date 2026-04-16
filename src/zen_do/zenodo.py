@@ -158,25 +158,6 @@ def zenodo_get_record(token: str) -> Optional[ZenodoRecord]:
     return matching_records[0]
 
 
-def zenodo_create_record(token: str) -> None:
-    """Create a new Zenodo concept record and publish the first version.
-
-    Args:
-        token: Zenodo API access token.
-    """
-    ...
-
-
-def zenodo_update_record(token: str, id: int) -> None:
-    """Publish a new version of an existing Zenodo concept record.
-
-    Args:
-        token: Zenodo API access token.
-        id: Zenodo record ID.
-    """
-    ...
-
-
 def _load_zenodo_json() -> ZenodoMetadata:
     return ZenodoMetadata.model_validate_json(Path(".zenodo.json").read_text())
 
