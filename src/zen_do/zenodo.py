@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Literal, Optional, Self, Union
 
 import requests
-from pydantic import BaseModel, ConfigDict, TypeAdapter, model_validator
+from pydantic import BaseModel, ConfigDict, model_validator
 
 from zen_do.internals import _filter, _map
 
@@ -215,7 +215,7 @@ class ZenodoClient:
         host = "sandbox.zenodo" if sandbox else "zenodo"
         self.depositions = f"https://{host}.org/api/deposit/depositions"
 
-    def _resolve[ResponseType](
+    def _resolve[ResponseType: ZenodoModel](
         self,
         response: requests.Response,
         response_type: type[ResponseType],
@@ -224,8 +224,18 @@ class ZenodoClient:
         # TODO: include response.text in error because that is where Zenodo
         # gives reasons
         response.raise_for_status()
-        adapter: TypeAdapter[ResponseType] = TypeAdapter(response_type)
-        return adapter.validate_python(response.json())
+        return response_type.model_construct(**response.json())
+
+    def _resolve_list[ResponseType: ZenodoModel](
+        self,
+        response: requests.Response,
+        response_type: type[ResponseType],
+    ) -> list[ResponseType]:
+        """Maps the API response to a list of the given model."""
+        # TODO: include response.text in error because that is where Zenodo
+        # gives reasons
+        response.raise_for_status()
+        return _map(response.json(), lambda item: response_type.model_construct(**item))
 
     def get_records(self) -> list[ZenodoRecord]:
         """Gets all records.
@@ -236,7 +246,7 @@ class ZenodoClient:
         response = requests.get(
             self.depositions, headers=self.headers, timeout=self.timeout
         )
-        return self._resolve(response, list[ZenodoRecord])
+        return self._resolve_list(response, ZenodoRecord)
 
     def get_record(self, record_id: Union[int, str]) -> ZenodoRecord:
         """Gets the record with the given ID.
