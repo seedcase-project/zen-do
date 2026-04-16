@@ -1,7 +1,6 @@
-import os
-
 from cyclopts import App
 
+from zen_do.get_token import get_token
 from zen_do.zenodo import (
     zenodo_create_record,
     zenodo_get_record,
@@ -18,12 +17,9 @@ app = App(
 
 
 @app.command()
-def zenodo_publish() -> None:
+def zenodo_publish(sandbox: bool = False) -> None:
     """Publish a new version of the repository on Zenodo."""
-    token = os.getenv("ZENODO_TOKEN")
-    if not token:
-        raise RuntimeError("ZENODO_TOKEN environment variable is not set.")
-
+    token = get_token(sandbox)
     if record := zenodo_get_record(token):
         zenodo_update_record(token, record.id)
         print("Zenodo record updated successfully!")
