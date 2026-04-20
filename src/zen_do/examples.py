@@ -57,5 +57,5 @@ def example_deposit(
         metadata=metadata,
         state=state,
         submitted=submitted,
-        links=ZenodoLinks(latest_draft="https://path.com/path/9999", bucket=bucket),
+        links=ZenodoLinks(bucket=bucket),
     )

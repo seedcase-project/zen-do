@@ -106,6 +106,20 @@ def mock_update_metadata(requests_mock):
 
 
 @pytest.fixture
+def mock_new_version(requests_mock):
+    deposition = example_deposit()
+
+    def _mock(json=deposition.model_dump(), id=deposition.id, status_code=201):
+        return requests_mock.post(
+            f"{sandbox_client.deposits}/{id}/actions/newversion",
+            json=json,
+            status_code=status_code,
+        )
+
+    return _mock
+
+
+@pytest.fixture
 def mock_upload_file(requests_mock):
     def _mock(url=None, json={}, file_path=Path("data.txt"), status_code=200):
         if url is None:
@@ -306,6 +320,35 @@ def test_update_metadata_failure(mock_update_metadata, mock_make_editable):
     mock_update_metadata(status_code=400)
     with raises(requests.HTTPError):
         sandbox_client.update_metadata(deposit, example_metadata())
+
+
+# new_version
+
+
+def test_new_version_success(mock_discard, mock_new_version):
+    mock_discard()
+    new_version_response = example_deposit(id=88)
+    mock_new_version = mock_new_version(new_version_response.model_dump())
+
+    result = sandbox_client.new_version(example_deposit(submitted=True))
+
+    assert_headers_correct(mock_new_version)
+    assert result.id == new_version_response.id
+
+
+def test_new_version_flags_non_published(mock_discard, mock_new_version):
+    mock_discard()
+    mock_new_version()
+    with raises(ValueError):
+        sandbox_client.new_version(example_deposit(submitted=False))
+
+
+def test_new_version_api_failure(mock_discard, mock_new_version):
+    mock_discard()
+
+    mock_new_version(status_code=400)
+    with raises(requests.HTTPError):
+        sandbox_client.new_version(example_deposit())
 
 
 # upload_file

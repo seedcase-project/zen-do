@@ -78,13 +78,16 @@ class ZenodoLinks(ZenodoModel):
     """Model representing the group of links in Zenodo metadata.
 
     Attributes:
-        bucket: The file upload link for the deposit.
-        latest_draft: Link to the latest draft or the deposit.
+    <<<<<<< HEAD
+            bucket: The file upload link for the deposit.
+            latest_draft: Link to the latest draft or the deposit.
+    =======
+            bucket: The file upload link for the deposit.
+    >>>>>>> f94f8ac2b7af3b4e85bd3eae71898c2435a1155f
     """
 
     # Published deposits cannot receive new file uploads
     bucket: Optional[str] = None
-    latest_draft: str
 
 
 class ZenodoFile(ZenodoModel):
@@ -321,6 +324,31 @@ class ZenodoClient:
             f"{self.deposits}/{deposit.id}",
             headers=self.headers,
             json={"metadata": metadata.model_dump()},
+            timeout=self.timeout,
+        )
+        return self._resolve(response, ZenodoDeposit)
+
+    def new_version(self, deposit: ZenodoDeposit) -> ZenodoDeposit:
+        """Creates a new, unpublished version of a published deposit.
+
+        Args:
+            deposit: The deposit.
+
+        Returns:
+            The new version of the deposit.
+        """
+        if not deposit.submitted:
+            raise ValueError(
+                f"Cannot create new version for deposit {deposit.id} because it "
+                "has not yet been published."
+            )
+
+        # Discard any changes on the old version to avoid the situation where we
+        # create a new version but leave unpublished changes on the old one.
+        self.discard(deposit)
+        response = requests.post(
+            f"{self.deposits}/{deposit.id}/actions/newversion",
+            headers=self.headers,
             timeout=self.timeout,
         )
         return self._resolve(response, ZenodoDeposit)
