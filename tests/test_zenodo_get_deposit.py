@@ -53,6 +53,12 @@ def test_returns_deposit_if_matching_deposit_has_at_least_one_matching_identifie
                 resource_type="other",
                 scheme="urn",
             ).model_dump(),
+            # Malformed identifier added in the UI
+            {
+                "identifier": "not our URN format",
+                "relation": "isIdenticalTo",
+                "scheme": "urn",
+            },
         ]
     )
     requests_mock.get(url=ANY, json=[fetched_deposit])
