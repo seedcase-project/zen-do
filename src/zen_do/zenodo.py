@@ -158,25 +158,6 @@ def zenodo_get_deposit(token: str) -> Optional[ZenodoDeposit]:
     return matching_deposits[0]
 
 
-def zenodo_create_deposit(token: str) -> None:
-    """Create a new Zenodo concept deposit and publish the first version.
-
-    Args:
-        token: Zenodo API access token.
-    """
-    ...
-
-
-def zenodo_update_deposit(token: str, id: int) -> None:
-    """Publish a new version of an existing Zenodo concept deposit.
-
-    Args:
-        token: Zenodo API access token.
-        id: Zenodo deposit ID.
-    """
-    ...
-
-
 def _load_zenodo_json() -> ZenodoMetadata:
     return ZenodoMetadata.model_validate_json(Path(".zenodo.json").read_text())
 

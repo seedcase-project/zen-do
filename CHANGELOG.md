@@ -16,6 +16,16 @@ individual release will not have many changes within it. Below is a list
 of the releases we've made so far, along with what was changed within
 each release.
 
+## 0.8.0 (2026-04-17)
+
+### Feat
+
+- :sparkles: add `update_metadata()` (#34)
+
+### Refactor
+
+- 🔥 remove unused/out-dated functions (#66)
+
 ## 0.7.0 (2026-04-16)
 
 ### Feat
