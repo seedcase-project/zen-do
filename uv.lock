@@ -2409,6 +2409,19 @@ wheels = [
 ]
 
 [[package]]
+name = "seedcase-soil"
+version = "0.7.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "cyclopts" },
+    { name = "rich" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ce/ba/6fca3821296c895390dc25238d4d019fdcdb0496ea598e8146a0832f0855/seedcase_soil-0.7.0.tar.gz", hash = "sha256:acfadebe16da957796e0c100d80d526e841704285ef4692ec5dd6883ee81b980", size = 1041872, upload-time = "2026-04-20T07:36:01.103Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/88/af/040b0587cde999616d3e51c9cc236511fd38f6ca6b0a20b0bca8cf980d7f/seedcase_soil-0.7.0-py3-none-any.whl", hash = "sha256:cfade0181d93c7750e0967cf7d6d3abfa3445feca6263bc112aab484070b6678", size = 15515, upload-time = "2026-04-20T07:35:59.916Z" },
+]
+
+[[package]]
 name = "send2trash"
 version = "2.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2812,6 +2825,7 @@ dependencies = [
     { name = "keyring" },
     { name = "pydantic" },
     { name = "requests" },
+    { name = "seedcase-soil" },
 ]
 
 [package.dev-dependencies]
@@ -2840,6 +2854,7 @@ requires-dist = [
     { name = "keyring", specifier = ">=25.7.0" },
     { name = "pydantic", specifier = ">=2.12.5" },
     { name = "requests", specifier = ">=2.32.5" },
+    { name = "seedcase-soil", specifier = ">=0.7.0" },
 ]
 
 [package.metadata.requires-dev]

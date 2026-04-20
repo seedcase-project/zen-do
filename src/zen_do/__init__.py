@@ -2,15 +2,8 @@
 
 from .cli import zenodo_publish
 from .examples import example_deposit, example_metadata
-from .zenodo import (
-    ZenodoClient,
-    ZenodoCreator,
-    ZenodoDeposit,
-    ZenodoDepositState,
-    ZenodoLinks,
-    ZenodoMetadata,
-    ZenodoRelatedIdentifier,
-)
+from .zenodo_client import ZenodoClient, ZenodoDepositState
+from .zenodo_metadata import ZenodoCreator, ZenodoMetadata, ZenodoRelatedIdentifier
 
 __all__ = [
     "example_metadata",
@@ -18,9 +11,7 @@ __all__ = [
     "zenodo_publish",
     "ZenodoClient",
     "ZenodoCreator",
-    "ZenodoLinks",
     "ZenodoMetadata",
-    "ZenodoDeposit",
     "ZenodoDepositState",
     "ZenodoRelatedIdentifier",
 ]
