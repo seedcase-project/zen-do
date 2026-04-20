@@ -11,10 +11,10 @@ type ZenodoResponse = dict[str, Any]
 type ZenodoDepositState = Literal["done", "inprogress", "error", "unsubmitted"]
 
 
-def _get_zenodo_field(deposit: ZenodoResponse, field: str) -> Any:
-    if field not in deposit:
-        raise ValueError(f"Missing '{field}' field in object {deposit!r}.")
-    return deposit[field]
+def _get_zenodo_field(response: ZenodoResponse, field: str) -> Any:
+    if field not in response:
+        raise ValueError(f"Missing '{field}' field in object {response!r}.")
+    return response[field]
 
 
 def _get_deposit_id(deposit: ZenodoResponse) -> int:
