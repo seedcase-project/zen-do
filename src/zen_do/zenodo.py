@@ -78,12 +78,7 @@ class ZenodoLinks(ZenodoModel):
     """Model representing the group of links in Zenodo metadata.
 
     Attributes:
-    <<<<<<< HEAD
             bucket: The file upload link for the deposit.
-            latest_draft: Link to the latest draft or the deposit.
-    =======
-            bucket: The file upload link for the deposit.
-    >>>>>>> f94f8ac2b7af3b4e85bd3eae71898c2435a1155f
     """
 
     # Published deposits cannot receive new file uploads
