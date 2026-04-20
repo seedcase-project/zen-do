@@ -194,7 +194,7 @@ class ZenodoClient:
         self.timeout = timeout
 
         host = "sandbox.zenodo" if sandbox else "zenodo"
-        self.depositions = f"https://{host}.org/api/deposit/depositions"
+        self.deposits = f"https://{host}.org/api/deposit/depositions"
 
     def _resolve[ResponseType: ZenodoModel](
         self,
@@ -225,7 +225,7 @@ class ZenodoClient:
             The list of all deposits.
         """
         response = requests.get(
-            self.depositions, headers=self.headers, timeout=self.timeout
+            self.deposits, headers=self.headers, timeout=self.timeout
         )
         return self._resolve_list(response, ZenodoDeposit)
 
@@ -242,115 +242,115 @@ class ZenodoClient:
             requests.exceptions.HTTPError: If there is no deposit with the given ID.
         """
         response = requests.get(
-            f"{self.depositions}/{deposit_id}",
+            f"{self.deposits}/{deposit_id}",
             headers=self.headers,
             timeout=self.timeout,
         )
         return self._resolve(response, ZenodoDeposit)
 
     def create(self, metadata: ZenodoMetadata) -> ZenodoDeposit:
-        """Creates a new deposition in editable state.
+        """Creates a new deposit in editable state.
 
         Args:
-            metadata: The metadata of the new deposition.
+            metadata: The metadata of the new deposit.
 
         Returns:
-            The newly created deposition.
+            The newly created deposit.
         """
         response = requests.post(
-            self.depositions,
+            self.deposits,
             headers=self.headers,
             json={"metadata": metadata.model_dump()},
             timeout=self.timeout,
         )
         return self._resolve(response, ZenodoDeposit)
 
-    def make_editable(self, deposition: ZenodoDeposit) -> ZenodoDeposit:
-        """Makes the deposition editable.
+    def make_editable(self, deposit: ZenodoDeposit) -> ZenodoDeposit:
+        """Makes the deposit editable.
 
         Args:
-            deposition: The deposition.
+            deposit: The deposit.
 
         Returns:
-            The deposition in editable state.
+            The deposit in editable state.
         """
-        if deposition.editable:
-            return deposition
+        if deposit.editable:
+            return deposit
 
         response = requests.post(
-            f"{self.depositions}/{deposition.id}/actions/edit",
+            f"{self.deposits}/{deposit.id}/actions/edit",
             headers=self.headers,
             timeout=self.timeout,
         )
         return self._resolve(response, ZenodoDeposit)
 
-    def discard(self, deposition: ZenodoDeposit) -> None:
-        """Puts the deposition in a non-editable state by discarding all changes.
+    def discard(self, deposit: ZenodoDeposit) -> None:
+        """Puts the deposit in a non-editable state by discarding all changes.
 
-        If the deposition's state is `unsubmitted`, the deposition is deleted.
-        If the deposition's state is `inprogress`, the deposition is restored to
+        If the deposit's state is `unsubmitted`, the deposit is deleted.
+        If the deposit's state is `inprogress`, the deposit is restored to
         the state when it was last published.
 
         Args:
-            deposition: The deposition.
+            deposit: The deposit.
         """
-        if not deposition.editable:
+        if not deposit.editable:
             return None
 
         response = requests.post(
-            f"{self.depositions}/{deposition.id}/actions/discard",
+            f"{self.deposits}/{deposit.id}/actions/discard",
             headers=self.headers,
             timeout=self.timeout,
         )
         response.raise_for_status()
 
     def update_metadata(
-        self, deposition: ZenodoDeposit, metadata: ZenodoMetadata
+        self, deposit: ZenodoDeposit, metadata: ZenodoMetadata
     ) -> ZenodoDeposit:
-        """Updates the metadata of a deposition.
+        """Updates the metadata of a deposit.
 
         Args:
-            deposition: The deposition.
+            deposit: The deposit.
             metadata: The new metadata.
 
         Returns:
-            The updated deposition.
+            The updated deposit.
         """
-        deposition = self.make_editable(deposition)
+        deposit = self.make_editable(deposit)
         response = requests.put(
-            f"{self.depositions}/{deposition.id}",
+            f"{self.deposits}/{deposit.id}",
             headers=self.headers,
             json={"metadata": metadata.model_dump()},
             timeout=self.timeout,
         )
         return self._resolve(response, ZenodoDeposit)
 
-    def upload_file(self, deposition: ZenodoDeposit, file_path: Path) -> ZenodoFile:
-        """Uploads a file to a deposition. The deposition must be unpublished.
+    def upload_file(self, deposit: ZenodoDeposit, file_path: Path) -> ZenodoFile:
+        """Uploads a file to a deposit. The deposit must be unpublished.
 
         Args:
-            deposition: The deposition.
+            deposit: The deposit.
             file_path: The path to the file.
 
         Returns:
-            The updated deposition.
+            The updated deposit.
         """
-        if deposition.submitted:
+        if deposit.submitted:
             raise ValueError(
-                f"Cannot upload new file to deposition {deposition.id} because the "
-                "deposition has already been published. You must first create a new "
-                "version of the deposition and upload the files there."
+                f"Cannot upload new file to deposit {deposit.id} because the "
+                "deposit has already been published. You must first create a new "
+                "version of the deposit and upload the files there."
             )
 
-        if not deposition.links.bucket:
+        if not deposit.links.bucket:
             raise ValueError(
-                f"Cannot upload new file to deposition {deposition.id} because the "
-                "deposition does not have a file-upload (bucket) link. "
+                f"Cannot upload new file to deposit {deposit.id} because the "
+                "deposit does not have a file-upload (bucket) link. "
             )
 
         with file_path.open("rb") as file_stream:
             response = requests.put(
-                f"{deposition.links.bucket}/{file_path.name}",
+                f"{deposit.links.bucket}/{file_path.name}",
                 data=file_stream,
                 headers=self.headers,
                 timeout=self.timeout,
@@ -370,7 +370,7 @@ class ZenodoClient:
             return deposit
 
         response = requests.post(
-            f"{self.depositions}/{deposit.id}/actions/publish",
+            f"{self.deposits}/{deposit.id}/actions/publish",
             headers=self.headers,
             timeout=self.timeout,
         )
