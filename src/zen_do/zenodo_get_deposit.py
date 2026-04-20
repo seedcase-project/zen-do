@@ -3,7 +3,7 @@ from typing import Optional
 
 import seedcase_soil as ss
 
-from zen_do.zenodo_client import ZenodoClient, ZenodoResponse, _get_deposit_field
+from zen_do.zenodo_client import ZenodoClient, ZenodoResponse, _get_zenodo_field
 from zen_do.zenodo_metadata import ZenodoMetadata, ZenodoRelatedIdentifier
 
 
@@ -26,7 +26,7 @@ def zenodo_get_deposit(client: ZenodoClient) -> Optional[ZenodoResponse]:
         deposits,
         lambda deposit: bool(
             ss.keep(
-                _get_deposit_field(deposit, "metadata").get("related_identifiers", []),
+                _get_zenodo_field(deposit, "metadata").get("related_identifiers", []),
                 lambda id: _urn_matches(id, urn),
             )
         ),
@@ -42,8 +42,8 @@ def zenodo_get_deposit(client: ZenodoClient) -> Optional[ZenodoResponse]:
     return matching_deposits[0]
 
 
-def _urn_matches(id_json: ZenodoResponse, target_urn: str) -> bool:
-    id = ZenodoRelatedIdentifier.model_construct(**id_json)
+def _urn_matches(id_response: ZenodoResponse, target_urn: str) -> bool:
+    id = ZenodoRelatedIdentifier.model_construct(**id_response)
     return _is_urn(id) and id.identifier == target_urn
 
 

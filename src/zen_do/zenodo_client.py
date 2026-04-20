@@ -11,18 +11,18 @@ type ZenodoResponse = dict[str, Any]
 type ZenodoDepositState = Literal["done", "inprogress", "error", "unsubmitted"]
 
 
-def _get_deposit_field(deposit: ZenodoResponse, field: str) -> Any:
+def _get_zenodo_field(deposit: ZenodoResponse, field: str) -> Any:
     if field not in deposit:
         raise ValueError(f"Missing '{field}' field in object {deposit!r}.")
     return deposit[field]
 
 
 def _get_deposit_id(deposit: ZenodoResponse) -> int:
-    return int(_get_deposit_field(deposit, "id"))
+    return int(_get_zenodo_field(deposit, "id"))
 
 
 def _is_deposit_editable(deposit: ZenodoResponse) -> bool:
-    return _get_deposit_field(deposit, "state") in ["inprogress", "unsubmitted"]
+    return _get_zenodo_field(deposit, "state") in ["inprogress", "unsubmitted"]
 
 
 class ZenodoClient:
@@ -189,7 +189,7 @@ class ZenodoClient:
             The new version of the deposit.
         """
         id = _get_deposit_id(deposit)
-        if not _get_deposit_field(deposit, "submitted"):
+        if not _get_zenodo_field(deposit, "submitted"):
             raise ValueError(
                 f"Cannot create new version for deposit {id} because it "
                 "has not yet been published."
@@ -216,14 +216,14 @@ class ZenodoClient:
             Information about the uploaded file.
         """
         id = _get_deposit_id(deposit)
-        if _get_deposit_field(deposit, "submitted"):
+        if _get_zenodo_field(deposit, "submitted"):
             raise ValueError(
                 f"Cannot upload new file to deposit {id} because the "
                 "deposit has already been published. You must first create a new "
                 "version of the deposit and upload the files there."
             )
 
-        bucket = _get_deposit_field(deposit, "links").get("bucket")
+        bucket = _get_zenodo_field(deposit, "links").get("bucket")
         if not bucket:
             raise ValueError(
                 f"Cannot upload new file to deposit {id} because the "
@@ -249,8 +249,8 @@ class ZenodoClient:
             The published deposit.
         """
         if (
-            _get_deposit_field(deposit, "submitted")
-            and _get_deposit_field(deposit, "state") == "done"
+            _get_zenodo_field(deposit, "submitted")
+            and _get_zenodo_field(deposit, "state") == "done"
         ):
             return deposit
 
