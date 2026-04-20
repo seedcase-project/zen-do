@@ -79,12 +79,10 @@ class ZenodoLinks(ZenodoModel):
 
     Attributes:
         bucket: The file upload link for the record.
-        latest_draft: Link to the latest draft or the record.
     """
 
     # Published records cannot receive new file uploads
     bucket: Optional[str] = None
-    latest_draft: str
 
 
 class ZenodoFile(ZenodoModel):
@@ -321,6 +319,31 @@ class ZenodoClient:
             f"{self.depositions}/{deposition.id}",
             headers=self.headers,
             json={"metadata": metadata.model_dump()},
+            timeout=self.timeout,
+        )
+        return self._resolve(response, ZenodoRecord)
+
+    def new_version(self, deposition: ZenodoRecord) -> ZenodoRecord:
+        """Creates a new, unpublished version of a published deposition.
+
+        Args:
+            deposition: The deposition.
+
+        Returns:
+            The new version of the deposition.
+        """
+        if not deposition.submitted:
+            raise ValueError(
+                f"Cannot create new version for deposition {deposition.id} because it "
+                "has not yet been published."
+            )
+
+        # Discard any changes on the old version to avoid the situation where we
+        # create a new version but leave unpublished changes on the old one.
+        self.discard(deposition)
+        response = requests.post(
+            f"{self.depositions}/{deposition.id}/actions/newversion",
+            headers=self.headers,
             timeout=self.timeout,
         )
         return self._resolve(response, ZenodoRecord)
