@@ -79,7 +79,7 @@ def test_returns_none_if_no_matching_deposits(_zenodo_json):
     assert deposit is None
 
 
-def test_raises_error_if_zenodo_json_has_no_repo_url(monkeypatch, tmp_path):
+def test_raises_error_if_zenodo_json_has_no_urn_id(monkeypatch, tmp_path):
     metadata = example_metadata()
     monkeypatch.chdir(tmp_path)
     del metadata.related_identifiers[0]
@@ -89,7 +89,7 @@ def test_raises_error_if_zenodo_json_has_no_repo_url(monkeypatch, tmp_path):
         zenodo_get_deposit([])
 
 
-def test_raises_error_if_zenodo_json_has_multiple_repo_urls(monkeypatch, tmp_path):
+def test_raises_error_if_zenodo_json_has_multiple_urn_ids(monkeypatch, tmp_path):
     metadata = example_metadata()
     monkeypatch.chdir(tmp_path)
     metadata.related_identifiers.append(

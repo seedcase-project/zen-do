@@ -10,7 +10,7 @@ from zen_do.zenodo_metadata import ZenodoMetadata, ZenodoRelatedIdentifier
 def zenodo_get_deposit(deposits: list[ZenodoResponse]) -> Optional[ZenodoResponse]:
     """Gets the Zenodo deposit for the repository if it exists.
 
-    Gets the repository URL from the `.zenodo.json` file. If one
+    Gets the URN identifier from the `.zenodo.json` file. If one
     doesn't exist, this function will not work.
 
     Args:
