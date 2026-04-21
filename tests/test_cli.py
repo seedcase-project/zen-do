@@ -10,9 +10,7 @@ def _mock_zenodo_get_deposit(mocker):
 
 @fixture
 def _mock_client(mocker):
-    mock = mocker.patch("zen_do.cli.ZenodoClient")
-    mock.return_value.get_deposits.return_value = []
-    return mock
+    return mocker.patch("zen_do.cli.ZenodoClient")
 
 
 def test_zenodo_publish_existing_deposit(
