@@ -18,7 +18,7 @@ def zenodo_publish(sandbox: bool = False) -> None:
     """Publish a new version of the repository on Zenodo."""
     token = get_token(sandbox)
     client = ZenodoClient(token, sandbox)
-    if deposit := zenodo_get_deposit(client):
+    if deposit := zenodo_get_deposit(client.get_deposits()):
         print("Zenodo deposit updated successfully!")
         print(f"{deposit}")
     else:

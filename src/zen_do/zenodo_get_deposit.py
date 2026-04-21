@@ -3,25 +3,24 @@ from typing import Optional
 
 import seedcase_soil as ss
 
-from zen_do.zenodo_client import ZenodoClient, ZenodoResponse, _get_zenodo_field
+from zen_do.zenodo_client import ZenodoResponse, _get_zenodo_field
 from zen_do.zenodo_metadata import ZenodoMetadata, ZenodoRelatedIdentifier
 
 
-def zenodo_get_deposit(client: ZenodoClient) -> Optional[ZenodoResponse]:
+def zenodo_get_deposit(deposits: list[ZenodoResponse]) -> Optional[ZenodoResponse]:
     """Gets the Zenodo deposit for the repository if it exists.
 
     Gets the repository URL from the `.zenodo.json` file. If one
     doesn't exist, this function will not work.
 
     Args:
-        client: The Zenodo client to use for the request.
+        deposits: All the deposits on Zenodo associated with an access token.
 
     Returns:
         The Zenodo deposit for the repo if it exists, None otherwise.
     """
     urn = _get_urn()
 
-    deposits = client.get_deposits()
     matching_deposits = ss.keep(
         deposits,
         lambda deposit: bool(
