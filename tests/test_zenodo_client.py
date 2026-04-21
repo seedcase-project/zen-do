@@ -152,6 +152,16 @@ def mock_publish(requests_mock):
     return _mock
 
 
+def test_flags_missing_field_in_response():
+    # Test _get_zenodo_field
+    with raises(KeyError):
+        sandbox_client.publish({})
+
+    # Test _get_deposit_id
+    with raises(KeyError):
+        sandbox_client.new_version({})
+
+
 # _resolve and _resolve_list
 
 
