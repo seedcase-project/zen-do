@@ -191,6 +191,26 @@ def test_resolve_list_flags_unexpected_type(mock_get_deposits):
         sandbox_client.get_deposits()
 
 
+@mark.parametrize(
+    "response, reason",
+    [
+        ({"message": "error reason"}, "error reason"),
+        ({}, "N/A"),
+        ([], "N/A"),
+    ],
+)
+def test_reason_included_in_error(
+    mock_get_deposit, mock_get_deposits, response, reason
+):
+    mock_get_deposit(json=response, status_code=400)
+    with raises(requests.HTTPError, match=f"400 Error: {reason}"):
+        sandbox_client.get_deposit(123)
+
+    mock_get_deposits(json=response, status_code=400)
+    with raises(requests.HTTPError, match=f"400 Error: {reason}"):
+        sandbox_client.get_deposits()
+
+
 # get_deposits
 
 
