@@ -1,5 +1,6 @@
+from enum import StrEnum
 from pathlib import Path
-from typing import Any, Literal, Union
+from typing import Any, Union
 
 import requests
 
@@ -8,7 +9,13 @@ from zen_do.zenodo_metadata import ZenodoMetadata
 type ZenodoResponse = dict[str, Any]
 
 
-type ZenodoDepositState = Literal["done", "inprogress", "error", "unsubmitted"]
+class ZenodoDepositState(StrEnum):
+    """Different states a Zenodo deposit can be in."""
+
+    done = "done"
+    inprogress = "inprogress"
+    error = "error"
+    unsubmitted = "unsubmitted"
 
 
 def _get_zenodo_field(response: ZenodoResponse, field: str) -> Any:
@@ -22,7 +29,10 @@ def _get_deposit_id(deposit: ZenodoResponse) -> int:
 
 
 def _is_deposit_editable(deposit: ZenodoResponse) -> bool:
-    return _get_zenodo_field(deposit, "state") in ["inprogress", "unsubmitted"]
+    return _get_zenodo_field(deposit, "state") in [
+        ZenodoDepositState.inprogress,
+        ZenodoDepositState.unsubmitted,
+    ]
 
 
 def _raise_for_status_with_reason(response: requests.Response) -> None:
@@ -262,7 +272,7 @@ class ZenodoClient:
         """
         if (
             _get_zenodo_field(deposit, "submitted")
-            and _get_zenodo_field(deposit, "state") == "done"
+            and _get_zenodo_field(deposit, "state") == ZenodoDepositState.done
         ):
             return deposit
 

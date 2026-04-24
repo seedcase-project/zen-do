@@ -16,6 +16,24 @@ individual release will not have many changes within it. Below is a list
 of the releases we've made so far, along with what was changed within
 each release.
 
+## 0.9.4 (2026-04-24)
+
+### Refactor
+
+- ♻️ `ZenodoDepositState` to enum, not literal (#65)
+
+## 0.9.3 (2026-04-24)
+
+### Refactor
+
+- ♻️ switch to use Soil functionals (#80)
+
+## 0.9.2 (2026-04-24)
+
+### Refactor
+
+- :lipstick: improve look of CLI by using our Soil theme (#68)
+
 ## 0.9.1 (2026-04-20)
 
 ### Refactor
