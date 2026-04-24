@@ -1,6 +1,7 @@
 import re
 from typing import Optional, Self
 
+import seedcase_soil as ss
 from pydantic import BaseModel, model_validator
 
 
@@ -62,3 +63,26 @@ class ZenodoMetadata(BaseModel):
     upload_type: str
     creators: list[ZenodoCreator]
     related_identifiers: list[ZenodoRelatedIdentifier] = []
+
+    @property
+    def urn(self) -> str:
+        """The URN related identifier of the deposit."""
+        urns = ss.keep(self.related_identifiers, _is_urn)
+        return urns[0].identifier
+
+    @model_validator(mode="after")
+    def _check_unique_urn(self) -> Self:
+
+        urns = ss.keep(self.related_identifiers, _is_urn)
+        if len(urns) != 1:
+            raise ValueError(
+                "Expected exactly one `isIdenticalTo` URN in the Zenodo metadata file "
+                f"under `related_identifiers`, but found {len(urns)}. Ensure there is "
+                "a single unique URN, as it is used to identify the corresponding "
+                "deposit on Zenodo."
+            )
+        return self
+
+
+def _is_urn(id: ZenodoRelatedIdentifier) -> bool:
+    return id.relation == "isIdenticalTo" and id.scheme == "urn"
