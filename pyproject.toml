@@ -27,7 +27,7 @@ dependencies = [
   "keyring>=25.7.0",
   "pydantic>=2.12.5",
   "requests>=2.32.5",
-  "seedcase-soil",
+  "seedcase-soil>=0.10.0",
 ]
 
 [project.urls]
@@ -62,6 +62,3 @@ dev = [
   "typos>=1.44.0",
   "vulture>=2.15",
 ]
-
-[tool.uv.sources]
-seedcase-soil = { git = "https://github.com/seedcase-project/seedcase-soil.git" }
