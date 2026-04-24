@@ -39,7 +39,7 @@ def example_deposit(
     bucket: Optional[str] = "https://path.com/path/wrwee-324-23f-sdf",
     urn: str = "urn:zenodo:my-org:project:book",
 ) -> ZenodoDeposit:
-    """An example Zenodo record."""
+    """An example Zenodo deposit."""
     metadata = metadata.model_copy(
         update={
             "related_identifiers": [
