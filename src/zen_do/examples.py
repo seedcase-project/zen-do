@@ -2,10 +2,10 @@ from typing import Optional
 
 from zen_do.zenodo import (
     ZenodoCreator,
+    ZenodoDeposit,
+    ZenodoDepositState,
     ZenodoLinks,
     ZenodoMetadata,
-    ZenodoRecord,
-    ZenodoRecordState,
     ZenodoRelatedIdentifier,
 )
 
@@ -31,15 +31,15 @@ def example_metadata(title: str = "Test Book") -> ZenodoMetadata:
     )
 
 
-def example_record(
+def example_deposit(
     id: int = 123,
     metadata: ZenodoMetadata = example_metadata(),
-    state: ZenodoRecordState = "done",
+    state: ZenodoDepositState = "done",
     submitted: bool = True,
     bucket: Optional[str] = "https://path.com/path/wrwee-324-23f-sdf",
     urn: str = "urn:zenodo:my-org:project:book",
-) -> ZenodoRecord:
-    """An example Zenodo record."""
+) -> ZenodoDeposit:
+    """An example Zenodo deposit."""
     metadata = metadata.model_copy(
         update={
             "related_identifiers": [
@@ -52,10 +52,10 @@ def example_record(
             ]
         }
     )
-    return ZenodoRecord(
+    return ZenodoDeposit(
         id=id,
         metadata=metadata,
         state=state,
         submitted=submitted,
-        links=ZenodoLinks(latest_draft="https://path.com/path/9999", bucket=bucket),
+        links=ZenodoLinks(bucket=bucket),
     )
