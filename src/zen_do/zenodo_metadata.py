@@ -72,7 +72,6 @@ class ZenodoMetadata(BaseModel):
 
     @model_validator(mode="after")
     def _check_unique_urn(self) -> Self:
-
         urns = ss.keep(self.related_identifiers, _is_urn)
         if len(urns) != 1:
             raise ValueError(
