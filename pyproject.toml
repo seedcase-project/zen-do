@@ -1,6 +1,6 @@
 [project]
 name = "zen-do"
-version = "0.9.1"
+version = "0.9.2"
 description = "Tasks to get Zenodo to do from the command line"
 authors = [
   { name = "Luke W. Johnston", email = "lwjohnst@gmail.com" },
@@ -23,11 +23,11 @@ license = "MIT"
 license-files = ["LICENSE.md"]
 requires-python = ">=3.12"
 dependencies = [
-    "cyclopts>=4.8.0",
-    "keyring>=25.7.0",
-    "pydantic>=2.12.5",
-    "requests>=2.32.5",
-    "seedcase-soil>=0.7.0",
+  "cyclopts>=4.8.0",
+  "keyring>=25.7.0",
+  "pydantic>=2.12.5",
+  "requests>=2.32.5",
+  "seedcase-soil>=0.10.0",
 ]
 
 [project.urls]
@@ -37,7 +37,7 @@ changelog = "https://github.com/seedcase-project/zen-do/blob/main/CHANGELOG.md"
 issues = "https://github.com/seedcase-project/zen-do/issues"
 
 [project.scripts]
-zen-do = "zen_do.cli:app"
+zen-do = "zen_do.cli:main"
 
 [build-system]
 requires = ["hatchling"]
