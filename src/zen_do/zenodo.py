@@ -1,6 +1,7 @@
 import re
+from enum import StrEnum
 from pathlib import Path
-from typing import Literal, Optional, Self, Union
+from typing import Optional, Self, Union
 
 import requests
 from pydantic import BaseModel, ConfigDict, model_validator
@@ -88,7 +89,13 @@ class ZenodoFile(ZenodoModel):
     """Model representing a file on a Zenodo deposit."""
 
 
-type ZenodoDepositState = Literal["done", "inprogress", "error", "unsubmitted"]
+class ZenodoDepositState(StrEnum):
+    """Different states a Zenodo deposit can be in."""
+
+    done = "done"
+    inprogress = "inprogress"
+    error = "error"
+    unsubmitted = "unsubmitted"
 
 
 class ZenodoDeposit(ZenodoModel):
@@ -111,7 +118,10 @@ class ZenodoDeposit(ZenodoModel):
     @property
     def editable(self) -> bool:
         """Whether the deposit can be edited."""
-        return self.state in ["inprogress", "unsubmitted"]
+        return self.state in [
+            ZenodoDepositState.inprogress,
+            ZenodoDepositState.unsubmitted,
+        ]
 
 
 def zenodo_get_deposit(token: str) -> Optional[ZenodoDeposit]:
