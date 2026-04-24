@@ -113,8 +113,8 @@ zen-do convert [METADATA_FILE] --to [FORMAT]
 ```
 
 There are many different file formats and standards that contain similar
-or even identical metadata, but that are structured slightly differently
-or are in different file formats. The `convert` command helps to keep
+or even identical metadata, but that are structured slightly differently.
+The `convert` command helps to keep
 one "source of truth" between these different formats for those cases
 where a repository might need different formats for different purposes.
 For example, GitHub will look for a `CITATION.cff` file to display the
@@ -182,6 +182,8 @@ class Format(StrEnum):
 @app.command()
 def convert(
         metadata_file: Path = Path(".zenodo.toml"),
+        /,
+        *,
         to: Annotated[list[Format], Parameter(consume_multiple=True)],
         verbose: bool = False
     ) -> None:
@@ -197,6 +199,7 @@ def convert(
     # metadata: Metadata = read_metadata(path=metadata_file)
     # Convert to the given formats
     # formats: list[str] = convert_to_formats(metadata, to)
+    # TODO: Consider how updating existing files will work, need to read other formats first?
     # output_path: list[Path] = write_formats(formats)
     print_if_verbose(verbose, f"Written the format(s) to files {output_paths}.")
 ```
