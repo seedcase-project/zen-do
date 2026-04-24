@@ -6,7 +6,7 @@ import requests
 from pytest import mark, raises
 
 from zen_do.examples import example_deposit, example_metadata
-from zen_do.zenodo_client import ZenodoClient
+from zen_do.zenodo_client import ZenodoClient, ZenodoDepositState
 
 sandbox_client = ZenodoClient(sandbox=True, token="token")
 
@@ -267,7 +267,7 @@ def test_make_editable_success_when_editable(mock_make_editable, state):
 
 
 def test_make_editable_success_when_not_editable(mock_make_editable):
-    deposit = example_deposit(state="done")
+    deposit = example_deposit(state=ZenodoDepositState.done)
     mock = mock_make_editable()
 
     result = sandbox_client.make_editable(deposit)
@@ -298,7 +298,7 @@ def test_discard_success_when_editable(mock_discard, state):
 def test_discard_success_when_not_editable(mock_discard):
     mock = mock_discard()
 
-    sandbox_client.discard(example_deposit(state="done"))
+    sandbox_client.discard(example_deposit(state=ZenodoDepositState.done))
 
     assert not mock.called
 
@@ -306,13 +306,20 @@ def test_discard_success_when_not_editable(mock_discard):
 def test_discard_failure(mock_discard):
     mock_discard(status_code=400)
     with raises(requests.HTTPError):
-        sandbox_client.discard(example_deposit(state="inprogress"))
+        sandbox_client.discard(example_deposit(state=ZenodoDepositState.inprogress))
 
 
 # update_metadata
 
 
-@mark.parametrize("state", ["inprogress", "unsubmitted", "done"])
+@mark.parametrize(
+    "state",
+    [
+        ZenodoDepositState.inprogress,
+        ZenodoDepositState.unsubmitted,
+        ZenodoDepositState.done,
+    ],
+)
 def test_update_metadata_success(mock_update_metadata, mock_make_editable, state):
     deposit = example_deposit(state=state)
     new_metadata = example_metadata(title="New Title")
@@ -370,7 +377,7 @@ def test_new_version_api_failure(mock_discard, mock_new_version):
 def test_upload_file_success(mock_upload_file, tmp_path):
     file_path = tmp_path / "data.txt"
     file_path.write_text("This is my file.")
-    deposit = example_deposit(submitted=False, state="unsubmitted")
+    deposit = example_deposit(submitted=False, state=ZenodoDepositState.unsubmitted)
     mock = mock_upload_file()
 
     result = sandbox_client.upload_file(deposit, file_path=file_path)
@@ -383,7 +390,7 @@ def test_upload_file_success(mock_upload_file, tmp_path):
 def test_upload_file_failure_api(mock_upload_file, tmp_path):
     file_path = tmp_path / "data.txt"
     file_path.write_text("This is my file.")
-    deposit = example_deposit(submitted=False, state="unsubmitted")
+    deposit = example_deposit(submitted=False, state=ZenodoDepositState.unsubmitted)
     mock_upload_file(status_code=400)
     with raises(requests.HTTPError):
         sandbox_client.upload_file(deposit, file_path=file_path)
@@ -392,7 +399,7 @@ def test_upload_file_failure_api(mock_upload_file, tmp_path):
 def test_upload_file_failure_file_not_found():
     with raises(FileNotFoundError):
         sandbox_client.upload_file(
-            example_deposit(submitted=False, state="unsubmitted"),
+            example_deposit(submitted=False, state=ZenodoDepositState.unsubmitted),
             file_path=Path("data.txt"),
         )
 
@@ -408,7 +415,9 @@ def test_upload_file_failure_published():
 def test_upload_file_failure_no_bucket():
     with raises(ValueError):
         sandbox_client.upload_file(
-            example_deposit(submitted=False, state="unsubmitted", bucket=None),
+            example_deposit(
+                submitted=False, state=ZenodoDepositState.unsubmitted, bucket=None
+            ),
             file_path=Path("data.txt"),
         )
 
@@ -419,8 +428,8 @@ def test_upload_file_failure_no_bucket():
 @mark.parametrize(
     "deposit",
     [
-        example_deposit(submitted=False, state="unsubmitted"),
-        example_deposit(submitted=True, state="inprogress"),
+        example_deposit(submitted=False, state=ZenodoDepositState.unsubmitted),
+        example_deposit(submitted=True, state=ZenodoDepositState.inprogress),
     ],
 )
 def test_publish_success_unpublished(mock_publish, deposit):
@@ -435,14 +444,16 @@ def test_publish_success_unpublished(mock_publish, deposit):
 def test_publish_success_published(mock_publish):
     mock = mock_publish()
 
-    result = sandbox_client.publish(example_deposit(submitted=True, state="done"))
+    result = sandbox_client.publish(
+        example_deposit(submitted=True, state=ZenodoDepositState.done)
+    )
 
     assert not mock.called
     assert result["id"] == 123
 
 
 def test_publish_failure(mock_publish):
-    deposit = example_deposit(submitted=True, state="inprogress")
+    deposit = example_deposit(submitted=True, state=ZenodoDepositState.inprogress)
     mock_publish(status_code=500)
     with raises(requests.HTTPError):
         sandbox_client.publish(deposit)

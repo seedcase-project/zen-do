@@ -34,7 +34,7 @@ def example_metadata(
 def example_deposit(
     id: int = 123,
     metadata: ZenodoMetadata = example_metadata(),
-    state: ZenodoDepositState = "done",
+    state: ZenodoDepositState = ZenodoDepositState.done,
     submitted: bool = True,
     bucket: Optional[str] = "https://path.com/path/wrwee-324-23f-sdf",
     urn: str = "urn:zenodo:my-org:project:book",
