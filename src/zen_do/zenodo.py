@@ -1,6 +1,7 @@
 import re
+from enum import StrEnum
 from pathlib import Path
-from typing import Literal, Optional, Self, Union
+from typing import Optional, Self, Union
 
 import requests
 from pydantic import BaseModel, ConfigDict, model_validator
@@ -89,7 +90,13 @@ class ZenodoFile(ZenodoModel):
     """Model representing a file on a Zenodo deposit."""
 
 
-type ZenodoDepositState = Literal["done", "inprogress", "error", "unsubmitted"]
+class ZenodoDepositState(StrEnum):
+    """Different states a Zenodo deposit can be in."""
+
+    done = "done"
+    inprogress = "inprogress"
+    error = "error"
+    unsubmitted = "unsubmitted"
 
 
 class ZenodoDeposit(ZenodoModel):
@@ -112,7 +119,10 @@ class ZenodoDeposit(ZenodoModel):
     @property
     def editable(self) -> bool:
         """Whether the deposit can be edited."""
-        return self.state in ["inprogress", "unsubmitted"]
+        return self.state in [
+            ZenodoDepositState.inprogress,
+            ZenodoDepositState.unsubmitted,
+        ]
 
 
 def zenodo_get_deposit(token: str) -> Optional[ZenodoDeposit]:
@@ -398,54 +408,3 @@ class ZenodoClient:
             timeout=self.timeout,
         )
         return self._resolve(response, ZenodoDeposit)
-
-
-def example_metadata(title: str = "Test Book") -> ZenodoMetadata:
-    """A set of example Zenodo metadata."""
-    return ZenodoMetadata(
-        title=title,
-        upload_type="poster",
-        creators=[
-            ZenodoCreator(
-                name="Doe, Jane", affiliation="University of Testfalia", orcid="ABC"
-            )
-        ],
-        related_identifiers=[
-            ZenodoRelatedIdentifier(
-                identifier="urn:zenodo:my-org:project:book",
-                relation="isIdenticalTo",
-                resource_type="other",
-                scheme="urn",
-            )
-        ],
-    )
-
-
-def example_deposit(
-    id: int = 123,
-    metadata: ZenodoMetadata = example_metadata(),
-    state: ZenodoDepositState = "done",
-    submitted: bool = True,
-    bucket: Optional[str] = "https://path.com/path/wrwee-324-23f-sdf",
-    urn: str = "urn:zenodo:my-org:project:book",
-) -> ZenodoDeposit:
-    """An example Zenodo record."""
-    metadata = metadata.model_copy(
-        update={
-            "related_identifiers": [
-                ZenodoRelatedIdentifier(
-                    identifier=urn,
-                    relation="isIdenticalTo",
-                    resource_type="other",
-                    scheme="urn",
-                )
-            ]
-        }
-    )
-    return ZenodoDeposit(
-        id=id,
-        metadata=metadata,
-        state=state,
-        submitted=submitted,
-        links=ZenodoLinks(bucket=bucket),
-    )
