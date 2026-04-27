@@ -11,7 +11,7 @@ developers) stay focused on the package's scope.
 
 ## {{< var planned >}} `init`
 
-```bash
+``` {.bash filename="Terminal"}
 zen-do init --verbose
 ```
 
@@ -40,7 +40,7 @@ def init(verbose: bool = False) -> None:
 
 ## {{< var planned >}} `list`
 
-```bash
+``` {.bash filename="Terminal"}
 zen-do list --sandbox
 ```
 
@@ -70,7 +70,7 @@ def list(sandbox: bool = False) -> None:
 
 ## {{< var planned >}} `get`
 
-```bash
+``` {.bash filename="Terminal"}
 zen-do get [METADATA_FILE] --sandbox
 ```
 
@@ -104,4 +104,102 @@ def get(metadata_file: Path = Path(".zenodo.toml"), \, *, sandbox: bool = False)
     # deposits: list[Deposit] = list_deposits(sandbox=sandbox, token=token)
     # deposit: Deposit = find_deposit(deposits=deposits, metadata=metadata)
     pretty_print(deposit)
+```
+
+## {{< var planned >}} `convert`
+
+``` {.bash filename="Terminal"}
+zen-do convert [METADATA_FILE] --to [FORMAT]
+```
+
+There are many different file formats and standards that contain similar
+or even identical metadata, but that are structured slightly differently.
+The `convert` command helps to keep
+one "source of truth" between these different formats for those cases
+where a repository might need different formats for different purposes.
+For example, GitHub will look for a `CITATION.cff` file to display the
+citation information for a repository, but doesn't recognize other
+formats (like `.zenodo.toml`). Rather than manually keeping these
+different files in sync, the `convert` command can simplify this syncing
+task.
+
+We decided to only convert from `.zenodo.toml` to other formats, rather
+than allow any format to be converted to any other format because we
+want the `.zenodo.toml` file to be the "single source of truth" for a
+project's metadata. This means that any changes to the metadata must be
+done in the `.zenodo.toml` file and `convert` can update the other
+formats. This also simplifies the implementation and testing of the
+`convert` command, as we only need to implement the logic for converting
+from `.zenodo.toml` to other formats, rather than having to handle
+conversions between all possible pairs of formats.
+
+There are several different formats that we've encountered that would be
+useful to keep synchronized with the `.zenodo.toml` file, including:
+
+- {{< var planned >}} `.zenodo.json`: This is the file format that
+  Zenodo looks for in their existing
+  [GitHub release to record integration](https://help.zenodo.org/docs/github/describe-software/).
+  Both the JSON and TOML formats are equivalent in content.
+- {{< var planned >}} `CITATION.cff`: GitHub uses this file to
+  [display the citation](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-citation-files)
+  information for a repository when it is in the root of the repository.
+  This contains only a subset of the metadata found in the
+  `.zenodo.toml` file.
+- {{< var planned >}} `pyproject.toml`: While this file is almost
+  entirely used only for Python projects, it contains similar metadata
+  fields to the `.zenodo.toml` file, such as the project name,
+  description, authors, and license.
+- {{< var planned >}} `codemeta.json`: This file is used to describe
+  software metadata in a machine-readable format, following the
+  [CodeMeta](https://codemeta.github.io/) standard. It contains similar
+  metadata fields to the `.zenodo.toml` file.
+- {{< var planned >}} `_quarto.yml`: This file is used to build
+  [Quarto](https://quarto.org/) documents. Like `pyproject.toml`, it
+  also contains similar metadata fields to the `.zenodo.toml` file, such
+  as the title, description, and authors.
+- {{< var planned >}} `DESCRIPTION`: This is a typical file found in R
+  projects. It is necessary for developing and building R packages. As
+  with `pyproject.toml`, it contains similar metadata fields to the
+  `.zenodo.toml` file, such as the package name, description, authors,
+  and license.
+
+The `--to` argument can be a single format or an array of formats,
+allowing users to convert to multiple formats in one command.
+
+```python
+from cyclopts import App, Parameter
+from pathlib import Path
+from typing import Annotated
+from enum import StrEnum
+
+class Format(StrEnum):
+    zenodo_json = ".zenodo.json"
+    citation_cff = "CITATION.cff"
+    pyproject_toml = "pyproject.toml"
+    quarto_yml = "_quarto.yml"
+    description = "DESCRIPTION"
+
+@app.command()
+def convert(
+        metadata_file: Path = Path(".zenodo.toml"),
+        /,
+        *,
+        to: Annotated[list[Format], Parameter(consume_multiple=True)],
+        verbose: bool = False
+    ) -> None:
+    """Convert a metadata file, e.g. `.zenodo.toml`, to other formats.
+
+    Args:
+        metadata_file: The path to the metadata file to convert.
+        to: The formats to convert the metadata file to. Can be a single format
+            or an array of formats.
+        verbose: Whether to print a log of the actions done.
+    """
+    # Read metadata file (checking if the URN exists or not).
+    # metadata: Metadata = read_metadata(path=metadata_file)
+    # Convert to the given formats
+    # formats: list[str] = convert_to_formats(metadata, to)
+    # TODO: Consider how updating existing files will work, need to read other formats first?
+    # output_path: list[Path] = write_formats(formats)
+    print_if_verbose(verbose, f"Written the format(s) to files {output_paths}.")
 ```

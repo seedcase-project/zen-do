@@ -1,11 +1,11 @@
 import re
+from enum import StrEnum
 from pathlib import Path
-from typing import Literal, Optional, Self, Union
+from typing import Optional, Self, Union
 
 import requests
 from pydantic import BaseModel, ConfigDict, model_validator
-
-from zen_do.internals import _filter, _map
+from seedcase_soil import fmap, keep
 
 
 class ZenodoModel(BaseModel):
@@ -89,7 +89,13 @@ class ZenodoFile(ZenodoModel):
     """Model representing a file on a Zenodo deposit."""
 
 
-type ZenodoDepositState = Literal["done", "inprogress", "error", "unsubmitted"]
+class ZenodoDepositState(StrEnum):
+    """Different states a Zenodo deposit can be in."""
+
+    done = "done"
+    inprogress = "inprogress"
+    error = "error"
+    unsubmitted = "unsubmitted"
 
 
 class ZenodoDeposit(ZenodoModel):
@@ -112,7 +118,10 @@ class ZenodoDeposit(ZenodoModel):
     @property
     def editable(self) -> bool:
         """Whether the deposit can be edited."""
-        return self.state in ["inprogress", "unsubmitted"]
+        return self.state in [
+            ZenodoDepositState.inprogress,
+            ZenodoDepositState.unsubmitted,
+        ]
 
 
 def zenodo_get_deposit(token: str) -> Optional[ZenodoDeposit]:
@@ -135,11 +144,11 @@ def zenodo_get_deposit(token: str) -> Optional[ZenodoDeposit]:
         timeout=10,
     )
     response.raise_for_status()
-    deposits: list[ZenodoDeposit] = _map(response.json(), ZenodoDeposit.model_validate)
-    matching_deposits = _filter(
+    deposits: list[ZenodoDeposit] = fmap(response.json(), ZenodoDeposit.model_validate)
+    matching_deposits = keep(
         deposits,
         lambda deposit: bool(
-            _filter(
+            keep(
                 deposit.metadata.related_identifiers,
                 lambda id: _is_urn(id) and id.identifier == urn,
             )
@@ -166,7 +175,7 @@ def _is_urn(id: ZenodoRelatedIdentifier) -> bool:
 
 def _get_urn() -> str:
     metadata = _load_zenodo_json()
-    ids = _filter(metadata.related_identifiers, _is_urn)
+    ids = keep(metadata.related_identifiers, _is_urn)
     if len(ids) != 1:
         raise ValueError(
             "Expected exactly one `isIdenticalTo` URN in `.zenodo.json` under "
@@ -214,7 +223,7 @@ class ZenodoClient:
         # TODO: include response.text in error because that is where Zenodo
         # gives reasons
         response.raise_for_status()
-        return _map(response.json(), lambda item: response_type.model_construct(**item))
+        return fmap(response.json(), lambda item: response_type.model_construct(**item))
 
     def get_deposits(self) -> list[ZenodoDeposit]:
         """Gets all deposits.
