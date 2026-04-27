@@ -1,31 +1,34 @@
-from seedcase_soil import (
-    # print_if_verbose,
-    run_without_tracebacks,
-    setup_cli,
-)
+import seedcase_soil as so
+from rich import print_json
 
 from zen_do.get_token import get_token
-from zen_do.zenodo_client import ZenodoClient
-from zen_do.zenodo_get_deposit import zenodo_get_deposit
+from zen_do.zenodo_client import (
+    ZenodoClient,
+)
 
-app = setup_cli(
+app = so.setup_cli(
     name="zen-do",
     help="zen-do simplifies interacting with Zenodo for common publishing tasks.",
 )
 
 
 @app.command()
-def zenodo_publish(sandbox: bool = False) -> None:
-    """Publish a new version of the repository on Zenodo."""
+def list(sandbox: bool = False) -> None:
+    """List all Zenodo deposits in an account as raw JSON (from the Zenodo servers).
+
+    Args:
+        sandbox: Whether to use the Zenodo sandbox environment for testing purposes.
+    """
     token = get_token(sandbox)
     client = ZenodoClient(token, sandbox)
-    if deposit := zenodo_get_deposit(client.get_deposits()):
-        print("Zenodo deposit updated successfully!")
-        print(f"{deposit}")
+    deposits = client.get_deposits()
+
+    if deposits:
+        print_json(data=deposits)
     else:
-        print("New Zenodo record created successfully!")
+        so.pretty_print("No deposits found.")
 
 
 def main() -> None:
     """Create an entry point to run the cli without tracebacks."""
-    run_without_tracebacks(app)
+    so.run_without_tracebacks(app)
