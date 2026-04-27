@@ -8,9 +8,15 @@ def _mock_zenodo_get_deposit(mocker):
     return mocker.patch("zen_do.cli.zenodo_get_deposit")
 
 
+@fixture
+def _mock_client(mocker):
+    return mocker.patch("zen_do.cli.ZenodoClient")
+
+
 def test_zenodo_publish_existing_deposit(
     monkeypatch,
     _mock_zenodo_get_deposit,
+    _mock_client,
 ):
     monkeypatch.setenv("ZENODO_TOKEN", "token")
     app("zenodo-publish", result_action="return_value")
@@ -19,6 +25,7 @@ def test_zenodo_publish_existing_deposit(
 def test_zenodo_publish_new_deposit(
     monkeypatch,
     _mock_zenodo_get_deposit,
+    _mock_client,
 ):
     monkeypatch.setenv("ZENODO_TOKEN", "token")
     _mock_zenodo_get_deposit.return_value = None

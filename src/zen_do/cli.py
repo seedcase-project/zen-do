@@ -5,9 +5,7 @@ from seedcase_soil import (
 )
 
 from zen_do.get_token import get_token
-from zen_do.zenodo import (
-    zenodo_get_deposit,
-)
+from zen_do.zenodo import ZenodoClient, zenodo_get_deposit
 
 app = setup_cli(
     name="zen-do",
@@ -19,7 +17,8 @@ app = setup_cli(
 def zenodo_publish(sandbox: bool = False) -> None:
     """Publish a new version of the repository on Zenodo."""
     token = get_token(sandbox)
-    if deposit := zenodo_get_deposit(token):
+    client = ZenodoClient(token, sandbox)
+    if deposit := zenodo_get_deposit(client.get_deposits()):
         print("Zenodo deposit updated successfully!")
         print(f"{deposit}")
     else:
