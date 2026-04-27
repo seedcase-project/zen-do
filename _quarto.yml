@@ -18,8 +18,8 @@ website:
         href: docs/guide/index.qmd
       - text: "Design"
         href: docs/design/index.qmd
-      # - text: "Reference"
-      #   href: docs/reference/index.qmd
+      - text: "Reference"
+        href: docs/reference/index.qmd
     tools:
       - icon: github
         href: "https://github.com/seedcase-project/zen-do"
@@ -63,19 +63,22 @@ quartodoc:
     table_style: description-list
     show_signature_annotations: true
   sections:
+    - title: "CLI"
+      contents:
+        - zenodo_publish
     - title: "Zenodo API"
       contents:
         - ZenodoClient
         - ZenodoCreator
         - ZenodoLinks
         - ZenodoMetadata
-        - ZenodoRecord
-        - ZenodoRecordState
+        - ZenodoDeposit
+        - ZenodoDepositState
         - ZenodoRelatedIdentifier
     - title: "Example deposit and metadata"
       contents:
         - example_metadata
-        - example_record
+        - example_deposit
 
 metadata-files:
   - docs/reference/_sidebar.yml
