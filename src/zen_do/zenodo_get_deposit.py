@@ -1,3 +1,4 @@
+import tomllib
 from pathlib import Path
 from typing import Optional
 
@@ -10,7 +11,7 @@ from zen_do.zenodo_metadata import ZenodoMetadata, ZenodoRelatedIdentifier
 def zenodo_get_deposit(deposits: list[ZenodoResponse]) -> Optional[ZenodoResponse]:
     """Gets the Zenodo deposit for the repository if it exists.
 
-    Gets the URN identifier from the `.zenodo.json` file. If one
+    Gets the URN identifier from the `.zenodo.toml` file. If one
     doesn't exist, this function will not work.
 
     Args:
@@ -51,11 +52,11 @@ def _is_urn(id: ZenodoRelatedIdentifier) -> bool:
 
 
 def _get_urn() -> str:
-    metadata = _load_zenodo_json()
+    metadata = _load_zenodo_toml()
     ids = ss.keep(metadata.related_identifiers, _is_urn)
     if len(ids) != 1:
         raise ValueError(
-            "Expected exactly one `isIdenticalTo` URN in `.zenodo.json` under "
+            "Expected exactly one `isIdenticalTo` URN in `.zenodo.toml` under "
             f"`related_identifiers`, but found {len(ids)}. Ensure there is a single "
             "unique URN, as it is used to identify the corresponding deposit on Zenodo."
         )
@@ -63,5 +64,8 @@ def _get_urn() -> str:
     return ids[0].identifier
 
 
-def _load_zenodo_json() -> ZenodoMetadata:
-    return ZenodoMetadata.model_validate_json(Path(".zenodo.json").read_text())
+def _load_zenodo_toml() -> ZenodoMetadata:
+    with open(Path(".zenodo.toml"), mode="rb") as file:
+        toml_file = tomllib.load(file)
+
+    return ZenodoMetadata.model_validate(toml_file)
