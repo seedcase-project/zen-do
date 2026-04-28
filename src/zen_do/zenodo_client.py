@@ -35,6 +35,22 @@ def _is_deposit_editable(deposit: ZenodoResponse) -> bool:
     ]
 
 
+def _raise_for_status_with_reason(response: requests.Response) -> None:
+    try:
+        response.raise_for_status()
+    except requests.HTTPError as e:
+        reason = "N/A"
+        response_json = response.json()
+        if isinstance(response_json, dict):
+            reason = response_json.get("message", reason)
+
+        raise requests.HTTPError(
+            f"{response.status_code} Error: {reason}",
+            response=response,
+            request=e.request,
+        ) from e
+
+
 class ZenodoClient:
     """Class for interacting with the Zenodo API."""
 
@@ -57,9 +73,7 @@ class ZenodoClient:
         response: requests.Response,
     ) -> ZenodoResponse:
         """Maps the API response to a dictionary."""
-        # TODO: include response.text in error because that is where Zenodo
-        # gives reasons
-        response.raise_for_status()
+        _raise_for_status_with_reason(response)
         response_json = response.json()
         if not isinstance(response_json, dict):
             raise TypeError(
@@ -72,9 +86,7 @@ class ZenodoClient:
         response: requests.Response,
     ) -> list[ZenodoResponse]:
         """Maps the API response to a list."""
-        # TODO: include response.text in error because that is where Zenodo
-        # gives reasons
-        response.raise_for_status()
+        _raise_for_status_with_reason(response)
         response_json = response.json()
         if not isinstance(response_json, list):
             raise TypeError(
