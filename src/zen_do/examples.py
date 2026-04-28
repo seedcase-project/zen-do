@@ -2,11 +2,10 @@ from typing import Optional
 
 from zen_do.zenodo import (
     ZenodoCreator,
-    ZenodoDeposit,
     ZenodoDepositState,
-    ZenodoLinks,
     ZenodoMetadata,
     ZenodoRelatedIdentifier,
+    ZenodoResponse,
 )
 
 
@@ -38,7 +37,7 @@ def example_deposit(
     submitted: bool = True,
     bucket: Optional[str] = "https://path.com/path/wrwee-324-23f-sdf",
     urn: str = "urn:zenodo:my-org:project:book",
-) -> ZenodoDeposit:
+) -> ZenodoResponse:
     """An example Zenodo deposit."""
     metadata = metadata.model_copy(
         update={
@@ -52,10 +51,10 @@ def example_deposit(
             ]
         }
     )
-    return ZenodoDeposit(
-        id=id,
-        metadata=metadata,
-        state=state,
-        submitted=submitted,
-        links=ZenodoLinks(bucket=bucket),
-    )
+    return {
+        "id": id,
+        "metadata": metadata.model_dump(),
+        "state": state,
+        "submitted": submitted,
+        "links": {"bucket": bucket} if bucket else {},
+    }

@@ -70,9 +70,7 @@ quartodoc:
       contents:
         - ZenodoClient
         - ZenodoCreator
-        - ZenodoLinks
         - ZenodoMetadata
-        - ZenodoDeposit
         - ZenodoDepositState
         - ZenodoRelatedIdentifier
     - title: "Example deposit and metadata"

@@ -1,20 +1,14 @@
 import re
 from enum import StrEnum
 from pathlib import Path
-from typing import Optional, Self, Union
+from typing import Any, Optional, Self, Union
 
 import requests
-from pydantic import BaseModel, ConfigDict, model_validator
-from seedcase_soil import fmap, keep
+import seedcase_soil as so
+from pydantic import BaseModel, model_validator
 
 
-class ZenodoModel(BaseModel):
-    """Model configuring all Zenodo models."""
-
-    model_config = ConfigDict(extra="allow", frozen=True)
-
-
-class ZenodoCreator(ZenodoModel):
+class ZenodoCreator(BaseModel):
     """Model representing the creator of a Zenodo deposit.
 
     Attributes:
@@ -28,7 +22,7 @@ class ZenodoCreator(ZenodoModel):
     orcid: str
 
 
-class ZenodoRelatedIdentifier(ZenodoModel):
+class ZenodoRelatedIdentifier(BaseModel):
     """Model representing an identifier related to a Zenodo deposit.
 
     Attributes:
@@ -58,7 +52,7 @@ class ZenodoRelatedIdentifier(ZenodoModel):
         return self
 
 
-class ZenodoMetadata(ZenodoModel):
+class ZenodoMetadata(BaseModel):
     """Model representing Zenodo metadata.
 
     Attributes:
@@ -74,19 +68,7 @@ class ZenodoMetadata(ZenodoModel):
     related_identifiers: list[ZenodoRelatedIdentifier] = []
 
 
-class ZenodoLinks(ZenodoModel):
-    """Model representing the group of links in Zenodo metadata.
-
-    Attributes:
-            bucket: The file upload link for the deposit.
-    """
-
-    # Published deposits cannot receive new file uploads
-    bucket: Optional[str] = None
-
-
-class ZenodoFile(ZenodoModel):
-    """Model representing a file on a Zenodo deposit."""
+type ZenodoResponse = dict[str, Any]
 
 
 class ZenodoDepositState(StrEnum):
@@ -98,59 +80,43 @@ class ZenodoDepositState(StrEnum):
     unsubmitted = "unsubmitted"
 
 
-class ZenodoDeposit(ZenodoModel):
-    """Model representing a Zenodo deposit.
-
-    Attributes:
-        id: The ID of the deposit.
-        metadata: The metadata the deposit.
-        links: Links to deposit assets and API endpoints.
-        state: The state of the deposit.
-        submitted: Whether the deposit has been published.
-    """
-
-    id: int
-    metadata: ZenodoMetadata
-    links: ZenodoLinks
-    state: ZenodoDepositState
-    submitted: bool
-
-    @property
-    def editable(self) -> bool:
-        """Whether the deposit can be edited."""
-        return self.state in [
-            ZenodoDepositState.inprogress,
-            ZenodoDepositState.unsubmitted,
-        ]
+def _get_zenodo_field(response: ZenodoResponse, field: str) -> Any:
+    if field not in response:
+        raise KeyError(f"Missing '{field}' field in object {response!r}.")
+    return response[field]
 
 
-def zenodo_get_deposit(token: str) -> Optional[ZenodoDeposit]:
+def _get_deposit_id(deposit: ZenodoResponse) -> int:
+    return int(_get_zenodo_field(deposit, "id"))
+
+
+def _is_deposit_editable(deposit: ZenodoResponse) -> bool:
+    return _get_zenodo_field(deposit, "state") in [
+        ZenodoDepositState.inprogress,
+        ZenodoDepositState.unsubmitted,
+    ]
+
+
+def zenodo_get_deposit(deposits: list[ZenodoResponse]) -> Optional[ZenodoResponse]:
     """Gets the Zenodo deposit for the repository if it exists.
 
-    Gets the repository URL from the `.zenodo.json` file. If one
+    Gets the URN identifier from the `.zenodo.json` file. If one
     doesn't exist, this function will not work.
 
     Args:
-        token: Zenodo API access token.
+        deposits: All the deposits on Zenodo associated with an access token.
 
     Returns:
         The Zenodo deposit for the repo if it exists, None otherwise.
     """
     urn = _get_urn()
 
-    response = requests.get(
-        "https://zenodo.org/api/deposit/depositions",
-        headers={"Authorization": f"Bearer {token}"},
-        timeout=10,
-    )
-    response.raise_for_status()
-    deposits: list[ZenodoDeposit] = fmap(response.json(), ZenodoDeposit.model_validate)
-    matching_deposits = keep(
+    matching_deposits = so.keep(
         deposits,
         lambda deposit: bool(
-            keep(
-                deposit.metadata.related_identifiers,
-                lambda id: _is_urn(id) and id.identifier == urn,
+            so.keep(
+                _get_zenodo_field(deposit, "metadata").get("related_identifiers", []),
+                lambda id: _urn_matches(id, urn),
             )
         ),
     )
@@ -169,13 +135,18 @@ def _load_zenodo_json() -> ZenodoMetadata:
     return ZenodoMetadata.model_validate_json(Path(".zenodo.json").read_text())
 
 
+def _urn_matches(id_response: ZenodoResponse, target_urn: str) -> bool:
+    id = ZenodoRelatedIdentifier.model_construct(**id_response)
+    return _is_urn(id) and id.identifier == target_urn
+
+
 def _is_urn(id: ZenodoRelatedIdentifier) -> bool:
     return id.relation == "isIdenticalTo" and id.scheme == "urn"
 
 
 def _get_urn() -> str:
     metadata = _load_zenodo_json()
-    ids = keep(metadata.related_identifiers, _is_urn)
+    ids = so.keep(metadata.related_identifiers, _is_urn)
     if len(ids) != 1:
         raise ValueError(
             "Expected exactly one `isIdenticalTo` URN in `.zenodo.json` under "
@@ -189,12 +160,12 @@ def _get_urn() -> str:
 class ZenodoClient:
     """Class for interacting with the Zenodo API."""
 
-    def __init__(self, sandbox: bool, token: str, timeout: int = 30):
+    def __init__(self, token: str, sandbox: bool = False, timeout: int = 30):
         """Initialises the client.
 
         Args:
-            sandbox: Whether to use the sandbox API or the real one.
             token: Zenodo access token.
+            sandbox: Whether to use the sandbox API or the real one.
             timeout: Request timeout in seconds.
         """
         self.headers = {"Authorization": f"Bearer {token}"}
@@ -203,29 +174,37 @@ class ZenodoClient:
         host = "sandbox.zenodo" if sandbox else "zenodo"
         self.deposits = f"https://{host}.org/api/deposit/depositions"
 
-    def _resolve[ResponseType: ZenodoModel](
+    def _resolve(
         self,
         response: requests.Response,
-        response_type: type[ResponseType],
-    ) -> ResponseType:
-        """Maps the API response to the given model."""
+    ) -> ZenodoResponse:
+        """Maps the API response to a dictionary."""
         # TODO: include response.text in error because that is where Zenodo
         # gives reasons
         response.raise_for_status()
-        return response_type.model_construct(**response.json())
+        response_json = response.json()
+        if not isinstance(response_json, dict):
+            raise TypeError(
+                f"Expected response to be a JSON object but got {response_json!r}"
+            )
+        return response_json
 
-    def _resolve_list[ResponseType: ZenodoModel](
+    def _resolve_list(
         self,
         response: requests.Response,
-        response_type: type[ResponseType],
-    ) -> list[ResponseType]:
-        """Maps the API response to a list of the given model."""
+    ) -> list[ZenodoResponse]:
+        """Maps the API response to a list."""
         # TODO: include response.text in error because that is where Zenodo
         # gives reasons
         response.raise_for_status()
-        return fmap(response.json(), lambda item: response_type.model_construct(**item))
+        response_json = response.json()
+        if not isinstance(response_json, list):
+            raise TypeError(
+                f"Expected response to be a JSON array but got {response_json!r}"
+            )
+        return response_json
 
-    def get_deposits(self) -> list[ZenodoDeposit]:
+    def get_deposits(self) -> list[ZenodoResponse]:
         """Gets all deposits.
 
         Returns:
@@ -234,9 +213,9 @@ class ZenodoClient:
         response = requests.get(
             self.deposits, headers=self.headers, timeout=self.timeout
         )
-        return self._resolve_list(response, ZenodoDeposit)
+        return self._resolve_list(response)
 
-    def get_deposit(self, deposit_id: Union[int, str]) -> ZenodoDeposit:
+    def get_deposit(self, deposit_id: Union[int, str]) -> ZenodoResponse:
         """Gets the deposit with the given ID.
 
         Args:
@@ -253,9 +232,9 @@ class ZenodoClient:
             headers=self.headers,
             timeout=self.timeout,
         )
-        return self._resolve(response, ZenodoDeposit)
+        return self._resolve(response)
 
-    def create(self, metadata: ZenodoMetadata) -> ZenodoDeposit:
+    def create(self, metadata: ZenodoMetadata) -> ZenodoResponse:
         """Creates a new deposit in editable state.
 
         Args:
@@ -270,9 +249,9 @@ class ZenodoClient:
             json={"metadata": metadata.model_dump()},
             timeout=self.timeout,
         )
-        return self._resolve(response, ZenodoDeposit)
+        return self._resolve(response)
 
-    def make_editable(self, deposit: ZenodoDeposit) -> ZenodoDeposit:
+    def make_editable(self, deposit: ZenodoResponse) -> ZenodoResponse:
         """Makes the deposit editable.
 
         Args:
@@ -281,17 +260,17 @@ class ZenodoClient:
         Returns:
             The deposit in editable state.
         """
-        if deposit.editable:
+        if _is_deposit_editable(deposit):
             return deposit
 
         response = requests.post(
-            f"{self.deposits}/{deposit.id}/actions/edit",
+            f"{self.deposits}/{_get_deposit_id(deposit)}/actions/edit",
             headers=self.headers,
             timeout=self.timeout,
         )
-        return self._resolve(response, ZenodoDeposit)
+        return self._resolve(response)
 
-    def discard(self, deposit: ZenodoDeposit) -> None:
+    def discard(self, deposit: ZenodoResponse) -> None:
         """Puts the deposit in a non-editable state by discarding all changes.
 
         If the deposit's state is `unsubmitted`, the deposit is deleted.
@@ -301,19 +280,19 @@ class ZenodoClient:
         Args:
             deposit: The deposit.
         """
-        if not deposit.editable:
+        if not _is_deposit_editable(deposit):
             return None
 
         response = requests.post(
-            f"{self.deposits}/{deposit.id}/actions/discard",
+            f"{self.deposits}/{_get_deposit_id(deposit)}/actions/discard",
             headers=self.headers,
             timeout=self.timeout,
         )
         response.raise_for_status()
 
     def update_metadata(
-        self, deposit: ZenodoDeposit, metadata: ZenodoMetadata
-    ) -> ZenodoDeposit:
+        self, deposit: ZenodoResponse, metadata: ZenodoMetadata
+    ) -> ZenodoResponse:
         """Updates the metadata of a deposit.
 
         Args:
@@ -325,14 +304,14 @@ class ZenodoClient:
         """
         deposit = self.make_editable(deposit)
         response = requests.put(
-            f"{self.deposits}/{deposit.id}",
+            f"{self.deposits}/{_get_deposit_id(deposit)}",
             headers=self.headers,
             json={"metadata": metadata.model_dump()},
             timeout=self.timeout,
         )
-        return self._resolve(response, ZenodoDeposit)
+        return self._resolve(response)
 
-    def new_version(self, deposit: ZenodoDeposit) -> ZenodoDeposit:
+    def new_version(self, deposit: ZenodoResponse) -> ZenodoResponse:
         """Creates a new, unpublished version of a published deposit.
 
         Args:
@@ -341,9 +320,10 @@ class ZenodoClient:
         Returns:
             The new version of the deposit.
         """
-        if not deposit.submitted:
+        id = _get_deposit_id(deposit)
+        if not _get_zenodo_field(deposit, "submitted"):
             raise ValueError(
-                f"Cannot create new version for deposit {deposit.id} because it "
+                f"Cannot create new version for deposit {id} because it "
                 "has not yet been published."
             )
 
@@ -351,13 +331,13 @@ class ZenodoClient:
         # create a new version but leave unpublished changes on the old one.
         self.discard(deposit)
         response = requests.post(
-            f"{self.deposits}/{deposit.id}/actions/newversion",
+            f"{self.deposits}/{id}/actions/newversion",
             headers=self.headers,
             timeout=self.timeout,
         )
-        return self._resolve(response, ZenodoDeposit)
+        return self._resolve(response)
 
-    def upload_file(self, deposit: ZenodoDeposit, file_path: Path) -> ZenodoFile:
+    def upload_file(self, deposit: ZenodoResponse, file_path: Path) -> ZenodoResponse:
         """Uploads a file to a deposit. The deposit must be unpublished.
 
         Args:
@@ -365,31 +345,33 @@ class ZenodoClient:
             file_path: The path to the file.
 
         Returns:
-            The updated deposit.
+            Information about the uploaded file.
         """
-        if deposit.submitted:
+        id = _get_deposit_id(deposit)
+        if _get_zenodo_field(deposit, "submitted"):
             raise ValueError(
-                f"Cannot upload new file to deposit {deposit.id} because the "
+                f"Cannot upload new file to deposit {id} because the "
                 "deposit has already been published. You must first create a new "
                 "version of the deposit and upload the files there."
             )
 
-        if not deposit.links.bucket:
+        bucket = _get_zenodo_field(deposit, "links").get("bucket")
+        if not bucket:
             raise ValueError(
-                f"Cannot upload new file to deposit {deposit.id} because the "
+                f"Cannot upload new file to deposit {id} because the "
                 "deposit does not have a file-upload (bucket) link. "
             )
 
         with file_path.open("rb") as file_stream:
             response = requests.put(
-                f"{deposit.links.bucket}/{file_path.name}",
+                f"{bucket}/{file_path.name}",
                 data=file_stream,
                 headers=self.headers,
                 timeout=self.timeout,
             )
-        return self._resolve(response, ZenodoFile)
+        return self._resolve(response)
 
-    def publish(self, deposit: ZenodoDeposit) -> ZenodoDeposit:
+    def publish(self, deposit: ZenodoResponse) -> ZenodoResponse:
         """Publishes a deposit.
 
         Args:
@@ -398,12 +380,15 @@ class ZenodoClient:
         Returns:
             The published deposit.
         """
-        if deposit.submitted and deposit.state == "done":
+        if (
+            _get_zenodo_field(deposit, "submitted")
+            and _get_zenodo_field(deposit, "state") == ZenodoDepositState.done
+        ):
             return deposit
 
         response = requests.post(
-            f"{self.deposits}/{deposit.id}/actions/publish",
+            f"{self.deposits}/{_get_deposit_id(deposit)}/actions/publish",
             headers=self.headers,
             timeout=self.timeout,
         )
-        return self._resolve(response, ZenodoDeposit)
+        return self._resolve(response)

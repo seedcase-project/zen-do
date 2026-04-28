@@ -46,7 +46,7 @@ def mock_get_deposits(requests_mock):
 def mock_get_deposit(requests_mock):
     deposit = example_deposit()
 
-    def _mock(json=deposit.model_dump(), id=deposit.id, status_code=200):
+    def _mock(json=deposit, id=deposit["id"], status_code=200):
         return requests_mock.get(
             f"{sandbox_client.deposits}/{id}",
             json=json,
@@ -58,7 +58,7 @@ def mock_get_deposit(requests_mock):
 
 @pytest.fixture
 def mock_create(requests_mock):
-    def _mock(json=example_deposit().model_dump(), status_code=201):
+    def _mock(json=example_deposit(), status_code=201):
         return requests_mock.post(
             sandbox_client.deposits, json=json, status_code=status_code
         )
@@ -70,7 +70,7 @@ def mock_create(requests_mock):
 def mock_make_editable(requests_mock):
     deposit = example_deposit()
 
-    def _mock(json=deposit.model_dump(), id=deposit.id, status_code=201):
+    def _mock(json=deposit, id=deposit["id"], status_code=201):
         return requests_mock.post(
             f"{sandbox_client.deposits}/{id}/actions/edit",
             json=json,
@@ -82,7 +82,7 @@ def mock_make_editable(requests_mock):
 
 @pytest.fixture
 def mock_discard(requests_mock):
-    def _mock(id=example_deposit().id, status_code=204):
+    def _mock(id=example_deposit()["id"], status_code=204):
         return requests_mock.post(
             f"{sandbox_client.deposits}/{id}/actions/discard",
             status_code=status_code,
@@ -95,7 +95,7 @@ def mock_discard(requests_mock):
 def mock_update_metadata(requests_mock):
     deposit = example_deposit()
 
-    def _mock(json=deposit.model_dump(), id=deposit.id, status_code=200):
+    def _mock(json=deposit, id=deposit["id"], status_code=200):
         return requests_mock.put(
             f"{sandbox_client.deposits}/{id}",
             json=json,
@@ -109,7 +109,7 @@ def mock_update_metadata(requests_mock):
 def mock_new_version(requests_mock):
     deposition = example_deposit()
 
-    def _mock(json=deposition.model_dump(), id=deposition.id, status_code=201):
+    def _mock(json=deposition, id=deposition["id"], status_code=201):
         return requests_mock.post(
             f"{sandbox_client.deposits}/{id}/actions/newversion",
             json=json,
@@ -121,9 +121,14 @@ def mock_new_version(requests_mock):
 
 @pytest.fixture
 def mock_upload_file(requests_mock):
-    def _mock(url=None, json={}, file_path=Path("data.txt"), status_code=200):
+    def _mock(
+        url=None,
+        json={"version_id": "abcd"},
+        file_path=Path("data.txt"),
+        status_code=200,
+    ):
         if url is None:
-            url = f"{example_deposit().links.bucket}/{file_path.name}"
+            url = f"{example_deposit()['links']['bucket']}/{file_path.name}"
         return requests_mock.put(
             url,
             json=json,
@@ -137,7 +142,7 @@ def mock_upload_file(requests_mock):
 def mock_publish(requests_mock):
     deposit = example_deposit()
 
-    def _mock(json=deposit.model_dump(), id=deposit.id, status_code=202):
+    def _mock(json=deposit, id=deposit["id"], status_code=202):
         return requests_mock.post(
             f"{sandbox_client.deposits}/{id}/actions/publish",
             json=json,
@@ -145,6 +150,16 @@ def mock_publish(requests_mock):
         )
 
     return _mock
+
+
+def test_flags_missing_field_in_response():
+    # Test _get_zenodo_field
+    with raises(KeyError):
+        sandbox_client.publish({})
+
+    # Test _get_deposit_id
+    with raises(KeyError):
+        sandbox_client.new_version({})
 
 
 # _resolve and _resolve_list
@@ -184,14 +199,12 @@ def test_get_deposits_success(mock_get_deposits):
     result = sandbox_client.get_deposits()
     assert result == []
 
-    mock = mock_get_deposits(
-        [example_deposit(1).model_dump(), example_deposit(2).model_dump()]
-    )
+    mock = mock_get_deposits([example_deposit(1), example_deposit(2)])
     result = sandbox_client.get_deposits()
     assert_headers_correct(mock)
     assert len(result) == 2
-    assert result[0].id == 1
-    assert result[1].id == 2
+    assert result[0]["id"] == 1
+    assert result[1]["id"] == 2
 
 
 def test_get_deposits_failure(mock_get_deposits):
@@ -209,7 +222,7 @@ def test_get_deposit_success(mock_get_deposit):
     result = sandbox_client.get_deposit(123)
 
     assert_headers_correct(mock)
-    assert result.id == 123
+    assert result["id"] == 123
 
 
 def test_get_deposit_failure(mock_get_deposit):
@@ -228,7 +241,7 @@ def test_create_success(mock_create):
     result = sandbox_client.create(metadata)
 
     assert_headers_correct(mock)
-    assert result.id == 123
+    assert result["id"] == 123
     assert mock.last_request.json()["metadata"] == metadata.model_dump()
 
 
@@ -250,7 +263,7 @@ def test_make_editable_success_when_editable(mock_make_editable, state):
     result = sandbox_client.make_editable(deposit)
 
     assert not mock.called
-    assert result.id == deposit.id
+    assert result["id"] == deposit["id"]
 
 
 def test_make_editable_success_when_not_editable(mock_make_editable):
@@ -260,7 +273,7 @@ def test_make_editable_success_when_not_editable(mock_make_editable):
     result = sandbox_client.make_editable(deposit)
 
     assert_headers_correct(mock)
-    assert result.id == deposit.id
+    assert result["id"] == deposit["id"]
 
 
 def test_make_editable_failure(mock_make_editable):
@@ -316,7 +329,7 @@ def test_update_metadata_success(mock_update_metadata, mock_make_editable, state
     result = sandbox_client.update_metadata(deposit, new_metadata)
 
     assert_headers_correct(mock)
-    assert result.id == deposit.id
+    assert result["id"] == deposit["id"]
     assert mock.last_request.json() == {"metadata": new_metadata.model_dump()}
 
 
@@ -335,12 +348,12 @@ def test_update_metadata_failure(mock_update_metadata, mock_make_editable):
 def test_new_version_success(mock_discard, mock_new_version):
     mock_discard()
     new_version_response = example_deposit(id=88)
-    mock_new_version = mock_new_version(new_version_response.model_dump())
+    mock_new_version = mock_new_version(new_version_response)
 
     result = sandbox_client.new_version(example_deposit(submitted=True))
 
     assert_headers_correct(mock_new_version)
-    assert result.id == new_version_response.id
+    assert result["id"] == new_version_response["id"]
 
 
 def test_new_version_flags_non_published(mock_discard, mock_new_version):
@@ -425,7 +438,7 @@ def test_publish_success_unpublished(mock_publish, deposit):
     result = sandbox_client.publish(deposit)
 
     assert_headers_correct(mock)
-    assert result.id == 123
+    assert result["id"] == 123
 
 
 def test_publish_success_published(mock_publish):
@@ -436,7 +449,7 @@ def test_publish_success_published(mock_publish):
     )
 
     assert not mock.called
-    assert result.id == 123
+    assert result["id"] == 123
 
 
 def test_publish_failure(mock_publish):

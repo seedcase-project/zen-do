@@ -1,10 +1,7 @@
 import json
-from http import HTTPStatus
 from pathlib import Path
 
 from pytest import MonkeyPatch, fixture, mark, raises
-from requests import HTTPError
-from requests_mock import ANY
 
 from zen_do.examples import example_deposit, example_metadata
 from zen_do.zenodo import (
@@ -20,94 +17,81 @@ def _zenodo_json(monkeypatch: MonkeyPatch, tmp_path: Path) -> None:
 
 
 def test_returns_deposit_if_matching_deposit_has_exactly_one_matching_identifier(
-    requests_mock, _zenodo_json
+    _zenodo_json,
 ):
-    requests_mock.get(
-        url=ANY,
-        json=[
-            example_deposit(id=12).model_dump(),
-            example_deposit(urn="urn:zenodo:my-org:project:poster").model_dump(),
-        ],
-    )
+    deposits = [
+        example_deposit(id=12),
+        example_deposit(urn="urn:zenodo:my-org:project:poster"),
+    ]
 
-    deposit = zenodo_get_deposit("token")
+    deposit = zenodo_get_deposit(deposits)
 
     assert deposit
-    assert deposit.id == 12
+    assert deposit["id"] == 12
 
 
 def test_returns_deposit_if_matching_deposit_has_at_least_one_matching_identifier(
-    requests_mock, _zenodo_json
+    _zenodo_json,
 ):
     fetched_deposit = example_deposit(id=12)
-    fetched_deposit.metadata.related_identifiers.extend(
+    fetched_deposit["metadata"]["related_identifiers"].extend(
         [
             # Duplicate identifier
-            fetched_deposit.metadata.related_identifiers[0],
+            fetched_deposit["metadata"]["related_identifiers"][0],
             # Different identifier
             ZenodoRelatedIdentifier(
                 identifier="urn:zenodo:my-org:project:poster",
                 relation="isIdenticalTo",
                 resource_type="other",
                 scheme="urn",
-            ),
+            ).model_dump(),
+            # Malformed identifier added in the UI
+            {
+                "identifier": "not our URN format",
+                "relation": "isIdenticalTo",
+                "scheme": "urn",
+            },
         ]
     )
-    requests_mock.get(url=ANY, json=[fetched_deposit.model_dump()])
 
-    deposit = zenodo_get_deposit("token")
+    deposit = zenodo_get_deposit([fetched_deposit])
 
     assert deposit
-    assert deposit.id == 12
+    assert deposit["id"] == 12
 
 
-def test_raises_error_if_multiple_matching_deposits(requests_mock, _zenodo_json):
-    requests_mock.get(
-        url=ANY,
-        json=[example_deposit(id=12).model_dump(), example_deposit(id=13).model_dump()],
-    )
+def test_raises_error_if_multiple_matching_deposits(_zenodo_json):
+    deposits = [example_deposit(id=12), example_deposit(id=13)]
 
     with raises(ValueError):
-        zenodo_get_deposit("token")
+        zenodo_get_deposit(deposits)
 
 
-def test_returns_none_if_no_deposits_on_zenodo(requests_mock, _zenodo_json):
-    requests_mock.get(url=ANY, json=[])
-
-    deposit = zenodo_get_deposit("token")
+def test_returns_none_if_no_deposits_on_zenodo(_zenodo_json):
+    deposit = zenodo_get_deposit([])
 
     assert deposit is None
 
 
-def test_returns_none_if_no_matching_deposits(requests_mock, _zenodo_json):
-    requests_mock.get(
-        url=ANY,
-        json=[example_deposit(urn="urn:zenodo:my-org:project:poster").model_dump()],
-    )
+def test_returns_none_if_no_matching_deposits(_zenodo_json):
+    deposits = [example_deposit(urn="urn:zenodo:my-org:project:poster")]
 
-    deposit = zenodo_get_deposit("token")
+    deposit = zenodo_get_deposit(deposits)
 
     assert deposit is None
 
 
-def test_raises_error_if_request_unsuccessful(requests_mock, _zenodo_json):
-    requests_mock.get(url=ANY, status_code=HTTPStatus.BAD_REQUEST)
-
-    with raises(HTTPError):
-        zenodo_get_deposit("token")
-
-
-def test_raises_error_if_zenodo_json_has_no_repo_url(monkeypatch, tmp_path):
+def test_raises_error_if_zenodo_json_has_no_urn_id(monkeypatch, tmp_path):
     metadata = example_metadata()
     monkeypatch.chdir(tmp_path)
     del metadata.related_identifiers[0]
     (tmp_path / ".zenodo.json").write_text(metadata.model_dump_json())
 
     with raises(ValueError):
-        zenodo_get_deposit("token")
+        zenodo_get_deposit([])
 
 
-def test_raises_error_if_zenodo_json_has_multiple_repo_urls(monkeypatch, tmp_path):
+def test_raises_error_if_zenodo_json_has_multiple_urn_ids(monkeypatch, tmp_path):
     metadata = example_metadata()
     monkeypatch.chdir(tmp_path)
     metadata.related_identifiers.append(
@@ -121,7 +105,7 @@ def test_raises_error_if_zenodo_json_has_multiple_repo_urls(monkeypatch, tmp_pat
     (tmp_path / ".zenodo.json").write_text(metadata.model_dump_json())
 
     with raises(ValueError):
-        zenodo_get_deposit("token")
+        zenodo_get_deposit([])
 
 
 @mark.parametrize(
@@ -145,4 +129,4 @@ def test_flags_incorrect_urn(monkeypatch, tmp_path, urn):
     (tmp_path / ".zenodo.json").write_text(json.dumps(metadata_json))
 
     with raises(ValueError):
-        zenodo_get_deposit("token")
+        zenodo_get_deposit([])
