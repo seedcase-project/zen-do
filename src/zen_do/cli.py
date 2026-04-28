@@ -2,9 +2,7 @@ import seedcase_soil as so
 from rich import print_json
 
 from zen_do.get_token import get_token
-from zen_do.zenodo_client import (
-    ZenodoClient,
-)
+from zen_do.zenodo_client import ZenodoClient
 
 app = so.setup_cli(
     name="zen-do",
