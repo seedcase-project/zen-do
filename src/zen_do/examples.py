@@ -1,11 +1,13 @@
 from typing import Optional
 
-from zen_do.zenodo import (
-    ZenodoCreator,
+from zen_do.zenodo_client import (
     ZenodoDepositState,
+    ZenodoResponse,
+)
+from zen_do.zenodo_metadata import (
+    ZenodoCreator,
     ZenodoMetadata,
     ZenodoRelatedIdentifier,
-    ZenodoResponse,
 )
 
 

@@ -5,7 +5,8 @@ from seedcase_soil import (
 )
 
 from zen_do.get_token import get_token
-from zen_do.zenodo import ZenodoClient, zenodo_get_deposit
+from zen_do.zenodo_client import ZenodoClient
+from zen_do.zenodo_get_deposit import zenodo_get_deposit
 
 app = setup_cli(
     name="zen-do",

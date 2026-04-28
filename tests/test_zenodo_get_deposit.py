@@ -4,10 +4,8 @@ from pathlib import Path
 from pytest import MonkeyPatch, fixture, mark, raises
 
 from zen_do.examples import example_deposit, example_metadata
-from zen_do.zenodo import (
-    ZenodoRelatedIdentifier,
-    zenodo_get_deposit,
-)
+from zen_do.zenodo_get_deposit import zenodo_get_deposit
+from zen_do.zenodo_metadata import ZenodoRelatedIdentifier
 
 
 @fixture
