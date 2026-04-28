@@ -5,7 +5,8 @@ from zen_do.get_token import SERVICE_NAME, get_token
 
 
 @mark.parametrize("sandbox", [False, True])
-def test_get_token_flags_no_token_found(sandbox):
+def test_get_token_flags_no_token_found(sandbox, mocker):
+    mocker.patch("keyring.get_password", return_value=None)
     with raises(RuntimeError):
         get_token(sandbox)
 
@@ -24,7 +25,10 @@ def test_gets_token_from_keyring(monkeypatch, mocker, sandbox, token_name):
 @mark.parametrize(
     "sandbox, token_name", [(False, "ZENODO_TOKEN"), (True, "ZENODO_SANDBOX_TOKEN")]
 )
-def test_gets_token_from_env_vars_if_not_in_keyring(monkeypatch, sandbox, token_name):
+def test_gets_token_from_env_vars_if_not_in_keyring(
+    mocker, monkeypatch, sandbox, token_name
+):
+    mocker.patch("keyring.get_password", return_value=None)
     monkeypatch.setenv("ZENODO_TOKEN", "ZENODO_TOKEN_value")
     monkeypatch.setenv("ZENODO_SANDBOX_TOKEN", "ZENODO_SANDBOX_TOKEN_value")
 

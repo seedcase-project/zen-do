@@ -2,7 +2,10 @@
 
 from .cli import zenodo_publish
 from .examples import example_deposit, example_metadata
-from .zenodo_client import ZenodoClient, ZenodoDepositState
+from .zenodo_client import (
+    ZenodoClient,
+    ZenodoDepositState,
+)
 from .zenodo_metadata import ZenodoCreator, ZenodoMetadata, ZenodoRelatedIdentifier
 
 __all__ = [
