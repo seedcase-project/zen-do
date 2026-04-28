@@ -70,7 +70,7 @@ build-quartodoc:
   uv run quartodoc build
 
 # Build the documentation website using Quarto
-build-website:
+build-website: build-quartodoc
   uv run quarto render --execute
 
 # Check the commit messages on the current branch that are not on the main branch
