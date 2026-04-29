@@ -8,7 +8,9 @@ from zen_do.zenodo_client import ZenodoResponse, _get_zenodo_field
 from zen_do.zenodo_metadata import ZenodoMetadata, ZenodoRelatedIdentifier, _is_urn
 
 
-def zenodo_get_deposit(deposits: list[ZenodoResponse]) -> Optional[ZenodoResponse]:
+def zenodo_get_deposit(
+    deposits: list[ZenodoResponse], metadata_file: Path = Path(".zenodo.toml")
+) -> Optional[ZenodoResponse]:
     """Gets the Zenodo deposit for the repository if it exists.
 
     Gets the URN identifier from the `.zenodo.toml` file. If one
@@ -16,11 +18,12 @@ def zenodo_get_deposit(deposits: list[ZenodoResponse]) -> Optional[ZenodoRespons
 
     Args:
         deposits: All the deposits on Zenodo associated with an access token.
+        metadata_file: The path to the metadata file.
 
     Returns:
         The Zenodo deposit for the repo if it exists, None otherwise.
     """
-    urn = _load_zenodo_toml().urn
+    urn = _load_zenodo_toml(metadata_file).urn
 
     matching_deposits = so.keep(
         deposits,
@@ -47,8 +50,8 @@ def _urn_matches(id_response: ZenodoResponse, target_urn: str) -> bool:
     return _is_urn(id) and id.identifier == target_urn
 
 
-def _load_zenodo_toml() -> ZenodoMetadata:
-    with open(Path(".zenodo.toml"), mode="rb") as file:
+def _load_zenodo_toml(metadata_file: Path) -> ZenodoMetadata:
+    with open(metadata_file, mode="rb") as file:
         toml_file = tomllib.load(file)
 
     return ZenodoMetadata.model_validate(toml_file)

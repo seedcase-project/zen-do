@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import pydantic
 import toml
 from pytest import MonkeyPatch, fixture, raises
 
@@ -23,6 +24,17 @@ def test_returns_deposit_if_matching_deposit_has_exactly_one_matching_identifier
     ]
 
     deposit = zenodo_get_deposit(deposits)
+
+    assert deposit
+    assert deposit["id"] == 12
+
+
+def test_can_use_non_default_file_location(tmp_path):
+    (tmp_path / "book").mkdir()
+    metadata_path = tmp_path / "book" / ".book.zenodo.toml"
+    metadata_path.write_text(toml.dumps(example_metadata().model_dump()))
+
+    deposit = zenodo_get_deposit([example_deposit(id=12)], metadata_path)
 
     assert deposit
     assert deposit["id"] == 12
@@ -63,6 +75,14 @@ def test_raises_error_if_multiple_matching_deposits(_zenodo_toml):
 
     with raises(ValueError):
         zenodo_get_deposit(deposits)
+
+
+def test_raises_error_if_metadata_file_empty(tmp_path):
+    metadata_path = tmp_path / ".zenodo.toml"
+    metadata_path.touch()
+
+    with raises(pydantic.ValidationError):
+        zenodo_get_deposit([example_deposit()], metadata_path)
 
 
 def test_returns_none_if_no_deposits_on_zenodo(_zenodo_toml):
