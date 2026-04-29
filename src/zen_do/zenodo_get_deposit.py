@@ -1,25 +1,29 @@
+import tomllib
 from pathlib import Path
 from typing import Optional
 
 import seedcase_soil as so
 
 from zen_do.zenodo_client import ZenodoResponse, _get_zenodo_field
-from zen_do.zenodo_metadata import ZenodoMetadata, ZenodoRelatedIdentifier
+from zen_do.zenodo_metadata import ZenodoMetadata, ZenodoRelatedIdentifier, _is_urn
 
 
-def zenodo_get_deposit(deposits: list[ZenodoResponse]) -> Optional[ZenodoResponse]:
+def zenodo_get_deposit(
+    deposits: list[ZenodoResponse], metadata_file: Path = Path(".zenodo.toml")
+) -> Optional[ZenodoResponse]:
     """Gets the Zenodo deposit for the repository if it exists.
 
-    Gets the URN identifier from the `.zenodo.json` file. If one
+    Gets the URN identifier from the `.zenodo.toml` file. If one
     doesn't exist, this function will not work.
 
     Args:
         deposits: All the deposits on Zenodo associated with an access token.
+        metadata_file: The path to the metadata file.
 
     Returns:
         The Zenodo deposit for the repo if it exists, None otherwise.
     """
-    urn = _get_urn()
+    urn = _load_zenodo_toml(metadata_file).urn
 
     matching_deposits = so.keep(
         deposits,
@@ -41,27 +45,13 @@ def zenodo_get_deposit(deposits: list[ZenodoResponse]) -> Optional[ZenodoRespons
     return matching_deposits[0]
 
 
-def _load_zenodo_json() -> ZenodoMetadata:
-    return ZenodoMetadata.model_validate_json(Path(".zenodo.json").read_text())
-
-
 def _urn_matches(id_response: ZenodoResponse, target_urn: str) -> bool:
     id = ZenodoRelatedIdentifier.model_construct(**id_response)
     return _is_urn(id) and id.identifier == target_urn
 
 
-def _is_urn(id: ZenodoRelatedIdentifier) -> bool:
-    return id.relation == "isIdenticalTo" and id.scheme == "urn"
+def _load_zenodo_toml(metadata_file: Path) -> ZenodoMetadata:
+    with open(metadata_file, mode="rb") as file:
+        toml_file = tomllib.load(file)
 
-
-def _get_urn() -> str:
-    metadata = _load_zenodo_json()
-    ids = so.keep(metadata.related_identifiers, _is_urn)
-    if len(ids) != 1:
-        raise ValueError(
-            "Expected exactly one `isIdenticalTo` URN in `.zenodo.json` under "
-            f"`related_identifiers`, but found {len(ids)}. Ensure there is a single "
-            "unique URN, as it is used to identify the corresponding deposit on Zenodo."
-        )
-
-    return ids[0].identifier
+    return ZenodoMetadata.model_validate(toml_file)

@@ -1,7 +1,8 @@
-import json
 from pathlib import Path
 
-from pytest import MonkeyPatch, fixture, mark, raises
+import pydantic
+import toml
+from pytest import MonkeyPatch, fixture, raises
 
 from zen_do.examples import example_deposit, example_metadata
 from zen_do.zenodo_get_deposit import zenodo_get_deposit
@@ -9,13 +10,13 @@ from zen_do.zenodo_metadata import ZenodoRelatedIdentifier
 
 
 @fixture
-def _zenodo_json(monkeypatch: MonkeyPatch, tmp_path: Path) -> None:
+def _zenodo_toml(monkeypatch: MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.chdir(tmp_path)
-    (tmp_path / ".zenodo.json").write_text(example_metadata().model_dump_json())
+    (tmp_path / ".zenodo.toml").write_text(toml.dumps(example_metadata().model_dump()))
 
 
 def test_returns_deposit_if_matching_deposit_has_exactly_one_matching_identifier(
-    _zenodo_json,
+    _zenodo_toml,
 ):
     deposits = [
         example_deposit(id=12),
@@ -28,8 +29,19 @@ def test_returns_deposit_if_matching_deposit_has_exactly_one_matching_identifier
     assert deposit["id"] == 12
 
 
+def test_can_use_non_default_file_location(tmp_path):
+    (tmp_path / "book").mkdir()
+    metadata_path = tmp_path / "book" / ".book.zenodo.toml"
+    metadata_path.write_text(toml.dumps(example_metadata().model_dump()))
+
+    deposit = zenodo_get_deposit([example_deposit(id=12)], metadata_path)
+
+    assert deposit
+    assert deposit["id"] == 12
+
+
 def test_returns_deposit_if_matching_deposit_has_at_least_one_matching_identifier(
-    _zenodo_json,
+    _zenodo_toml,
 ):
     fetched_deposit = example_deposit(id=12)
     fetched_deposit["metadata"]["related_identifiers"].extend(
@@ -58,73 +70,30 @@ def test_returns_deposit_if_matching_deposit_has_at_least_one_matching_identifie
     assert deposit["id"] == 12
 
 
-def test_raises_error_if_multiple_matching_deposits(_zenodo_json):
+def test_raises_error_if_multiple_matching_deposits(_zenodo_toml):
     deposits = [example_deposit(id=12), example_deposit(id=13)]
 
     with raises(ValueError):
         zenodo_get_deposit(deposits)
 
 
-def test_returns_none_if_no_deposits_on_zenodo(_zenodo_json):
+def test_raises_error_if_metadata_file_empty(tmp_path):
+    metadata_path = tmp_path / ".zenodo.toml"
+    metadata_path.touch()
+
+    with raises(pydantic.ValidationError):
+        zenodo_get_deposit([example_deposit()], metadata_path)
+
+
+def test_returns_none_if_no_deposits_on_zenodo(_zenodo_toml):
     deposit = zenodo_get_deposit([])
 
     assert deposit is None
 
 
-def test_returns_none_if_no_matching_deposits(_zenodo_json):
+def test_returns_none_if_no_matching_deposits(_zenodo_toml):
     deposits = [example_deposit(urn="urn:zenodo:my-org:project:poster")]
 
     deposit = zenodo_get_deposit(deposits)
 
     assert deposit is None
-
-
-def test_raises_error_if_zenodo_json_has_no_urn_id(monkeypatch, tmp_path):
-    metadata = example_metadata()
-    monkeypatch.chdir(tmp_path)
-    del metadata.related_identifiers[0]
-    (tmp_path / ".zenodo.json").write_text(metadata.model_dump_json())
-
-    with raises(ValueError):
-        zenodo_get_deposit([])
-
-
-def test_raises_error_if_zenodo_json_has_multiple_urn_ids(monkeypatch, tmp_path):
-    metadata = example_metadata()
-    monkeypatch.chdir(tmp_path)
-    metadata.related_identifiers.append(
-        ZenodoRelatedIdentifier(
-            identifier="urn:zenodo:my-org:project:poster",
-            relation="isIdenticalTo",
-            resource_type="other",
-            scheme="urn",
-        )
-    )
-    (tmp_path / ".zenodo.json").write_text(metadata.model_dump_json())
-
-    with raises(ValueError):
-        zenodo_get_deposit([])
-
-
-@mark.parametrize(
-    "urn",
-    [
-        "",
-        "not a URN",
-        "urn",
-        "urn:",
-        "urn:unknown",
-        "urn:zenodo",
-        "urn:zenodo:",
-        "urn:zenodo:a:",
-        "urn:zenodo:a/b",
-    ],
-)
-def test_flags_incorrect_urn(monkeypatch, tmp_path, urn):
-    metadata_json = example_metadata().model_dump()
-    metadata_json["related_identifiers"][0]["identifier"] = urn
-    monkeypatch.chdir(tmp_path)
-    (tmp_path / ".zenodo.json").write_text(json.dumps(metadata_json))
-
-    with raises(ValueError):
-        zenodo_get_deposit([])
