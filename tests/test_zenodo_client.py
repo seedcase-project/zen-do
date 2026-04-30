@@ -6,7 +6,7 @@ import requests
 from pytest import mark, raises
 
 from zen_do.examples import example_deposit, example_metadata
-from zen_do.zenodo import ZenodoClient, ZenodoDepositState
+from zen_do.zenodo_client import ZenodoClient, ZenodoDepositState
 
 sandbox_client = ZenodoClient(sandbox=True, token="token")
 
