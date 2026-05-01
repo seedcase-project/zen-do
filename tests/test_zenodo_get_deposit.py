@@ -4,18 +4,15 @@ import toml
 from pytest import MonkeyPatch, fixture, mark, raises
 
 from zen_do.examples import example_deposit, example_metadata
+from zen_do.internals import _write_metadata
 from zen_do.zenodo_get_deposit import zenodo_get_deposit
-from zen_do.zenodo_metadata import ZenodoMetadata, ZenodoRelatedIdentifier
-
-
-def _write_metadata(path: Path, metadata: ZenodoMetadata) -> None:
-    (path / ".zenodo.toml").write_text(toml.dumps(metadata.model_dump()))
+from zen_do.zenodo_metadata import ZenodoRelatedIdentifier
 
 
 @fixture
 def _zenodo_toml(monkeypatch: MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.chdir(tmp_path)
-    _write_metadata(tmp_path, example_metadata())
+    _write_metadata(example_metadata())
 
 
 def test_returns_deposit_if_matching_deposit_has_exactly_one_matching_identifier(
@@ -87,7 +84,7 @@ def test_raises_error_if_zenodo_json_has_no_urn_id(monkeypatch, tmp_path):
     metadata = example_metadata()
     monkeypatch.chdir(tmp_path)
     del metadata.related_identifiers[0]
-    _write_metadata(tmp_path, metadata)
+    _write_metadata(metadata)
 
     with raises(ValueError):
         zenodo_get_deposit([])
@@ -104,7 +101,7 @@ def test_raises_error_if_zenodo_json_has_multiple_urn_ids(monkeypatch, tmp_path)
             scheme="urn",
         )
     )
-    _write_metadata(tmp_path, metadata)
+    _write_metadata(metadata)
 
     with raises(ValueError):
         zenodo_get_deposit([])

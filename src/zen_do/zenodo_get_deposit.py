@@ -1,11 +1,10 @@
-import tomllib
-from pathlib import Path
 from typing import Optional
 
 import seedcase_soil as so
 
+from zen_do.internals import _read_metadata
 from zen_do.zenodo_client import ZenodoResponse, _get_zenodo_field
-from zen_do.zenodo_metadata import ZenodoMetadata, ZenodoRelatedIdentifier
+from zen_do.zenodo_metadata import ZenodoRelatedIdentifier
 
 
 def zenodo_get_deposit(deposits: list[ZenodoResponse]) -> Optional[ZenodoResponse]:
@@ -52,7 +51,7 @@ def _is_urn(id: ZenodoRelatedIdentifier) -> bool:
 
 
 def _get_urn() -> str:
-    metadata = _load_zenodo_toml()
+    metadata = _read_metadata()
     ids = so.keep(metadata.related_identifiers, _is_urn)
     if len(ids) != 1:
         raise ValueError(
@@ -62,10 +61,3 @@ def _get_urn() -> str:
         )
 
     return ids[0].identifier
-
-
-def _load_zenodo_toml() -> ZenodoMetadata:
-    with open(Path(".zenodo.toml"), mode="rb") as file:
-        toml_file = tomllib.load(file)
-
-    return ZenodoMetadata.model_validate(toml_file)
