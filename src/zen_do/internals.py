@@ -7,8 +7,8 @@ import toml
 from zen_do.zenodo_metadata import ZenodoMetadata
 
 
-def _read_metadata() -> ZenodoMetadata:
-    with open(Path(".zenodo.toml"), mode="rb") as file:
+def _read_metadata(path: Path = Path(".zenodo.toml")) -> ZenodoMetadata:
+    with open(path, mode="rb") as file:
         toml_file = tomllib.load(file)
 
     return ZenodoMetadata.model_validate(toml_file)
