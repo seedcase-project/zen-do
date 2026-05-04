@@ -27,6 +27,7 @@ dependencies = [
   "keyring>=25.7.0",
   "pydantic>=2.12.5",
   "requests>=2.32.5",
+  "rich>=15.0.0",
   "seedcase-soil>=0.10.0",
   "toml>=0.10.2",
 ]
