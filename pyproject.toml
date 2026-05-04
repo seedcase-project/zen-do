@@ -1,6 +1,6 @@
 [project]
 name = "zen-do"
-version = "0.9.6"
+version = "0.10.0"
 description = "Tasks to get Zenodo to do from the command line"
 authors = [
   { name = "Luke W. Johnston", email = "lwjohnst@gmail.com" },
