@@ -4,7 +4,7 @@ from typing import Optional
 import seedcase_soil as so
 
 from zen_do.zenodo_client import ZenodoResponse, _get_zenodo_field
-from zen_do.zenodo_metadata import ZenodoMetadata, ZenodoRelatedIdentifier
+from zen_do.zenodo_metadata import ZenodoMetadata, ZenodoRelatedIdentifier, _is_urn
 
 
 def zenodo_get_deposit(deposits: list[ZenodoResponse]) -> Optional[ZenodoResponse]:
@@ -19,7 +19,7 @@ def zenodo_get_deposit(deposits: list[ZenodoResponse]) -> Optional[ZenodoRespons
     Returns:
         The Zenodo deposit for the repo if it exists, None otherwise.
     """
-    urn = _get_urn()
+    urn = _load_zenodo_json().urn
 
     matching_deposits = so.keep(
         deposits,
@@ -48,20 +48,3 @@ def _load_zenodo_json() -> ZenodoMetadata:
 def _urn_matches(id_response: ZenodoResponse, target_urn: str) -> bool:
     id = ZenodoRelatedIdentifier.model_construct(**id_response)
     return _is_urn(id) and id.identifier == target_urn
-
-
-def _is_urn(id: ZenodoRelatedIdentifier) -> bool:
-    return id.relation == "isIdenticalTo" and id.scheme == "urn"
-
-
-def _get_urn() -> str:
-    metadata = _load_zenodo_json()
-    ids = so.keep(metadata.related_identifiers, _is_urn)
-    if len(ids) != 1:
-        raise ValueError(
-            "Expected exactly one `isIdenticalTo` URN in `.zenodo.json` under "
-            f"`related_identifiers`, but found {len(ids)}. Ensure there is a single "
-            "unique URN, as it is used to identify the corresponding deposit on Zenodo."
-        )
-
-    return ids[0].identifier
