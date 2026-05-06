@@ -113,15 +113,14 @@ zen-do convert [METADATA_FILE] --to [FORMAT]
 ```
 
 There are many different file formats and standards that contain similar
-or even identical metadata, but that are structured slightly differently.
-The `convert` command helps to keep
-one "source of truth" between these different formats for those cases
-where a repository might need different formats for different purposes.
-For example, GitHub will look for a `CITATION.cff` file to display the
-citation information for a repository, but doesn't recognize other
-formats (like `.zenodo.toml`). Rather than manually keeping these
-different files in sync, the `convert` command can simplify this syncing
-task.
+or even identical metadata, but that are structured slightly
+differently. The `convert` command helps to keep one "source of truth"
+between these different formats for those cases where a repository might
+need different formats for different purposes. For example, GitHub will
+look for a `CITATION.cff` file to display the citation information for a
+repository, but doesn't recognize other formats (like `.zenodo.toml`).
+Rather than manually keeping these different files in sync, the
+`convert` command can simplify this syncing task.
 
 We decided to only convert from `.zenodo.toml` to other formats, rather
 than allow any format to be converted to any other format because we
@@ -165,41 +164,3 @@ useful to keep synchronized with the `.zenodo.toml` file, including:
 
 The `--to` argument can be a single format or an array of formats,
 allowing users to convert to multiple formats in one command.
-
-```python
-from cyclopts import App, Parameter
-from pathlib import Path
-from typing import Annotated
-from enum import StrEnum
-
-class Format(StrEnum):
-    zenodo_json = ".zenodo.json"
-    citation_cff = "CITATION.cff"
-    pyproject_toml = "pyproject.toml"
-    quarto_yml = "_quarto.yml"
-    description = "DESCRIPTION"
-
-@app.command()
-def convert(
-        metadata_file: Path = Path(".zenodo.toml"),
-        /,
-        *,
-        to: Annotated[list[Format], Parameter(consume_multiple=True)],
-        verbose: bool = False
-    ) -> None:
-    """Convert a metadata file, e.g. `.zenodo.toml`, to other formats.
-
-    Args:
-        metadata_file: The path to the metadata file to convert.
-        to: The formats to convert the metadata file to. Can be a single format
-            or an array of formats.
-        verbose: Whether to print a log of the actions done.
-    """
-    # Read metadata file (checking if the URN exists or not).
-    # metadata: Metadata = read_metadata(path=metadata_file)
-    # Convert to the given formats
-    # formats: list[str] = convert_to_formats(metadata, to)
-    # TODO: Consider how updating existing files will work, need to read other formats first?
-    # output_path: list[Path] = write_formats(formats)
-    print_if_verbose(verbose, f"Written the format(s) to files {output_paths}.")
-```

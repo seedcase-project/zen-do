@@ -28,7 +28,7 @@ dependencies = [
   "pydantic>=2.12.5",
   "requests>=2.32.5",
   "seedcase-soil>=0.10.0",
-  "toml>=0.10.2",
+  "tomlkit>=0.14.0",
 ]
 
 [project.urls]
@@ -60,7 +60,6 @@ dev = [
   "ruff>=0.15.6",
   "types-requests>=2.32.4.20260107",
   "types-tabulate>=0.10.0.20260308",
-  "types-toml>=0.10.8.20260408",
   "typos>=1.44.0",
   "vulture>=2.15",
 ]
