@@ -9,7 +9,7 @@ developers) stay focused on the package's scope.
 
 {{< include /docs/includes/_design-status.qmd >}}
 
-## {{< var planned >}} `init`
+## {{< var done >}} `init`
 
 ``` {.bash filename="Terminal"}
 zen-do init --verbose
@@ -21,22 +21,6 @@ but with no values filled in, excluding a partially filled in URN for
 the project. This simple command is helpful to get started with making a
 new Zenodo deposit, as well as standardizing the name and structure of
 the file.
-
-```python
-@app.command()
-def init(verbose: bool = False) -> None:
-    """Create an empty `.zenodo.toml` file that has all the metadata fields.
-
-    Args:
-        verbose: Whether to print a log of the actions done.
-    """
-    # Check if .zenodo.toml already exists
-    # check_exists(".zenodo.toml")
-    # Copy the template .zenodo.toml file to the working directory
-    # OR...
-    # Take an internal class of the metadata fields and convert into TOML
-    print_if_verbose(verbose, "Created an empty `.zenodo.toml` file.")
-```
 
 ## {{< var planned >}} `list`
 
