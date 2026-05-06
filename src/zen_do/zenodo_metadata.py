@@ -1,5 +1,5 @@
 import re
-from typing import Optional, Self
+from typing import Any, Optional, Self
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
@@ -11,6 +11,10 @@ class KebabModel(BaseModel, frozen=True):
         alias_generator=lambda string: string.replace("_", "-"),
         populate_by_name=True,
     )
+
+    def model_dump_toml(self) -> dict[str, Any]:
+        """Dump the model to a dict with kebab-case keys for TOML."""
+        return self.model_dump(by_alias=True)
 
 
 class ZenodoCreator(KebabModel, frozen=True):

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-import toml
+import tomlkit
 from pytest import MonkeyPatch, fixture, mark, raises
 
 from zen_do.examples import example_deposit, example_metadata
@@ -125,7 +125,7 @@ def test_flags_incorrect_urn(monkeypatch, tmp_path, urn):
     metadata_json = example_metadata().model_dump()
     metadata_json["related_identifiers"][0]["identifier"] = urn
     monkeypatch.chdir(tmp_path)
-    (tmp_path / ".zenodo.toml").write_text(toml.dumps(metadata_json))
+    (tmp_path / ".zenodo.toml").write_text(tomlkit.dumps(metadata_json))
 
     with raises(ValueError):
         zenodo_get_deposit([])
