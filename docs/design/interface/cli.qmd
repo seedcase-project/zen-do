@@ -38,7 +38,7 @@ def init(verbose: bool = False) -> None:
     print_if_verbose(verbose, "Created an empty `.zenodo.toml` file.")
 ```
 
-## {{< var planned >}} `list`
+## {{< var done >}} `list`
 
 ``` {.bash filename="Terminal"}
 zen-do list --sandbox
@@ -48,25 +48,6 @@ The `list` command fetches the stored Zenodo token and gets all Zenodo
 deposits listed in the account connected to that token. Both the CLI and
 the internal Python interface are used in other functions like
 `publish()` to find whether a deposit exists or not.
-
-The Python interface, with some implementation comments and docstring,
-will be:
-
-```python
-@app.command()
-def list(sandbox: bool = False) -> None:
-    """List all Zenodo deposits in an account as raw JSON (from the Zenodo servers).
-
-    Args:
-        sandbox: Whether to use the Zenodo sandbox environment for testing purposes.
-    """
-    # Fetch token from system keyring or environment variable.
-    # token: Token = get_token(sandbox=sandbox)
-    # Get request to Zenodo servers.
-    # TODO: Either dict or a custom class for the deposit, e.g. `Deposit`?
-    # deposits: list[Deposit] = list_deposits(sandbox=sandbox, token=token)
-    pretty_print(deposits)
-```
 
 ## {{< var planned >}} `get`
 
@@ -113,15 +94,14 @@ zen-do convert [METADATA_FILE] --to [FORMAT]
 ```
 
 There are many different file formats and standards that contain similar
-or even identical metadata, but that are structured slightly differently.
-The `convert` command helps to keep
-one "source of truth" between these different formats for those cases
-where a repository might need different formats for different purposes.
-For example, GitHub will look for a `CITATION.cff` file to display the
-citation information for a repository, but doesn't recognize other
-formats (like `.zenodo.toml`). Rather than manually keeping these
-different files in sync, the `convert` command can simplify this syncing
-task.
+or even identical metadata, but that are structured slightly
+differently. The `convert` command helps to keep one "source of truth"
+between these different formats for those cases where a repository might
+need different formats for different purposes. For example, GitHub will
+look for a `CITATION.cff` file to display the citation information for a
+repository, but doesn't recognize other formats (like `.zenodo.toml`).
+Rather than manually keeping these different files in sync, the
+`convert` command can simplify this syncing task.
 
 We decided to only convert from `.zenodo.toml` to other formats, rather
 than allow any format to be converted to any other format because we
