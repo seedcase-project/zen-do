@@ -1,10 +1,23 @@
 import re
-from typing import Optional, Self
+from typing import Any, Optional, Self
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, ConfigDict, model_validator
 
 
-class ZenodoCreator(BaseModel):
+class KebabModel(BaseModel, frozen=True):
+    """Allow creating Pydantic model from kebab-case data."""
+
+    model_config = ConfigDict(
+        alias_generator=lambda string: string.replace("_", "-"),
+        populate_by_name=True,
+    )
+
+    def model_dump_toml(self) -> dict[str, Any]:
+        """Dump the model to a dict with kebab-case keys for TOML."""
+        return self.model_dump(by_alias=True)
+
+
+class ZenodoCreator(KebabModel, frozen=True):
     """Model representing the creator of a Zenodo deposit.
 
     Attributes:
@@ -18,7 +31,7 @@ class ZenodoCreator(BaseModel):
     orcid: str
 
 
-class ZenodoRelatedIdentifier(BaseModel):
+class ZenodoRelatedIdentifier(KebabModel, frozen=True):
     """Model representing an identifier related to a Zenodo deposit.
 
     Attributes:
@@ -48,7 +61,7 @@ class ZenodoRelatedIdentifier(BaseModel):
         return self
 
 
-class ZenodoMetadata(BaseModel):
+class ZenodoMetadata(KebabModel, frozen=True):
     """Model representing Zenodo metadata.
 
     Attributes:
