@@ -67,6 +67,7 @@ quartodoc:
       contents:
         - list
         - get
+        - init
     - title: "Zenodo API"
       contents:
         - ZenodoClient
