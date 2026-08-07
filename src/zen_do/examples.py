@@ -11,7 +11,9 @@ from zen_do.zenodo_metadata import (
 )
 
 
-def example_metadata(title: str = "Test Book") -> ZenodoMetadata:
+def example_metadata(
+    title: str = "Test Book", urn: str = "urn:zenodo:my-org:project:book"
+) -> ZenodoMetadata:
     """A set of example Zenodo metadata."""
     return ZenodoMetadata(
         title=title,
@@ -23,7 +25,7 @@ def example_metadata(title: str = "Test Book") -> ZenodoMetadata:
         ],
         related_identifiers=[
             ZenodoRelatedIdentifier(
-                identifier="urn:zenodo:my-org:project:book",
+                identifier=urn,
                 relation="isIdenticalTo",
                 resource_type="other",
                 scheme="urn",
