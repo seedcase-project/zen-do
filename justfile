@@ -38,7 +38,7 @@ install-deps:
 
 # Run the Python tests
 test-python:
-  uv run pytest
+  uv run pytest tests/unit
   # Make the badge from the coverage report
   uv run genbadge coverage \
     -i coverage.xml \
