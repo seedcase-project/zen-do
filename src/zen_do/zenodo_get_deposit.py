@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Optional
 
 import seedcase_soil as so
@@ -7,7 +8,9 @@ from zen_do.zenodo_client import ZenodoResponse, _get_zenodo_field
 from zen_do.zenodo_metadata import ZenodoRelatedIdentifier, _is_urn
 
 
-def zenodo_get_deposit(deposits: list[ZenodoResponse]) -> Optional[ZenodoResponse]:
+def zenodo_get_deposit(
+    deposits: list[ZenodoResponse], metadata_file: Path = Path(".zenodo.toml")
+) -> Optional[ZenodoResponse]:
     """Gets the Zenodo deposit for the repository if it exists.
 
     Gets the URN identifier from the `.zenodo.toml` file. If one
@@ -15,11 +18,12 @@ def zenodo_get_deposit(deposits: list[ZenodoResponse]) -> Optional[ZenodoRespons
 
     Args:
         deposits: All the deposits on Zenodo associated with an access token.
+        metadata_file: The path to the metadata file.
 
     Returns:
         The Zenodo deposit for the repo if it exists, None otherwise.
     """
-    urn = _read_metadata().urn
+    urn = _read_metadata(metadata_file).urn
 
     matching_deposits = so.keep(
         deposits,
