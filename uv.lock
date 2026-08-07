@@ -2997,6 +2997,7 @@ dependencies = [
     { name = "keyring" },
     { name = "pydantic" },
     { name = "requests" },
+    { name = "rich" },
     { name = "seedcase-soil" },
     { name = "tomlkit" },
 ]
@@ -3027,6 +3028,7 @@ requires-dist = [
     { name = "keyring", specifier = ">=25.7.0" },
     { name = "pydantic", specifier = ">=2.13.4" },
     { name = "requests", specifier = ">=2.34.2" },
+    { name = "rich", specifier = ">=15.0.0" },
     { name = "seedcase-soil", specifier = ">=0.16.0" },
     { name = "tomlkit", specifier = ">=0.14.0" },
 ]
