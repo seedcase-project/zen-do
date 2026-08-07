@@ -2998,6 +2998,7 @@ dependencies = [
     { name = "pydantic" },
     { name = "requests" },
     { name = "seedcase-soil" },
+    { name = "tomlkit" },
 ]
 
 [package.dev-dependencies]
@@ -3027,6 +3028,7 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.13.4" },
     { name = "requests", specifier = ">=2.34.2" },
     { name = "seedcase-soil", specifier = ">=0.16.0" },
+    { name = "tomlkit", specifier = ">=0.14.0" },
 ]
 
 [package.metadata.requires-dev]

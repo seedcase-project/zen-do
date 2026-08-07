@@ -1,16 +1,16 @@
-from pathlib import Path
 from typing import Optional
 
 import seedcase_soil as so
 
+from zen_do.internals import _read_metadata
 from zen_do.zenodo_client import ZenodoResponse, _get_zenodo_field
-from zen_do.zenodo_metadata import ZenodoMetadata, ZenodoRelatedIdentifier, _is_urn
+from zen_do.zenodo_metadata import ZenodoRelatedIdentifier, _is_urn
 
 
 def zenodo_get_deposit(deposits: list[ZenodoResponse]) -> Optional[ZenodoResponse]:
     """Gets the Zenodo deposit for the repository if it exists.
 
-    Gets the URN identifier from the `.zenodo.json` file. If one
+    Gets the URN identifier from the `.zenodo.toml` file. If one
     doesn't exist, this function will not work.
 
     Args:
@@ -19,7 +19,7 @@ def zenodo_get_deposit(deposits: list[ZenodoResponse]) -> Optional[ZenodoRespons
     Returns:
         The Zenodo deposit for the repo if it exists, None otherwise.
     """
-    urn = _load_zenodo_json().urn
+    urn = _read_metadata().urn
 
     matching_deposits = so.keep(
         deposits,
@@ -39,10 +39,6 @@ def zenodo_get_deposit(deposits: list[ZenodoResponse]) -> Optional[ZenodoRespons
     if not matching_deposits:
         return None
     return matching_deposits[0]
-
-
-def _load_zenodo_json() -> ZenodoMetadata:
-    return ZenodoMetadata.model_validate_json(Path(".zenodo.json").read_text())
 
 
 def _urn_matches(id_response: ZenodoResponse, target_urn: str) -> bool:

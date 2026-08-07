@@ -28,6 +28,7 @@ dependencies = [
   "pydantic>=2.13.4",
   "requests>=2.34.2",
   "seedcase-soil>=0.16.0",
+  "tomlkit>=0.14.0",
 ]
 
 [project.urls]
