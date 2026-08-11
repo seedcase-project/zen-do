@@ -144,3 +144,23 @@ def convert(
     # output_path: list[Path] = write_formats(formats)
     print_if_verbose(verbose, f"Written the format(s) to files {output_paths}.")
 ```
+
+## {{< var planned >}} `update`
+
+```bash
+zen-do update [METADATA-FILE] --sandbox --draft
+```
+
+The `update` command takes a `.zenodo.toml` metadata file and updates
+the contents with the Zenodo Deposit, which also updates the Record. It
+doesn't lead to a new DOI, as it doesn't change the files in the
+Deposit. This command is useful if you have a typo in one of the fields
+or forgot to add some information, but you don't want to re-upload the
+same file and create a new DOI.
+
+It has one required argument, `[METADATA-FILE]` that by default looks
+for the `.zenodo.toml` file in the working directory. The optional
+argument `--sandbox` is to update a Deposit in the sandbox environment.
+The second optional argument `--draft` will update the Deposit without
+publishing to the Record, to enable checking the Deposit before
+publishing.
