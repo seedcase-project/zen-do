@@ -113,15 +113,14 @@ zen-do convert [METADATA_FILE] --to [FORMAT]
 ```
 
 There are many different file formats and standards that contain similar
-or even identical metadata, but that are structured slightly differently.
-The `convert` command helps to keep
-one "source of truth" between these different formats for those cases
-where a repository might need different formats for different purposes.
-For example, GitHub will look for a `CITATION.cff` file to display the
-citation information for a repository, but doesn't recognize other
-formats (like `.zenodo.toml`). Rather than manually keeping these
-different files in sync, the `convert` command can simplify this syncing
-task.
+or even identical metadata, but that are structured slightly
+differently. The `convert` command helps to keep one "source of truth"
+between these different formats for those cases where a repository might
+need different formats for different purposes. For example, GitHub will
+look for a `CITATION.cff` file to display the citation information for a
+repository, but doesn't recognize other formats (like `.zenodo.toml`).
+Rather than manually keeping these different files in sync, the
+`convert` command can simplify this syncing task.
 
 We decided to only convert from `.zenodo.toml` to other formats, rather
 than allow any format to be converted to any other format because we
