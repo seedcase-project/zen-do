@@ -1,5 +1,3 @@
-from typing import Optional
-
 import seedcase_soil as so
 
 from zen_do.internals import _read_metadata
@@ -7,7 +5,7 @@ from zen_do.zenodo_client import ZenodoResponse, _get_zenodo_field
 from zen_do.zenodo_metadata import ZenodoRelatedIdentifier, _is_urn
 
 
-def zenodo_get_deposit(deposits: list[ZenodoResponse]) -> Optional[ZenodoResponse]:
+def zenodo_get_deposit(deposits: list[ZenodoResponse]) -> ZenodoResponse | None:
     """Gets the Zenodo deposit for the repository if it exists.
 
     Gets the URN identifier from the `.zenodo.toml` file. If one

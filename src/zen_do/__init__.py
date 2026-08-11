@@ -9,12 +9,12 @@ from .zenodo_client import (
 from .zenodo_metadata import ZenodoCreator, ZenodoMetadata, ZenodoRelatedIdentifier
 
 __all__ = [
-    "example_metadata",
-    "example_deposit",
-    "zenodo_publish",
     "ZenodoClient",
     "ZenodoCreator",
-    "ZenodoMetadata",
     "ZenodoDepositState",
+    "ZenodoMetadata",
     "ZenodoRelatedIdentifier",
+    "example_deposit",
+    "example_metadata",
+    "zenodo_publish",
 ]

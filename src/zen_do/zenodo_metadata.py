@@ -1,5 +1,5 @@
 import re
-from typing import Any, Optional, Self
+from typing import Any, Self
 
 import seedcase_soil as so
 from pydantic import BaseModel, ConfigDict, model_validator
@@ -46,7 +46,7 @@ class ZenodoRelatedIdentifier(KebabModel, frozen=True):
     identifier: str
     relation: str
     resource_type: str
-    scheme: Optional[str] = None
+    scheme: str | None = None
 
     @model_validator(mode="after")
     def _check_urn(self) -> Self:

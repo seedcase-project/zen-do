@@ -1,6 +1,6 @@
 from enum import StrEnum
 from pathlib import Path
-from typing import Any, Union
+from typing import Any
 
 import requests
 
@@ -105,7 +105,7 @@ class ZenodoClient:
         )
         return self._resolve_list(response)
 
-    def get_deposit(self, deposit_id: Union[int, str]) -> ZenodoResponse:
+    def get_deposit(self, deposit_id: int | str) -> ZenodoResponse:
         """Gets the deposit with the given ID.
 
         Args:
@@ -171,7 +171,7 @@ class ZenodoClient:
             deposit: The deposit.
         """
         if not _is_deposit_editable(deposit):
-            return None
+            return
 
         response = requests.post(
             f"{self.deposits}/{_get_deposit_id(deposit)}/actions/discard",
