@@ -1,5 +1,3 @@
-from typing import Optional
-
 from zen_do.zenodo_client import (
     ZenodoDepositState,
     ZenodoResponse,
@@ -36,13 +34,16 @@ def example_metadata(
 
 def example_deposit(
     id: int = 123,
-    metadata: ZenodoMetadata = example_metadata(),
+    metadata: ZenodoMetadata | None = None,
     state: ZenodoDepositState = ZenodoDepositState.done,
     submitted: bool = True,
-    bucket: Optional[str] = "https://path.com/path/wrwee-324-23f-sdf",
+    bucket: str | None = "https://path.com/path/wrwee-324-23f-sdf",
     urn: str = "urn:zenodo:my-org:project:book",
 ) -> ZenodoResponse:
     """An example Zenodo deposit."""
+    if metadata is None:
+        metadata = example_metadata()
+
     metadata = metadata.model_copy(
         update={
             "related_identifiers": [

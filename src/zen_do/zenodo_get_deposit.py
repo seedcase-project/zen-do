@@ -1,16 +1,15 @@
-import tomllib
 from pathlib import Path
-from typing import Optional
 
 import seedcase_soil as so
 
+from zen_do.internals import _read_metadata
 from zen_do.zenodo_client import ZenodoResponse, _get_zenodo_field
-from zen_do.zenodo_metadata import ZenodoMetadata, ZenodoRelatedIdentifier, _is_urn
+from zen_do.zenodo_metadata import ZenodoRelatedIdentifier, _is_urn
 
 
 def zenodo_get_deposit(
     deposits: list[ZenodoResponse], metadata_file: Path = Path(".zenodo.toml")
-) -> Optional[ZenodoResponse]:
+) -> ZenodoResponse | None:
     """Gets the Zenodo deposit for the repository if it exists.
 
     Gets the URN identifier from the `.zenodo.toml` file. If one
@@ -23,7 +22,7 @@ def zenodo_get_deposit(
     Returns:
         The Zenodo deposit for the repo if it exists, None otherwise.
     """
-    urn = _load_zenodo_toml(metadata_file).urn
+    urn = _read_metadata(metadata_file).urn
 
     matching_deposits = so.keep(
         deposits,
@@ -48,10 +47,3 @@ def zenodo_get_deposit(
 def _urn_matches(id_response: ZenodoResponse, target_urn: str) -> bool:
     id = ZenodoRelatedIdentifier.model_construct(**id_response)
     return _is_urn(id) and id.identifier == target_urn
-
-
-def _load_zenodo_toml(metadata_file: Path) -> ZenodoMetadata:
-    with open(metadata_file, mode="rb") as file:
-        toml_file = tomllib.load(file)
-
-    return ZenodoMetadata.model_validate(toml_file)

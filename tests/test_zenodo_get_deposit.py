@@ -1,10 +1,10 @@
 from pathlib import Path
 
 import pydantic
-import toml
 from pytest import MonkeyPatch, fixture, raises
 
 from zen_do.examples import example_deposit, example_metadata
+from zen_do.internals import _write_metadata
 from zen_do.zenodo_get_deposit import zenodo_get_deposit
 from zen_do.zenodo_metadata import ZenodoRelatedIdentifier
 
@@ -12,7 +12,7 @@ from zen_do.zenodo_metadata import ZenodoRelatedIdentifier
 @fixture
 def _zenodo_toml(monkeypatch: MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.chdir(tmp_path)
-    (tmp_path / ".zenodo.toml").write_text(toml.dumps(example_metadata().model_dump()))
+    _write_metadata(example_metadata())
 
 
 def test_returns_deposit_if_matching_deposit_has_exactly_one_matching_identifier(
@@ -31,8 +31,8 @@ def test_returns_deposit_if_matching_deposit_has_exactly_one_matching_identifier
 
 def test_can_use_non_default_file_location(tmp_path):
     (tmp_path / "book").mkdir()
-    metadata_path = tmp_path / "book" / ".book.zenodo.toml"
-    metadata_path.write_text(toml.dumps(example_metadata().model_dump()))
+    metadata_path = Path(tmp_path / "book" / ".book.zenodo.toml")
+    _write_metadata(example_metadata(), metadata_path)
 
     deposit = zenodo_get_deposit([example_deposit(id=12)], metadata_path)
 
