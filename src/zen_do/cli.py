@@ -79,7 +79,8 @@ def get(
     """
     token = get_token(sandbox)
     client = ZenodoClient(token, sandbox)
-    deposit = zenodo_get_deposit(client.get_deposits(), metadata_file)
+    metadata = _read_metadata(metadata_file)
+    deposit = zenodo_get_deposit(client.get_deposits(), metadata)
 
     if deposit:
         print_json(data=deposit)
@@ -108,9 +109,8 @@ def publish(
     """
     token = get_token(sandbox)
     client = ZenodoClient(token, sandbox)
-    # TODO: refactor to avoid 2 reads
-    deposit = zenodo_get_deposit(client.get_deposits(), metadata_file)
     metadata = _read_metadata(metadata_file)
+    deposit = zenodo_get_deposit(client.get_deposits(), metadata)
     success_state = "updated"
 
     if deposit:
