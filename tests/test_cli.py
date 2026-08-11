@@ -1,4 +1,4 @@
-from pytest import fixture
+from pytest import fixture, raises
 
 from zen_do.cli import app
 from zen_do.examples import example_deposit, example_metadata
@@ -43,6 +43,11 @@ def test_list_when_no_deposits_found(
     out = capsys.readouterr().out
 
     assert "[" not in out
+
+
+def test_zenodo_list_needs_token():
+    with raises(RuntimeError):
+        app("list", result_action="return_value")
 
 
 def test_get_when_deposit_found(
