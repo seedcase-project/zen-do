@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 
 import seedcase_soil as so
 from rich import print_json
@@ -95,7 +94,7 @@ def publish(
     metadata_file: Path = Path(".zenodo.toml"),
     /,
     *,
-    file_path: Optional[Path] = None,
+    file_path: Path | None = None,
     sandbox: bool = False,
     verbose: bool = False,
 ) -> None:
