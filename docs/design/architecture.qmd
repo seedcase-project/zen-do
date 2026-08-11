@@ -2,83 +2,79 @@
 title: "Architecture"
 ---
 
-This document contains the architectural design for zen-do. For design
-details of the Seedcase Project as a whole, see the
-[Seedcase Design](https://design.seedcase-project.org) documentation.
+This document contains the architectural design for zen-do. For design details
+of the Seedcase Project as a whole, see the [Seedcase
+Design](https://design.seedcase-project.org) documentation.
 
-The purpose of this description is to ensure that the team shares a
-common understanding about the implementation and to outline the design
-to anyone else interested in the internal workings of the package.
+The purpose of this description is to ensure that the team shares a common
+understanding about the implementation and to outline the design to anyone else
+interested in the internal workings of the package.
 
 ## Actions and objects
 
-This section describes the different actions and objects used throughout
-the package.
+This section describes the different actions and objects used throughout the
+package.
 
-| Object                  | Description                                                                                                                         |
-|-------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
-| deposit(s)              | A Zenodo deposit is the combined set of files and metadata that make up the content that will eventually form the published record. |
-| record(s)               | A Zenodo record is a given published set of metadata and files for a specific DOI.                                                  |
-| metadata                | The metadata for a deposit, kept within a file `.zenodo.toml`.                                                                      |
-| file(s)                 | The files to add to a deposit.                                                                                                      |
-| format                  | The file formats for the Zenodo metadata file(s) to convert between.                                                                |
-| token                   | The Zenodo personal access token to authenticate with the Zenodo API.                                                               |
+  | Object     | Description                                                                                                                         |
+  | ---------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+  | deposit(s) | A Zenodo deposit is the combined set of files and metadata that make up the content that will eventually form the published record. |
+  | record(s)  | A Zenodo record is a given published set of metadata and files for a specific DOI.                                                  |
+  | metadata   | The metadata for a deposit, kept within a file `.zenodo.toml`.                                                                      |
+  | file(s)    | The files to add to a deposit.                                                                                                      |
+  | format     | The file formats for the Zenodo metadata file(s) to convert between.                                                                |
+  | token      | The Zenodo personal access token to authenticate with the Zenodo API.                                                               |
 
-: Objects used in zen-do.
+  : Objects used in zen-do.
 
-| Action  | Description                                                                                                                                       |
-|---------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| init    | Create an empty metadata file to be filled in.                                                                                                    |
-| list    | List all Zenodo deposits in an account.                                                                                                           |
-| get     | Get a Zenodo deposit in an account from a metadata file.                                                                                          |
-| convert | Convert metadata files to and from different formats.                                                                                             |
-| update  | Updates an existing Zenodo deposit's metadata only (not file) based on the contents of a metadata file.                                           |
-| publish | Publish a new Zenodo record from an existing or new Zenodo deposit based on the metadata file and, if given, updating the file(s) in the deposit. |
-| discard | Discard a draft of or update to a Zenodo deposit (but not record).                                                                                |
+  | Action  | Description                                                                                                                                       |
+  | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | init    | Create an empty metadata file to be filled in.                                                                                                    |
+  | list    | List all Zenodo deposits in an account.                                                                                                           |
+  | get     | Get a Zenodo deposit in an account from a metadata file.                                                                                          |
+  | convert | Convert metadata files to and from different formats.                                                                                             |
+  | update  | Updates an existing Zenodo deposit's metadata only (not file) based on the contents of a metadata file.                                           |
+  | publish | Publish a new Zenodo record from an existing or new Zenodo deposit based on the metadata file and, if given, updating the file(s) in the deposit. |
+  | discard | Discard a draft of or update to a Zenodo deposit (but not record).                                                                                |
 
-: Actions used in zen-do.
+  : Actions used in zen-do.
 
 ### Metadata file
 
 The only allowable metadata file format that zen-do uses is
-[TOML](https://toml.io/en/), which is a simple, human-readable format
-that is easy to write and read. Why TOML rather than Zenodo's suggested
-JSON format? JSON is not a friendly format for humans to write and read,
-it doesn't allow comments, and doesn't support multi-line strings, which
-can be useful for writing long descriptions. TOML is the opposite, as it
-allows comments, multi-line strings, and is more human-friendly.
+[TOML](https://toml.io/en/), which is a simple, human-readable format that is
+easy to write and read. Why TOML rather than Zenodo's suggested JSON format?
+JSON is not a friendly format for humans to write and read, it doesn't allow
+comments, and doesn't support multi-line strings, which can be useful for
+writing long descriptions. TOML is the opposite, as it allows comments,
+multi-line strings, and is more human-friendly.
 
-The file is named `.zenodo.toml` and contains all the metadata for a
-Zenodo deposit. The file can be converted to and from other formats,
-such as `.zenodo.json`, `_quarto.yml`, `pyproject.toml`, and
-`CITATION.cff` (filling in the relevant fields where relevant in those
-other formats).
+The file is named `.zenodo.toml` and contains all the metadata for a Zenodo
+deposit. The file can be converted to and from other formats, such as
+`.zenodo.json`, `_quarto.yml`, `pyproject.toml`, and `CITATION.cff` (filling in
+the relevant fields where relevant in those other formats).
 
-We use the design pattern of "one `.zenodo.toml` file for one Zenodo
-deposit". So this file must be given (or present in the working
-directory) for many of the actions to work. There must also be a unique
-["related identifier"](https://developers.zenodo.org/#representation)
-for this (new or existing) deposit added to this `.zenodo.toml` file in
-order to identify it within the list of deposits of a user's account.
-This is described in more detail in the [interface](interface/index.qmd)
-documentation.
+We use the design pattern of "one `.zenodo.toml` file for one Zenodo deposit".
+So this file must be given (or present in the working directory) for many of the
+actions to work. There must also be a unique ["related
+identifier"](https://developers.zenodo.org/#representation) for this (new or
+existing) deposit added to this `.zenodo.toml` file in order to identify it
+within the list of deposits of a user's account. This is described in more
+detail in the [interface](interface/index.qmd) documentation.
 
 ## C4 Models
 
-This section contains diagrams for zen-do that are inspired by the
-[C4 Model](https://c4model.com/). The C4 Model is an established
-visualisation approach to describe the architecture of a software
-system. It breaks the system down into four levels of architectural
-abstraction: system context, containers, components, and code. For
-zen-do, we only use diagrams that are similar to the context and
-container models.
+This section contains diagrams for zen-do that are inspired by the [C4
+Model](https://c4model.com/). The C4 Model is an established visualisation
+approach to describe the architecture of a software system. It breaks the system
+down into four levels of architectural abstraction: system context, containers,
+components, and code. For zen-do, we only use diagrams that are similar to the
+context and container models.
 
 ### System context
 
-The system context diagram shows the users and external systems that
-interact with zen-do. The users provide zen-do with the metadata file,
-the file or files to add to a Zenodo deposit, and the token for the
-Zenodo account.
+The system context diagram shows the users and external systems that interact
+with zen-do. The users provide zen-do with the metadata file, the file or files
+to add to a Zenodo deposit, and the token for the Zenodo account.
 
 ```{mermaid}
 %%| label: fig-c4-context
@@ -112,15 +108,14 @@ flowchart TB
 
 ### Container/component
 
-In C4, a [container diagram](https://c4model.com/diagrams/container)
-zooms in on the system boundary to show the *containers* within it while
-a a [component diagram](https://c4model.com/abstractions/component) is
-"a grouping of related functionality encapsulated behind a well-defined
-interface", like a class or a module. For zen-do, we have a single
-container (the CLI) so we combine the container and component diagrams
-into one. The diagram below shows the main actions and objects within
-zen-do, how they interact with each other at a high level, and the
-technologies used for each.
+In C4, a [container diagram](https://c4model.com/diagrams/container) zooms in on
+the system boundary to show the *containers* within it while a a [component
+diagram](https://c4model.com/abstractions/component) is "a grouping of related
+functionality encapsulated behind a well-defined interface", like a class or a
+module. For zen-do, we have a single container (the CLI) so we combine the
+container and component diagrams into one. The diagram below shows the main
+actions and objects within zen-do, how they interact with each other at a high
+level, and the technologies used for each.
 
 ```{mermaid}
 %%| label: fig-c4-container

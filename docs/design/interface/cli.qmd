@@ -2,25 +2,24 @@
 title: "Command line"
 ---
 
-This documents the command-line interface (CLI) and its Python
-counterparts, including some function signatures and explanation of the
-choices we've made. This document is primarily to help us (the
-developers) stay focused on the package's scope.
+This documents the command-line interface (CLI) and its Python counterparts,
+including some function signatures and explanation of the choices we've made.
+This document is primarily to help us (the developers) stay focused on the
+package's scope.
 
 {{< include /docs/includes/_design-status.qmd >}}
 
 ## {{< var planned >}} `init`
 
-``` {.bash filename="Terminal"}
+```bash {filename="Terminal"}
 zen-do init --verbose
 ```
 
-This will create an empty `.zenodo.toml` file in the working directory
-that contains all the metadata fields available for a Zenodo deposit,
-but with no values filled in, excluding a partially filled in URN for
-the project. This simple command is helpful to get started with making a
-new Zenodo deposit, as well as standardizing the name and structure of
-the file.
+This will create an empty `.zenodo.toml` file in the working directory that
+contains all the metadata fields available for a Zenodo deposit, but with no
+values filled in, excluding a partially filled in URN for the project. This
+simple command is helpful to get started with making a new Zenodo deposit, as
+well as standardizing the name and structure of the file.
 
 ```python
 @app.command()
@@ -40,17 +39,16 @@ def init(verbose: bool = False) -> None:
 
 ## {{< var planned >}} `list`
 
-``` {.bash filename="Terminal"}
+```bash {filename="Terminal"}
 zen-do list --sandbox
 ```
 
-The `list` command fetches the stored Zenodo token and gets all Zenodo
-deposits listed in the account connected to that token. Both the CLI and
-the internal Python interface are used in other functions like
-`publish()` to find whether a deposit exists or not.
+The `list` command fetches the stored Zenodo token and gets all Zenodo deposits
+listed in the account connected to that token. Both the CLI and the internal
+Python interface are used in other functions like `publish()` to find whether a
+deposit exists or not.
 
-The Python interface, with some implementation comments and docstring,
-will be:
+The Python interface, with some implementation comments and docstring, will be:
 
 ```python
 @app.command()
@@ -70,21 +68,19 @@ def list(sandbox: bool = False) -> None:
 
 ## {{< var planned >}} `get`
 
-``` {.bash filename="Terminal"}
+```bash {filename="Terminal"}
 zen-do get [METADATA_FILE] --sandbox
 ```
 
-The `get` command will get the Zenodo deposit JSON based on the metadata
-file provided. If the deposit doesn't exist, it will output a message
-about not finding a match. This is useful for checking if a deposit
-already exists for a given set of metadata, and if so, getting the
-deposit information to use for updating or publishing it. Internally
-uses the Python functions within `list()` to get the list of deposits
-and uses that to find the deposit that matches the content of the
-metadata file using the URN ID.
+The `get` command will get the Zenodo deposit JSON based on the metadata file
+provided. If the deposit doesn't exist, it will output a message about not
+finding a match. This is useful for checking if a deposit already exists for a
+given set of metadata, and if so, getting the deposit information to use for
+updating or publishing it. Internally uses the Python functions within `list()`
+to get the list of deposits and uses that to find the deposit that matches the
+content of the metadata file using the URN ID.
 
-The Python interface, with some implementation comments and docstring,
-will be:
+The Python interface, with some implementation comments and docstring, will be:
 
 ```python
 @app.command()
@@ -108,63 +104,58 @@ def get(metadata_file: Path = Path(".zenodo.toml"), \, *, sandbox: bool = False)
 
 ## {{< var planned >}} `convert`
 
-``` {.bash filename="Terminal"}
+```bash {filename="Terminal"}
 zen-do convert [METADATA_FILE] --to [FORMAT]
 ```
 
-There are many different file formats and standards that contain similar
-or even identical metadata, but that are structured slightly differently.
-The `convert` command helps to keep
-one "source of truth" between these different formats for those cases
-where a repository might need different formats for different purposes.
-For example, GitHub will look for a `CITATION.cff` file to display the
-citation information for a repository, but doesn't recognize other
-formats (like `.zenodo.toml`). Rather than manually keeping these
-different files in sync, the `convert` command can simplify this syncing
-task.
+There are many different file formats and standards that contain similar or even
+identical metadata, but that are structured slightly differently. The `convert`
+command helps to keep one "source of truth" between these different formats for
+those cases where a repository might need different formats for different
+purposes. For example, GitHub will look for a `CITATION.cff` file to display the
+citation information for a repository, but doesn't recognize other formats (like
+`.zenodo.toml`). Rather than manually keeping these different files in sync, the
+`convert` command can simplify this syncing task.
 
-We decided to only convert from `.zenodo.toml` to other formats, rather
-than allow any format to be converted to any other format because we
-want the `.zenodo.toml` file to be the "single source of truth" for a
-project's metadata. This means that any changes to the metadata must be
-done in the `.zenodo.toml` file and `convert` can update the other
-formats. This also simplifies the implementation and testing of the
-`convert` command, as we only need to implement the logic for converting
-from `.zenodo.toml` to other formats, rather than having to handle
-conversions between all possible pairs of formats.
+We decided to only convert from `.zenodo.toml` to other formats, rather than
+allow any format to be converted to any other format because we want the
+`.zenodo.toml` file to be the "single source of truth" for a project's metadata.
+This means that any changes to the metadata must be done in the `.zenodo.toml`
+file and `convert` can update the other formats. This also simplifies the
+implementation and testing of the `convert` command, as we only need to
+implement the logic for converting from `.zenodo.toml` to other formats, rather
+than having to handle conversions between all possible pairs of formats.
 
-There are several different formats that we've encountered that would be
-useful to keep synchronized with the `.zenodo.toml` file, including:
+There are several different formats that we've encountered that would be useful
+to keep synchronized with the `.zenodo.toml` file, including:
 
-- {{< var planned >}} `.zenodo.json`: This is the file format that
-  Zenodo looks for in their existing
-  [GitHub release to record integration](https://help.zenodo.org/docs/github/describe-software/).
-  Both the JSON and TOML formats are equivalent in content.
-- {{< var planned >}} `CITATION.cff`: GitHub uses this file to
-  [display the citation](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-citation-files)
-  information for a repository when it is in the root of the repository.
-  This contains only a subset of the metadata found in the
-  `.zenodo.toml` file.
-- {{< var planned >}} `pyproject.toml`: While this file is almost
-  entirely used only for Python projects, it contains similar metadata
-  fields to the `.zenodo.toml` file, such as the project name,
-  description, authors, and license.
-- {{< var planned >}} `codemeta.json`: This file is used to describe
-  software metadata in a machine-readable format, following the
-  [CodeMeta](https://codemeta.github.io/) standard. It contains similar
-  metadata fields to the `.zenodo.toml` file.
+- {{< var planned >}} `.zenodo.json`: This is the file format that Zenodo looks
+  for in their existing [GitHub release to record
+  integration](https://help.zenodo.org/docs/github/describe-software/). Both the
+  JSON and TOML formats are equivalent in content.
+- {{< var planned >}} `CITATION.cff`: GitHub uses this file to [display the
+  citation](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-citation-files)
+  information for a repository when it is in the root of the repository. This
+  contains only a subset of the metadata found in the `.zenodo.toml` file.
+- {{< var planned >}} `pyproject.toml`: While this file is almost entirely used
+  only for Python projects, it contains similar metadata fields to the
+  `.zenodo.toml` file, such as the project name, description, authors, and
+  license.
+- {{< var planned >}} `codemeta.json`: This file is used to describe software
+  metadata in a machine-readable format, following the
+  [CodeMeta](https://codemeta.github.io/) standard. It contains similar metadata
+  fields to the `.zenodo.toml` file.
 - {{< var planned >}} `_quarto.yml`: This file is used to build
-  [Quarto](https://quarto.org/) documents. Like `pyproject.toml`, it
-  also contains similar metadata fields to the `.zenodo.toml` file, such
-  as the title, description, and authors.
-- {{< var planned >}} `DESCRIPTION`: This is a typical file found in R
-  projects. It is necessary for developing and building R packages. As
-  with `pyproject.toml`, it contains similar metadata fields to the
-  `.zenodo.toml` file, such as the package name, description, authors,
-  and license.
+  [Quarto](https://quarto.org/) documents. Like `pyproject.toml`, it also
+  contains similar metadata fields to the `.zenodo.toml` file, such as the
+  title, description, and authors.
+- {{< var planned >}} `DESCRIPTION`: This is a typical file found in R projects.
+  It is necessary for developing and building R packages. As with
+  `pyproject.toml`, it contains similar metadata fields to the `.zenodo.toml`
+  file, such as the package name, description, authors, and license.
 
-The `--to` argument can be a single format or an array of formats,
-allowing users to convert to multiple formats in one command.
+The `--to` argument can be a single format or an array of formats, allowing
+users to convert to multiple formats in one command.
 
 ```python
 from cyclopts import App, Parameter
