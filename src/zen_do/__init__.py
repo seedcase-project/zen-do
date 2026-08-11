@@ -9,9 +9,6 @@ from .zenodo_client import (
 from .zenodo_metadata import ZenodoCreator, ZenodoMetadata, ZenodoRelatedIdentifier
 
 __all__ = [
-    "example_metadata",
-    "example_deposit",
-    "list",
     "ZenodoClient",
     "ZenodoCreator",
     "ZenodoDepositState",
@@ -19,4 +16,5 @@ __all__ = [
     "ZenodoRelatedIdentifier",
     "example_deposit",
     "example_metadata",
+    "list",
 ]
