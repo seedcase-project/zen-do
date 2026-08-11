@@ -1,7 +1,6 @@
 from pathlib import Path
 
-import tomlkit
-from pytest import MonkeyPatch, fixture, mark, raises
+from pytest import MonkeyPatch, fixture, raises
 
 from zen_do.examples import example_deposit, example_metadata
 from zen_do.internals import _write_metadata
