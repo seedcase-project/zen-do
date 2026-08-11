@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any
 
 import requests
+import seedcase_soil as so
 
 from zen_do.zenodo_metadata import ZenodoMetadata
 
@@ -43,6 +44,8 @@ def _raise_for_status_with_reason(response: requests.Response) -> None:
         response_json = response.json()
         if isinstance(response_json, dict):
             reason = response_json.get("message", reason)
+            errors = so.fmap(response_json.get("errors", []), lambda e: f"\n- {e}")
+            reason += "".join(errors)
 
         raise requests.HTTPError(
             f"{response.status_code} Error: {reason}",
