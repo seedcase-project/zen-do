@@ -14,7 +14,9 @@ __all__ = [
     "list",
     "ZenodoClient",
     "ZenodoCreator",
-    "ZenodoMetadata",
     "ZenodoDepositState",
+    "ZenodoMetadata",
     "ZenodoRelatedIdentifier",
+    "example_deposit",
+    "example_metadata",
 ]
