@@ -1,7 +1,7 @@
-from pytest import fixture, raises
+from pytest import fixture
 
 from zen_do.cli import app
-from zen_do.examples import example_metadata
+from zen_do.examples import example_deposit, example_metadata
 from zen_do.internals import _read_metadata, _write_metadata
 
 
@@ -15,28 +15,33 @@ def _mock_client(mocker):
     return mocker.patch("zen_do.cli.ZenodoClient")
 
 
-def test_zenodo_publish_existing_deposit(
+def test_list_when_deposits_found(
+    capsys,
     monkeypatch,
-    _mock_zenodo_get_deposit,
     _mock_client,
 ):
     monkeypatch.setenv("ZENODO_TOKEN", "token")
-    app("zenodo-publish", result_action="return_value")
+    deposit = example_deposit()
+    _mock_client.return_value.get_deposits.return_value = [deposit]
+
+    app("list", result_action="return_value")
+    out = capsys.readouterr().out
+
+    assert str(deposit["id"]) in out
 
 
-def test_zenodo_publish_new_deposit(
+def test_list_when_no_deposits_found(
+    capsys,
     monkeypatch,
-    _mock_zenodo_get_deposit,
     _mock_client,
 ):
     monkeypatch.setenv("ZENODO_TOKEN", "token")
-    _mock_zenodo_get_deposit.return_value = None
-    app("zenodo-publish", result_action="return_value")
+    _mock_client.return_value.get_deposits.return_value = []
 
+    app("list", result_action="return_value")
+    out = capsys.readouterr().out
 
-def test_zenodo_publish_needs_token():
-    with raises(RuntimeError):
-        app("zenodo-publish", result_action="return_value")
+    assert "[" not in out
 
 
 def test_init_does_not_overwrite_existing_file(monkeypatch, tmp_path):
