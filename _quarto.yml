@@ -65,6 +65,7 @@ quartodoc:
   sections:
     - title: "CLI"
       contents:
+        - get
         - init
         - list
     - title: "Zenodo API"

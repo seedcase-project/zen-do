@@ -1,6 +1,6 @@
 """Module containing all source code."""
 
-from .cli import init, list
+from .cli import get, init, list
 from .examples import example_deposit, example_metadata
 from .zenodo_client import (
     ZenodoClient,
@@ -16,6 +16,7 @@ __all__ = [
     "ZenodoRelatedIdentifier",
     "example_deposit",
     "example_metadata",
+    "get",
     "init",
     "list",
 ]
