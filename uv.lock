@@ -2779,6 +2779,15 @@ wheels = [
 ]
 
 [[package]]
+name = "types-toml"
+version = "0.10.8.20260518"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/4b/11/6ece999e91f2ccb848ab4420f3f4816e78ac0541f739e6864affdaaa5737/types_toml-0.10.8.20260518.tar.gz", hash = "sha256:80e10facd24fdeda9d5c672187d72be3ac284843788d67f5aae59e3e016db6fe", size = 9419, upload-time = "2026-05-18T06:02:16.719Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/91/25/489751806bf5c95e4007f8e17409199c54d31e49ffbea07c5729b1286c8e/types_toml-0.10.8.20260518-py3-none-any.whl", hash = "sha256:0e564ab05f6fde62a315b3b5a9b6624fda569399795d30a37e64705a70459303", size = 9669, upload-time = "2026-05-18T06:02:15.86Z" },
+]
+
+[[package]]
 name = "typing-extensions"
 version = "4.16.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3009,6 +3018,7 @@ dependencies = [
     { name = "keyring" },
     { name = "pydantic" },
     { name = "requests" },
+    { name = "rich" },
     { name = "seedcase-soil" },
     { name = "tomlkit" },
 ]
@@ -3029,6 +3039,7 @@ dev = [
     { name = "ruff" },
     { name = "types-requests" },
     { name = "types-tabulate" },
+    { name = "types-toml" },
     { name = "typos" },
     { name = "vulture" },
 ]
@@ -3039,6 +3050,7 @@ requires-dist = [
     { name = "keyring", specifier = ">=25.7.0" },
     { name = "pydantic", specifier = ">=2.13.4" },
     { name = "requests", specifier = ">=2.34.2" },
+    { name = "rich", specifier = ">=15.0.0" },
     { name = "seedcase-soil", specifier = ">=0.16.0" },
     { name = "tomlkit", specifier = ">=0.14.0" },
 ]
@@ -3059,6 +3071,7 @@ dev = [
     { name = "ruff", specifier = ">=0.15.20" },
     { name = "types-requests", specifier = ">=2.33.0.20260712" },
     { name = "types-tabulate", specifier = ">=0.10.0.20260508" },
+    { name = "types-toml", specifier = ">=0.10.8.20260408" },
     { name = "typos", specifier = ">=1.48.0" },
     { name = "vulture", specifier = ">=2.15" },
 ]
