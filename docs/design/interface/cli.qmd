@@ -164,3 +164,16 @@ argument `--sandbox` is to update a Deposit in the sandbox environment.
 The second optional argument `--draft` will update the Deposit without
 publishing to the Record, to enable checking the Deposit before
 publishing.
+
+## {{< var planned >}} `discard`
+
+```bash
+zen-do discard [METADATA-FILE] --sandbox
+```
+
+The `discard` command cancels a Deposit that is in the "editable" state.
+This happens when using the `--draft` argument in e.g. `update` or
+`publish`. This is useful if you make a mistake with starting a Deposit
+and want to cancel while staying within the CLI. Like the other commands
+`--sandbox` will discard changes in the editable state for Deposits on
+the Zenodo sandbox.
