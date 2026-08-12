@@ -4,7 +4,7 @@ title: "Design"
 
 The purpose of these design documents is to describe the design of
 zen-do in enough detail to guide a sustainable implementation (i.e.,
-maintainable in the long term). It also is to ensure that the team has a
+maintainable in the long term). It is also to ensure that the team has a
 shared understanding of the package's scope and architecture.
 
 zen-do's design builds on our overall Seedcase
