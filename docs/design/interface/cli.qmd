@@ -177,3 +177,23 @@ This happens when using the `--draft` argument in e.g. `update` or
 and want to cancel while staying within the CLI. Like the other commands
 `--sandbox` will discard changes in the editable state for Deposits on
 the Zenodo sandbox.
+
+## {{< var planned >}} `publish`
+
+```bash
+zen-do publish [METADATA-FILE] --file [FILE1,FILE2] --draft --sandbox
+```
+
+The `publish` command takes a metadata file (`.zenodo.toml`) as well as
+some files in `--file` and uploads them to Zenodo. If a Deposit doesn't
+exist (based on the presence of the URN), a Deposit will be created. If
+a Deposit does exist, the metadata will be overwritten by the metadata
+in the file, all files will be deleted and the new files will be
+uploaded instead. If `--draft` is used, the Deposit doesn't get formally
+published as a new Record, otherwise it will immediately be created into
+a Record with a corresponding DOI. If `--sandbox` is used, the Deposit
+and Record will be created in the sandbox environment on Zenodo.
+
+Unlike the `update` command, this *requires* files to upload and will
+also create a new version and thus a new DOI. If only the metadata needs
+to be updated or fixed, use `update`, not `publish`.
