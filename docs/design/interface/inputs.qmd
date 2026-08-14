@@ -21,21 +21,23 @@ For repositories that have or will have multiple deposits, there will
 also be multiple `.zenodo.toml` files, one for each deposit. For most
 use-cases, you would store the `.zenodo.toml` file in the same folder as
 the file that will be uploaded to the deposit as its content. For
-example, in a research project repository, there may be a deposit for
-the paper with the metadata kept in `docs/paper/.zenodo.toml` alongside
-the paper PDF in `docs/paper/paper.pdf` and a deposit for the data with
-the metadata kept in `data/.zenodo.toml` for the data files in `data/`.
-This way, the metadata is kept close to the content it describes.
+example, in a research project repository, there may be two deposits.
+One deposit would be for the paper with the metadata in
+`docs/paper/.zenodo.toml` and the PDF in `docs/paper/paper.pdf`. The
+other deposit would be for the data with the metadata in
+`data/.zenodo.toml` and the data files in `data/`. This way, the
+metadata is kept close to the content it describes.
 
 However, sometimes multiple deposits might describe content in the same
 folder. For example, in the case of a repository with teaching material
-that builds into a website (as HTML) and as a PDF, the metadata file for
-the repository source files would be `.zenodo.toml` in the root of the
-repository, while the metadata for the PDF (that's rendered from the
-root source files) could be either stored in another folder or be called
-`.pdf.zenodo.toml` (or `.book.zenodo.toml` if the output is a book) in
-the root of the repository. In this case, the metadata files are kept in
-the same location but have different names to reflect their contents.
+that builds into a website (as HTML) and a PDF, there may be two
+metadata files in the same folder. The metadata file for the source
+files might be in `.zenodo.toml` in the repository root. Meanwhile, the
+metadata for the PDF (that's rendered from the root source files) could
+be either stored in another folder or be called `.pdf.zenodo.toml` (or
+`.book.zenodo.toml` if the output is a book) in the root of the
+repository. In this case, the metadata files are kept in the same
+location but have different names to reflect their contents.
 
 ### Unique ID between metadata and deposit
 
