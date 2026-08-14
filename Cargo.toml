@@ -1,0 +1,24 @@
+[package]
+name = "zen-do"
+version = "0.1.0"
+edition = "2024"
+authors = [
+  "Luke W. Johnston <lwjohnst@gmail.com>",
+  "Marton Vago <marton.vago95@gmail.com>",
+]
+description = "Zenodo tasks from the command-line"
+readme = "README.md"
+homepage = "https://zen-do.seedcase-project.org"
+repository = "https://github.com/seedcase-project/zen-do"
+license = "MIT"
+license-file = "LICENSE.md"
+keywords = [
+  "zenodo-api",
+  "zenodo",
+  "continuous-deployment",
+  "dissemination",
+  "open-science",
+]
+categories = ["command-line-utilities"]
+
+[dependencies]

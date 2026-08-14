@@ -5,11 +5,9 @@ title: "Design"
 The purpose of these design documents is to describe the design of zen-do in
 enough detail to guide a sustainable implementation (i.e., maintainable in the
 long term) and to ensure that the team has a shared understanding of the
-package's scope and architecture.
-
-zen-do's design builds on our overall Seedcase [design principles and
-patterns](https://design.seedcase-project.org/), and follows the same principles
-and patterns described there.
+package's scope and architecture. zen-do's design builds on our overall Seedcase
+[design principles and patterns](https://design.seedcase-project.org/), and
+follows the same principles and patterns described there.
 
 ## Purpose
 
@@ -29,8 +27,7 @@ Specifically, zen-do must:
 - Be usable "interactively" or through automation like continuous deployment
   (e.g. GitHub workflows).
 - Load a product's metadata for a Zenodo deposit from a file found within the
-  working directory (e.g. `.zenodo.toml`) and through the
-  CLI.
+  working directory (e.g. `.zenodo.toml`) and through the CLI.
 - Update a Zenodo deposit based on the product's metadata file.
 - Upload and/or replace files in a Zenodo deposit.
 - Publish a Zenodo record (that contains the DOI) from a new or existing

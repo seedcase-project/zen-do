@@ -1,12 +1,10 @@
 <!-- TODO: Include DOI after uploading -->
 <!-- [![PyPI Version](https://img.shields.io/pypi/v/{{< meta gh.repo >}}.svg)](https://pypi.org/project/{{< meta gh.repo >}}/) -->
 [![Copier](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/copier-org/copier/master/img/badge/badge-grayscale-inverted-border-teal.json?raw=true.svg)](https://github.com/copier-org/copier)
-[![Python Version from PEP 621
-TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2F{{< meta gh.org >}}%2F{{< meta gh.repo >}}%2Frefs%2Fheads%2Fmain%2Fpyproject.toml)](https://github.com/{{< meta gh.org >}}/{{< meta gh.repo >}}/blob/main/pyproject.toml)
-[![GitHub
-License](https://img.shields.io/github/license/{{< meta gh.org >}}/{{< meta gh.repo >}}.svg)](https://github.com/{{< meta gh.org >}}/{{< meta gh.repo >}}/blob/main/LICENSE.md)
 [![GitHub
 Release](https://img.shields.io/github/v/release/{{< meta gh.org >}}/{{< meta gh.repo >}}.svg)](https://github.com/{{< meta gh.org >}}/{{< meta gh.repo >}}/releases/latest)
+[![GitHub
+License](https://img.shields.io/github/license/{{< meta gh.org >}}/{{< meta gh.repo >}}.svg)](https://github.com/{{< meta gh.org >}}/{{< meta gh.repo >}}/blob/main/LICENSE.md)
 [![Build
 documentation](https://github.com/{{< meta gh.org >}}/{{< meta gh.repo >}}/actions/workflows/build-website.yml/badge.svg)](https://github.com/{{< meta gh.org >}}/{{< meta gh.repo >}}/actions/workflows/build-website.yml)
 [![Check
