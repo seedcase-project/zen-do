@@ -1,14 +1,14 @@
 [global]
-# 72 to match what we have currently been using
-line_length = 72
 flavor = "quarto"
 exclude = [
-    # Common directories to exclude
-    ".github",
-    # This is auto-generated from the qmd version
-    "**/README.md",
-    # This has it's own structure
-    "**/LICENSE.md"
+  # Common directories to exclude
+  ".github",
+  # This is auto-generated from the qmd version
+  "**/README.md",
+  # This has it's own structure
+  "**/LICENSE.md",
+  # URLs get mangled if running rumdl on this file
+  "**/_badges.qmd",
 ]
 
 # List style: `-`

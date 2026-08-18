@@ -6,12 +6,10 @@ updates:
       interval: monthly
     commit-message:
       prefix: ci
-      include: scope
 
-  - package-ecosystem: uv
+  - package-ecosystem: cargo
     directory: /
     schedule:
       interval: monthly
     commit-message:
-      prefix: build
-      include: scope
+      prefix: ci

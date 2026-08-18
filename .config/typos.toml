@@ -1,9 +1,8 @@
 [files]
 extend-exclude = [
-  "*.json",
+  "*.html",
   "*.css",
   ".quarto/*",
   "_site/*",
-  "_extensions/*",
-  ".coverage-report/*"
+  "*.svg"
 ]

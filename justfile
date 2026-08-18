@@ -1,131 +1,88 @@
 @_default:
-    just --list --unsorted
+  just --list
 
-@_checks: check-python check-unused check-security check-spelling check-urls check-commits
+# Build the full package, including any checks and documentation
+run-all: update-quarto-theme format-all check-all test-all build-all
 
-@_tests: test-python
+# Run all formatters
+format-all: format-rust format-md
 
-@_builds: build-contributors build-website build-readme
+# Run all checks
+check-all: check-spelling check-urls check-fmt check-cargo check-clippy
 
-# Run all build-related recipes in the justfile
-run-all: install-deps update-quarto-theme format-python format-md _checks _tests _builds
+# Run all tests
+test-all: test-rust
+
+# Run all build recipes
+build-all: build-rust-docs build-contributors build-readme build-website build-package
 
 # List all TODO items in the repository
 list-todos:
   grep -R -n \
     --exclude="*.code-snippets" \
     --exclude-dir=.quarto \
+    --exclude-dir=.git \
     --exclude=justfile \
+    --exclude=*.pyc \
     --exclude=_site \
-    "TODO" *
+    "TODO" .
 
 # Install the pre-commit hooks
 install-precommit:
-  # Install pre-commit hooks
-  uvx pre-commit install
-  # Run pre-commit hooks on all files
-  uvx pre-commit run --all-files
-  # Update versions of pre-commit hooks
-  uvx pre-commit autoupdate
+    uvx pre-commit install
+    uvx pre-commit autoupdate
+    uvx pre-commit run --all-files
+
 # Update the Quarto seedcase-theme extension
 update-quarto-theme:
   # Add theme if it doesn't exist, update if it does
   quarto update seedcase-project/seedcase-theme --no-prompt
 
-# Install Python package dependencies
-install-deps:
-  uv sync --all-extras --dev --upgrade
+# Check for spelling errors in files
+check-spelling:
+  uvx typos --config .config/typos.toml
 
-# Run the Python tests
-test-python:
-  uv run pytest
-  # Make the badge from the coverage report
-  uv run genbadge coverage \
-    -i coverage.xml \
-    -o htmlcov/coverage.svg
+# Check that URLs work
+check-urls:
+  # Ignore pre-commit.ci and GitHub URLs, since they are often block "bot" requests
+  lychee . \
+    --verbose \
+    --exclude 'pre-commit\.ci' \
+    --exclude 'github\.com' \
+    --exclude-path "_badges.qmd"
 
-# Check Python code for any errors that need manual attention
-check-python:
-  # Check formatting
-  uv run ruff check .
-  # Check types
-  uv run mypy --pretty .
+# Checks and lints with clippy
+check-clippy:
+  # Stricter linting
+  cargo clippy -- -W clippy::pedantic
 
-# Reformat Python code to match coding style and general structure
-format-python:
-  uv run ruff check --fix .
-  uv run ruff format .
+# Checks package and dependencies
+check-cargo:
+  cargo check
+
+# Checks formatting with rustfmt
+check-fmt:
+  cargo +nightly fmt --check -- --config-path .config/rustfmt.toml
+
+# Format the code and fix issues
+format-rust:
+  cargo fix --allow-dirty
+  cargo clippy --fix --allow-dirty -- -W clippy::pedantic
+  cargo +nightly fmt -- --config-path .config/rustfmt.toml
 
 # Format Markdown files
 format-md:
+  # Use both rumdl and panache, for different purposes
   uvx rumdl fmt --silent
+  uvx --from panache-cli panache format . --quiet
 
-# Build the quartodoc documentation for the website
-build-quartodoc:
-  # To let Quarto know where python is.
-  export QUARTO_PYTHON=.venv/bin/python3
-  # Delete any previously built files from quartodoc.
-  # -f is to not give an error if the files don't exist yet.
-  rm -rf docs/reference
-  uv run quartodoc build
+# Run the tests in the `src/` or `tests/` directories
+test-rust:
+  cargo test
 
-# Build the documentation website using Quarto
-build-website: build-quartodoc
-  uv run quarto render --execute
-
-# Check the commit messages on the current branch that are not on the main branch
-check-commits:
-  #!/usr/bin/env bash
-  branch_name=$(git rev-parse --abbrev-ref HEAD)
-  number_of_commits=$(git rev-list --count HEAD ^main)
-  if [[ ${branch_name} != "main" && ${number_of_commits} -gt 0 ]]
-  then
-    # If issue happens, try `uv tool update-shell`
-    uvx --from commitizen cz check --rev-range main..HEAD
-  else
-    echo "On 'main' or current branch doesn't have any commits."
-  fi
-
-# Run basic security checks on the package
-check-security:
-  uv run bandit -r src/
-
-# Check for spelling errors in files
-check-spelling:
-  uv run typos
-
-# Install lychee from https://lychee.cli.rs/guides/getting-started/
-# Check that URLs work
-check-urls:
-  lychee . \
-    --verbose \
-    --extensions md,qmd,py \
-    --exclude-path "_badges.qmd" \
-    --exclude-path "tests/test_zenodo_client.py" \
-    --exclude-path "src/zen_do/zenodo.py" \
-    --exclude-path "src/zen_do/examples.py"
-
-# Build the documentation as PDF using Quarto
-build-pdf:
-  # To let Quarto know where python is.
-  export QUARTO_PYTHON=.venv/bin/python3
-  uv run quarto install tinytex
-  # For generating images from Mermaid diagrams
-  uv run quarto install chromium
-  uv run quarto render --profile pdf --to pdf
-  find docs -name "mermaid-figure-*.png" -delete
-
-# Check for unused code in the package and its tests
-check-unused:
-  # exit code=0: No unused code was found
-  # exit code=3: Unused code was found
-  # Three confidence values:
-  # - 100 %: function/method/class argument, unreachable code
-  # - 90 %: import
-  # - 60 %: attribute, class, function, method, property, variable
-  # There are some things should be ignored though, with the allowlist.
-  # Create an allowlist with `vulture --make-allowlist`
-  uv run vulture --min-confidence 100 src/ tests/ **/vulture-allowlist.py
+# Build the code documentation
+build-rust-docs:
+  cargo doc
 
 # Re-build the README file from the Quarto version
 build-readme:
@@ -135,11 +92,22 @@ build-readme:
 build-contributors:
   sh ./tools/get-contributors.sh seedcase-project/zen-do > docs/includes/_contributors.qmd
 
+# Build the website using Quarto
+build-website:
+  uvx --from quarto quarto render
+
+# Build the package
+build-package:
+  cargo build
+
+# Preview the website with automatic reload on changes
+preview-website:
+  quarto preview
+
 # Check for and apply updates from the template
 update-from-template:
-  # Do not update existing source files
-  uvx copier update --trust --defaults $(find src/zen_do -type f -printf "--exclude %p ")
+  uvx copier update --defaults
 
 # Reset repo changes to match the template
 reset-from-template:
-  uvx copier recopy --trust --defaults
+  uvx copier recopy --defaults
