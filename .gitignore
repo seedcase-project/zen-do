@@ -1,7 +1,9 @@
+
 # Development files and folders
 _ignore
 bin/
 dev/
+_temp/
 
 # Temporary files
 *.tmp
@@ -9,72 +11,12 @@ dev/
 # Any IDE specific folders
 .idea
 
-# Any .env files
-.env
-.env.*
-**/.env.*
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Python specific content
-venv
-__pycache__/
-*.py[cod]
-
-# Python packaging and distribution
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# Python testing and code coverage
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-coverage.*
-.cache
-nosetests.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-cover/
-
 # MacOS
 .DS_Store
 
-# Quarto
-/.quarto/
-docs/.quarto/
-*.ipynb
-*.quarto_ipynb
-**/*.quarto_ipynb
-*.storage
-
-# Quartodoc
-/docs/reference/
-objects.json
+# mdbook
+*.html
+book/
 
 # Website generation
 _site
@@ -82,6 +24,21 @@ _book
 public
 site
 
+# Rust-specific
+target/
+debug
+**/*.rs.bk
+*.pdb
 
-# Misc files
-*.log
+# Any .env files
+.env
+.env.*
+**/.env.*
+.env
+
+# Quarto-specific
+/.quarto/
+docs/.quarto/
+*.ipynb
+*.quarto_ipynb
+**/*.quarto_ipynb

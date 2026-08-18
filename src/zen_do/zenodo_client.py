@@ -1,8 +1,9 @@
 from enum import StrEnum
 from pathlib import Path
-from typing import Any, Union
+from typing import Any
 
 import requests
+import seedcase_soil as so
 
 from zen_do.zenodo_metadata import ZenodoMetadata
 
@@ -35,6 +36,24 @@ def _is_deposit_editable(deposit: ZenodoResponse) -> bool:
     ]
 
 
+def _raise_for_status_with_reason(response: requests.Response) -> None:
+    try:
+        response.raise_for_status()
+    except requests.HTTPError as e:
+        reason = "N/A"
+        response_json = response.json()
+        if isinstance(response_json, dict):
+            reason = response_json.get("message", reason)
+            errors = so.fmap(response_json.get("errors", []), lambda e: f"\n- {e}")
+            reason += "".join(errors)
+
+        raise requests.HTTPError(
+            f"{response.status_code} Error: {reason}",
+            response=response,
+            request=e.request,
+        ) from e
+
+
 class ZenodoClient:
     """Class for interacting with the Zenodo API."""
 
@@ -57,9 +76,7 @@ class ZenodoClient:
         response: requests.Response,
     ) -> ZenodoResponse:
         """Maps the API response to a dictionary."""
-        # TODO: include response.text in error because that is where Zenodo
-        # gives reasons
-        response.raise_for_status()
+        _raise_for_status_with_reason(response)
         response_json = response.json()
         if not isinstance(response_json, dict):
             raise TypeError(
@@ -72,9 +89,7 @@ class ZenodoClient:
         response: requests.Response,
     ) -> list[ZenodoResponse]:
         """Maps the API response to a list."""
-        # TODO: include response.text in error because that is where Zenodo
-        # gives reasons
-        response.raise_for_status()
+        _raise_for_status_with_reason(response)
         response_json = response.json()
         if not isinstance(response_json, list):
             raise TypeError(
@@ -93,7 +108,7 @@ class ZenodoClient:
         )
         return self._resolve_list(response)
 
-    def get_deposit(self, deposit_id: Union[int, str]) -> ZenodoResponse:
+    def get_deposit(self, deposit_id: int | str) -> ZenodoResponse:
         """Gets the deposit with the given ID.
 
         Args:
@@ -159,7 +174,7 @@ class ZenodoClient:
             deposit: The deposit.
         """
         if not _is_deposit_editable(deposit):
-            return None
+            return
 
         response = requests.post(
             f"{self.deposits}/{_get_deposit_id(deposit)}/actions/discard",

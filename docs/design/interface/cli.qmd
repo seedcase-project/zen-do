@@ -2,175 +2,111 @@
 title: "Command line"
 ---
 
-This documents the command-line interface (CLI) and its Python
-counterparts, including some function signatures and explanation of the
-choices we've made. This document is primarily to help us (the
-developers) stay focused on the package's scope.
+This documents the command-line interface (CLI) and its Python counterparts,
+including some function signatures and explanation of the choices we've made.
+This document is primarily to help us (the developers) stay focused on the
+package's scope.
 
 {{< include /docs/includes/_design-status.qmd >}}
 
-## {{< var planned >}} `init`
+## {{< var done >}} `init`
 
-``` {.bash filename="Terminal"}
+```bash {filename="Terminal"}
 zen-do init --verbose
 ```
 
-This will create an empty `.zenodo.toml` file in the working directory
-that contains all the metadata fields available for a Zenodo deposit,
-but with no values filled in, excluding a partially filled in URN for
-the project. This simple command is helpful to get started with making a
-new Zenodo deposit, as well as standardizing the name and structure of
-the file.
+This will create an empty `.zenodo.toml` file in the working directory that
+contains all the metadata fields available for a Zenodo deposit, but with no
+values filled in, excluding a partially filled in URN for the project. This
+simple command is helpful to get started with making a new Zenodo deposit, as
+well as standardizing the name and structure of the file.
 
-```python
-@app.command()
-def init(verbose: bool = False) -> None:
-    """Create an empty `.zenodo.toml` file that has all the metadata fields.
+## {{< var done >}} `list`
 
-    Args:
-        verbose: Whether to print a log of the actions done.
-    """
-    # Check if .zenodo.toml already exists
-    # check_exists(".zenodo.toml")
-    # Copy the template .zenodo.toml file to the working directory
-    # OR...
-    # Take an internal class of the metadata fields and convert into TOML
-    print_if_verbose(verbose, "Created an empty `.zenodo.toml` file.")
-```
-
-## {{< var planned >}} `list`
-
-``` {.bash filename="Terminal"}
+```bash {filename="Terminal"}
 zen-do list --sandbox
 ```
 
-The `list` command fetches the stored Zenodo token and gets all Zenodo
-deposits listed in the account connected to that token. Both the CLI and
-the internal Python interface are used in other functions like
-`publish()` to find whether a deposit exists or not.
+The `list` command fetches the stored Zenodo token and gets all Zenodo deposits
+listed in the account connected to that token. Both the CLI and the internal
+Python interface are used in other functions like `publish()` to find whether a
+deposit exists or not.
 
-The Python interface, with some implementation comments and docstring,
-will be:
+## {{< var done >}} `get`
 
-```python
-@app.command()
-def list(sandbox: bool = False) -> None:
-    """List all Zenodo deposits in an account as raw JSON (from the Zenodo servers).
-
-    Args:
-        sandbox: Whether to use the Zenodo sandbox environment for testing purposes.
-    """
-    # Fetch token from system keyring or environment variable.
-    # token: Token = get_token(sandbox=sandbox)
-    # Get request to Zenodo servers.
-    # TODO: Either dict or a custom class for the deposit, e.g. `Deposit`?
-    # deposits: list[Deposit] = list_deposits(sandbox=sandbox, token=token)
-    pretty_print(deposits)
-```
-
-## {{< var planned >}} `get`
-
-``` {.bash filename="Terminal"}
+```bash {filename="Terminal"}
 zen-do get [METADATA_FILE] --sandbox
 ```
 
-The `get` command will get the Zenodo deposit JSON based on the metadata
-file provided. If the deposit doesn't exist, it will output a message
-about not finding a match. This is useful for checking if a deposit
-already exists for a given set of metadata, and if so, getting the
-deposit information to use for updating or publishing it. Internally
-uses the Python functions within `list()` to get the list of deposits
-and uses that to find the deposit that matches the content of the
-metadata file using the URN ID.
-
-The Python interface, with some implementation comments and docstring,
-will be:
-
-```python
-@app.command()
-def get(metadata_file: Path = Path(".zenodo.toml"), \, *, sandbox: bool = False) -> None:
-    """Get the Zenodo deposit JSON based on the metadata file.
-
-    Args:
-        metadata_file: The path to the metadata file.
-        sandbox: Whether to use the Zenodo sandbox environment for testing purposes.
-    """
-    # Read metadata file (checking if the URN exists or not).
-    # metadata: Metadata = read_metadata(path=metadata_file)
-    # Fetch token from system keyring or environment variable.
-    # token: Token = get_token(sandbox=sandbox)
-    # Get request to Zenodo servers.
-    # TODO: Either dict or a custom class for the deposit, e.g. `Deposit`?
-    # deposits: list[Deposit] = list_deposits(sandbox=sandbox, token=token)
-    # deposit: Deposit = find_deposit(deposits=deposits, metadata=metadata)
-    pretty_print(deposit)
-```
+The `get` command will get the Zenodo deposit JSON based on the metadata file
+provided. If the deposit doesn't exist, it will output a message about not
+finding a match. This is useful for checking if a deposit already exists for a
+given set of metadata, and if so, getting the deposit information to use for
+updating or publishing it. Internally uses the Python functions within `list()`
+to get the list of deposits and uses that to find the deposit that matches the
+content of the metadata file using the URN ID.
 
 ## {{< var planned >}} `convert`
 
-``` {.bash filename="Terminal"}
+```bash {filename="Terminal"}
 zen-do convert [METADATA_FILE] --to [FORMAT]
 ```
 
-There are many different file formats and standards that contain similar
-or even identical metadata, but that are structured slightly differently.
-The `convert` command helps to keep
-one "source of truth" between these different formats for those cases
-where a repository might need different formats for different purposes.
-For example, GitHub will look for a `CITATION.cff` file to display the
-citation information for a repository, but doesn't recognize other
-formats (like `.zenodo.toml`). Rather than manually keeping these
-different files in sync, the `convert` command can simplify this syncing
-task.
+There are many different file formats and standards that contain similar or even
+identical metadata, but that are structured slightly differently. The `convert`
+command helps to keep one "source of truth" between these different formats for
+those cases where a repository might need different formats for different
+purposes. For example, GitHub will look for a `CITATION.cff` file to display the
+citation information for a repository, but doesn't recognize other formats (like
+`.zenodo.toml`). Rather than manually keeping these different files in sync, the
+`convert` command can simplify this syncing task.
 
-We decided to only convert from `.zenodo.toml` to other formats, rather
-than allow any format to be converted to any other format because we
-want the `.zenodo.toml` file to be the "single source of truth" for a
-project's metadata. This means that any changes to the metadata must be
-done in the `.zenodo.toml` file and `convert` can update the other
-formats. This also simplifies the implementation and testing of the
-`convert` command, as we only need to implement the logic for converting
-from `.zenodo.toml` to other formats, rather than having to handle
-conversions between all possible pairs of formats.
+We decided to only convert from `.zenodo.toml` to other formats, rather than
+allow any format to be converted to any other format because we want the
+`.zenodo.toml` file to be the "single source of truth" for a project's metadata.
+This means that any changes to the metadata must be done in the `.zenodo.toml`
+file and `convert` can update the other formats. This also simplifies the
+implementation and testing of the `convert` command, as we only need to
+implement the logic for converting from `.zenodo.toml` to other formats, rather
+than having to handle conversions between all possible pairs of formats.
 
-There are several different formats that we've encountered that would be
-useful to keep synchronized with the `.zenodo.toml` file, including:
+There are several different formats that we've encountered that would be useful
+to keep synchronized with the `.zenodo.toml` file, including:
 
-- {{< var planned >}} `.zenodo.json`: This is the file format that
-  Zenodo looks for in their existing
-  [GitHub release to record integration](https://help.zenodo.org/docs/github/describe-software/).
-  Both the JSON and TOML formats are equivalent in content.
-- {{< var planned >}} `CITATION.cff`: GitHub uses this file to
-  [display the citation](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-citation-files)
-  information for a repository when it is in the root of the repository.
-  This contains only a subset of the metadata found in the
-  `.zenodo.toml` file.
-- {{< var planned >}} `pyproject.toml`: While this file is almost
-  entirely used only for Python projects, it contains similar metadata
-  fields to the `.zenodo.toml` file, such as the project name,
-  description, authors, and license.
-- {{< var planned >}} `codemeta.json`: This file is used to describe
-  software metadata in a machine-readable format, following the
-  [CodeMeta](https://codemeta.github.io/) standard. It contains similar
-  metadata fields to the `.zenodo.toml` file.
+- {{< var planned >}} `.zenodo.json`: This is the file format that Zenodo looks
+  for in their existing [GitHub release to record
+  integration](https://help.zenodo.org/docs/github/describe-software/). Both the
+  JSON and TOML formats are equivalent in content.
+- {{< var planned >}} `CITATION.cff`: GitHub uses this file to [display the
+  citation](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-citation-files)
+  information for a repository when it is in the root of the repository. This
+  contains only a subset of the metadata found in the `.zenodo.toml` file.
+- {{< var planned >}} `pyproject.toml`: While this file is almost entirely used
+  only for Python projects, it contains similar metadata fields to the
+  `.zenodo.toml` file, such as the project name, description, authors, and
+  license.
+- {{< var planned >}} `codemeta.json`: This file is used to describe software
+  metadata in a machine-readable format, following the
+  [CodeMeta](https://codemeta.github.io/) standard. It contains similar metadata
+  fields to the `.zenodo.toml` file.
 - {{< var planned >}} `_quarto.yml`: This file is used to build
-  [Quarto](https://quarto.org/) documents. Like `pyproject.toml`, it
-  also contains similar metadata fields to the `.zenodo.toml` file, such
-  as the title, description, and authors.
-- {{< var planned >}} `DESCRIPTION`: This is a typical file found in R
-  projects. It is necessary for developing and building R packages. As
-  with `pyproject.toml`, it contains similar metadata fields to the
-  `.zenodo.toml` file, such as the package name, description, authors,
-  and license.
+  [Quarto](https://quarto.org/) documents. Like `pyproject.toml`, it also
+  contains similar metadata fields to the `.zenodo.toml` file, such as the
+  title, description, and authors.
+- {{< var planned >}} `DESCRIPTION`: This is a typical file found in R projects.
+  It is necessary for developing and building R packages. As with
+  `pyproject.toml`, it contains similar metadata fields to the `.zenodo.toml`
+  file, such as the package name, description, authors, and license.
 
-The `--to` argument can be a single format or an array of formats,
-allowing users to convert to multiple formats in one command.
+The `--to` argument can be a single format or an array of formats, allowing
+users to convert to multiple formats in one command.
 
 ```python
 from cyclopts import App, Parameter
 from pathlib import Path
 from typing import Annotated
 from enum import StrEnum
+
 
 class Format(StrEnum):
     zenodo_json = ".zenodo.json"
@@ -179,14 +115,15 @@ class Format(StrEnum):
     quarto_yml = "_quarto.yml"
     description = "DESCRIPTION"
 
+
 @app.command()
 def convert(
-        metadata_file: Path = Path(".zenodo.toml"),
-        /,
-        *,
-        to: Annotated[list[Format], Parameter(consume_multiple=True)],
-        verbose: bool = False
-    ) -> None:
+    metadata_file: Path = Path(".zenodo.toml"),
+    /,
+    *,
+    to: Annotated[list[Format], Parameter(consume_multiple=True)],
+    verbose: bool = False,
+) -> None:
     """Convert a metadata file, e.g. `.zenodo.toml`, to other formats.
 
     Args:
@@ -203,3 +140,53 @@ def convert(
     # output_path: list[Path] = write_formats(formats)
     print_if_verbose(verbose, f"Written the format(s) to files {output_paths}.")
 ```
+
+## {{< var planned >}} `update`
+
+```bash
+zen-do update [METADATA-FILE] --sandbox --draft
+```
+
+The `update` command takes a `.zenodo.toml` metadata file and updates the
+contents with the Zenodo Deposit, which also updates the Record. It doesn't lead
+to a new DOI, as it doesn't change the files in the Deposit. This command is
+useful if you have a typo in one of the fields or forgot to add some
+information, but you don't want to re-upload the same file and create a new DOI.
+
+It has one required argument, `[METADATA-FILE]` that by default looks for the
+`.zenodo.toml` file in the working directory. The optional argument `--sandbox`
+is to update a Deposit in the sandbox environment. The second optional argument
+`--draft` will update the Deposit without publishing to the Record, to enable
+checking the Deposit before publishing.
+
+## {{< var planned >}} `discard`
+
+```bash
+zen-do discard [METADATA-FILE] --sandbox
+```
+
+The `discard` command cancels a Deposit that is in the "editable" state. This
+happens when using the `--draft` argument in e.g. `update` or `publish`. This is
+useful if you make a mistake with starting a Deposit and want to cancel while
+staying within the CLI. Like the other commands `--sandbox` will discard changes
+in the editable state for Deposits on the Zenodo sandbox.
+
+## {{< var planned >}} `publish`
+
+```bash
+zen-do publish [METADATA-FILE] --file [FILE1,FILE2] --draft --sandbox
+```
+
+The `publish` command takes a metadata file (`.zenodo.toml`) as well as some
+files in `--file` and uploads them to Zenodo. If a Deposit doesn't exist (based
+on the presence of the URN), a Deposit will be created. If a Deposit does exist,
+the metadata will be overwritten by the metadata in the file, all files will be
+deleted and the new files will be uploaded instead. If `--draft` is used, the
+Deposit doesn't get formally published as a new Record, otherwise it will
+immediately be created into a Record with a corresponding DOI. If `--sandbox` is
+used, the Deposit and Record will be created in the sandbox environment on
+Zenodo.
+
+Unlike the `update` command, this *requires* files to upload and will also
+create a new version and thus a new DOI. If only the metadata needs to be
+updated or fixed, use `update`, not `publish`.

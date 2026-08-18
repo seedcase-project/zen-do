@@ -1,13 +1,8 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: 0.21.0
-_src_path: gh:seedcase-project/template-python-package
-author_email: lwjohnst@gmail.com
-author_family_name: Johnston
-author_given_name: Luke
+_commit: 0.3.0
+_src_path: gh:seedcase-project/template-rs
 copyright_year: '2026'
-github_board_number: '24'
+for_seedcase: true
 github_repo: zen-do
 github_user: seedcase-project
 hosting_provider: netlify
-is_seedcase_project: true
-review_team: '@seedcase-project/developers'

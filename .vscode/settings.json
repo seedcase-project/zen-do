@@ -1,13 +1,5 @@
 {
-  "files.autoSave": "onFocusChange",
-  "editor.wordWrap": "off",
   "editor.formatOnSave": true,
-  "editor.codeActionsOnSave": {
-    "source.organizeImports": "always"
-  },
-  "git.autofetch": false,
-  "autoDocstring.customTemplatePath": ".vscode/google-notypes.mustache",
-  "editor.tabCompletion": "on",
   "editor.snippetSuggestions": "inline",
   "conventional-branch.type": [
     "build",
@@ -19,20 +11,23 @@
     "style",
     "test",
     "chore",
-    "perf",
-    "revert"
+    "revert",
+    "perf"
   ],
   "conventional-branch.format": "{Type}/{Branch}",
-  "[quarto][qmd]": {
-    "editor.formatOnSave": false
+  "[quarto][qmd][md]": {
+    "editor.defaultFormatter": "jolars.panache"
   },
-  "[python]": {
-    "editor.defaultFormatter": "charliermarsh.ruff"
+  "[rust]": {
+    "editor.defaultFormatter": "rust-lang.rust-analyzer"
   },
-  "python.defaultInterpreterPath": "${workspaceFolder}/.venv",
-  "python.languageServer": "Pylance",
   "files.insertFinalNewline": true,
-  "python.testing.pytestEnabled": true,
-  "python.testing.pytestPath": "${workspaceFolder}/.venv/bin/pytest",
-  "mypy.runUsingActiveInterpreter": true,
+  "typos.config": ".config/typos.toml",
+  "conventionalCommits.emojiFormat": "emoji",
+  "conventionalCommits.promptScopes": false,
+  "rust-analyzer.rustfmt.extraArgs": [
+    "+nightly",
+    "--config-path",
+    ".config/rustfmt.toml"
+  ]
 }

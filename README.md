@@ -6,12 +6,10 @@
 <!-- [![PyPI Version](https://img.shields.io/pypi/v/zen-do.svg)](https://pypi.org/project/zen-do/) -->
 
 [![Copier](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/copier-org/copier/master/img/badge/badge-grayscale-inverted-border-teal.json?raw=true.svg)](https://github.com/copier-org/copier)
-[![Python Version from PEP 621
-TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https://raw.githubusercontent.com/seedcase-project/zen-do/refs/heads/main/pyproject.toml)](https://github.com/seedcase-project/zen-do/blob/main/pyproject.toml)
-[![GitHub
-License](https://img.shields.io/github/license/seedcase-project/zen-do.svg)](https://github.com/seedcase-project/zen-do/blob/main/LICENSE.md)
 [![GitHub
 Release](https://img.shields.io/github/v/release/seedcase-project/zen-do.svg)](https://github.com/seedcase-project/zen-do/releases/latest)
+[![GitHub
+License](https://img.shields.io/github/license/seedcase-project/zen-do.svg)](https://github.com/seedcase-project/zen-do/blob/main/LICENSE.md)
 [![Build
 documentation](https://github.com/seedcase-project/zen-do/actions/workflows/build-website.yml/badge.svg)](https://github.com/seedcase-project/zen-do/actions/workflows/build-website.yml)
 [![Check
