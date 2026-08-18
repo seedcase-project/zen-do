@@ -40,7 +40,7 @@ def test_publish(monkeypatch, tmp_path):
             ZenodoCreator(
                 name="John Doe",
                 affiliation="Test University",
-                orcid="0009-0007-4628-655X",
+                orcid="0000-0002-1825-0097",
             )
         ],
         related_identifiers=[
