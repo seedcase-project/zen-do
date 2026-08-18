@@ -1,24 +1,21 @@
 
-# zen-do: Tasks to get Zenodo to do from the command line
+
+# zen-do: Zenodo tasks from the command-line
 
 <!-- TODO: Include DOI after uploading -->
 
-<!-- [![PyPI Version](https://img.shields.io/pypi/v/zen-do.svg)](https://pypi.org/project/zen-do/) -->
-
 [![Copier](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/copier-org/copier/master/img/badge/badge-grayscale-inverted-border-teal.json?raw=true.svg)](https://github.com/copier-org/copier)
 [![GitHub
-Release](https://img.shields.io/github/v/release/seedcase-project/zen-do.svg)](https://github.com/seedcase-project/zen-do/releases/latest)
-[![GitHub
 License](https://img.shields.io/github/license/seedcase-project/zen-do.svg)](https://github.com/seedcase-project/zen-do/blob/main/LICENSE.md)
+[![GitHub
+Release](https://img.shields.io/github/v/release/seedcase-project/zen-do.svg)](https://github.com/seedcase-project/zen-do/releases/latest)
+<!-- [![Crates.io Version](https://img.shields.io/crates/v/zen-do.svg)](https://crates.io/crates/zen-do) -->
 [![Build
 documentation](https://github.com/seedcase-project/zen-do/actions/workflows/build-website.yml/badge.svg)](https://github.com/seedcase-project/zen-do/actions/workflows/build-website.yml)
-[![Check
-package](https://github.com/seedcase-project/zen-do/actions/workflows/check-package.yml/badge.svg)](https://github.com/seedcase-project/zen-do/actions/workflows/check-package.yml)
+[![Checks](https://github.com/seedcase-project/zen-do/actions/workflows/checks.yml/badge.svg)](https://github.com/seedcase-project/zen-do/actions/workflows/checks.yml)
 [![OpenSSF
 Scorecard](https://api.scorecard.dev/projects/github.com/seedcase-project/zen-do/badge?raw=true.svg)](https://scorecard.dev/viewer/?uri=github.com/seedcase-project/zen-do)
 [![CodeQL](https://github.com/seedcase-project/zen-do/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)](https://github.com/seedcase-project/zen-do/actions/workflows/github-code-scanning/codeql)
-[![code
-coverage](https://raw.githubusercontent.com/seedcase-project/zen-do/coverage/coverage.svg?raw=true)](https://htmlpreview.github.io/?https://raw.githubusercontent.com/seedcase-project/zen-do/coverage/index.html)
 [![pre-commit.ci
 status](https://results.pre-commit.ci/badge/github/seedcase-project/zen-do/main.svg)](https://results.pre-commit.ci/latest/github/seedcase-project/zen-do/main)
 [![lifecycle](https://lifecycle.r-lib.org/articles/figures/lifecycle-experimental.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
@@ -35,64 +32,15 @@ intended use of zen-do is to integrate with a GitHub Action workflow for
 continuous deployment, it can also be used locally from the command line
 for more interactive use.
 
+Check out our [website](https://zen-do.seedcase-project.org) for more
+information, such as the features it provides and a
+[guide](https://zen-do.seedcase-project.org/docs/guide) to using the
+package. For a list of changes, see our [changelog](CHANGELOG.md).
+
 > [!TIP]
 >
-> This Python package was generated from the
-> [`template-python-package`](https://github.com/seedcase-project/template-python-package)
-> Seedcase template :tada:
-
-## Project files and folders
-
-- `.github/`: Contains GitHub-specific files, such as issue and pull
-  request templates, workflows,
-  [dependabot](https://docs.github.com/en/code-security/tutorials/secure-your-dependencies/dependabot-quickstart-guide)
-  configuration, pull request templates, and a
-  [CODEOWNERS](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners)
-  file.
-- `tools/vulture-allowlist.py`: List of variables that shouldn’t be
-  flagged by [Vulture](https://github.com/jendrikseipp/vulture) as
-  unused.
-- `tools/get-contributors.sh`: Script to get list of project
-  contributors.
-- `tests/`: Test files for the package.
-- `src/`: Source code for the package.
-- `docs/`: Documentation about using and developing the Python package.
-- `_renderer.py`: Custom
-  [`quartodoc`](https://machow.github.io/quartodoc/) renderer.
-- `pytest.ini`: Pytest configuration file.
-- `mypy.ini`: [`mypy`](https://mypy.readthedocs.io/en/stable/)
-  configuration file for type checking Python code.
-- `.copier-answers.yml`: Contains the answers you gave when copying the
-  project from the template. **You should not modify this file
-  directly.**
-- `.cz.toml`:
-  [Commitizen](https://commitizen-tools.github.io/commitizen/)
-  configuration file for managing versions and changelogs.
-- `.pre-commit-config.yaml`: [Pre-commit](https://pre-commit.com/)
-  configuration file for managing and running checks before each commit.
-- `.typos.toml`: [typos](https://github.com/crate-ci/typos) spell
-  checker configuration file.
-- `justfile`: [`just`](https://just.systems/man/en/) configuration file
-  for scripting project tasks.
-- `.editorconfig`: Editor configuration file for
-  [EditorConfig](https://editorconfig.org/) to maintain consistent
-  coding styles across different editors and IDEs.
-- `CHANGELOG.md`: Changelog file for tracking changes in the project.
-- `CITATION.cff`: Structured citation metadata for your project.
-- `CONTRIBUTING.md`: Guidelines for contributing to the project.
-- `_metadata.yml`: Quarto metadata file for the website, including
-  information about the project, such as the titles and GitHub names.
-- `pyproject.toml`: Main Python project configuration file defining
-  metadata and dependencies.
-- `_quarto.yml`: Quarto configuration file for the website, including
-  settings for the website, such as the theme, navigation, and other
-  options.
-- `ruff.toml`: [Ruff](https://docs.astral.sh/ruff/) configuration file
-  for linting and formatting Python code.
-- `uv.lock`: Lockfile used by [`uv`](https://docs.astral.sh/uv/) to
-  record exact versions of installed dependencies.
-- `.rumdl.toml`: [rumdl](https://rumdl.dev/) configuration file for
-  formatting Markdown files so that they are standardized and consistent
+> This Rust package was generated from
+> [template-rs](https://github.com/seedcase-project/template-rs) :tada:
 
 ## Contributing
 
@@ -104,10 +52,29 @@ Please note that this project is released with a [Contributor Code of
 Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree
 to abide by its terms.
 
+### Contributors
+
+The following people have contributed to this project by submitting pull
+requests :tada:
+
+[@lwjohnst86](https://github.com/lwjohnst86),
+[@martonvago](https://github.com/martonvago)
+
 ## Licensing
 
 This project is licensed under the [MIT License](LICENSE.md).
 
-## Changelog
+## Citing
 
-For a list of changes, see our [changelog](CHANGELOG.md) page.
+If you use this package in your work, please cite it as follows:
+
+Johnston L.W., Vago M. zen-do: Tasks to get Zenodo to do from the
+command line URL: https://zen-do.seedcase-project.org
+
+Or as a BibTeX entry:
+
+    @misc{YourReferenceHere,
+    author = {Johnston, Luke William and Vago, Marton},
+    title = {zen-do: Tasks to get Zenodo to do from the command line},
+    url = {https://zen-do.seedcase-project.org}
+    }

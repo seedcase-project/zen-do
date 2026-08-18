@@ -1,5 +1,9 @@
 project:
   type: seedcase-theme
+  render:
+    # Ignore this folder, it is the Rust build folder.
+    - "!target/"
+
 
 website:
   title: "zen-do"
@@ -18,8 +22,8 @@ website:
         href: docs/guide/index.qmd
       - text: "Design"
         href: docs/design/index.qmd
-      - text: "Reference"
-        href: docs/reference/index.qmd
+      # - text: "Reference"
+      #   href: docs/reference/index.qmd
     right:
       - text: "<img src='/_extensions/seedcase-project/seedcase-theme/logos/seedcase/a-part-of.svg' alt='Main Seedcase website' height='30px'>"
         href: "https://seedcase-project.org"
@@ -50,38 +54,6 @@ website:
       contents:
         - section: "Guide"
           href: docs/guide/index.qmd
-
-quartodoc:
-  sidebar: "docs/reference/_sidebar.yml"
-  style: "pkgdown"
-  dir: "docs/reference"
-  package: "zen_do"
-  parser: google
-  dynamic: true
-  renderer:
-    style: _renderer.py
-    table_style: description-list
-    show_signature_annotations: true
-  sections:
-    - title: "CLI"
-      contents:
-        - get
-        - init
-        - list
-    - title: "Zenodo API"
-      contents:
-        - ZenodoClient
-        - ZenodoCreator
-        - ZenodoMetadata
-        - ZenodoDepositState
-        - ZenodoRelatedIdentifier
-    - title: "Example deposit and metadata"
-      contents:
-        - example_metadata
-        - example_deposit
-
-metadata-files:
-  - docs/reference/_sidebar.yml
 
 format:
   seedcase-theme-html:
