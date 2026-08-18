@@ -4,7 +4,7 @@ import seedcase_soil as so
 from rich import print_json
 
 from zen_do.get_token import get_token
-from zen_do.internals import _write_metadata
+from zen_do.internals import _read_metadata, _write_metadata
 from zen_do.zenodo_client import ZenodoClient
 from zen_do.zenodo_get_deposit import zenodo_get_deposit
 from zen_do.zenodo_metadata import (
@@ -79,7 +79,8 @@ def get(
     """
     token = get_token(sandbox)
     client = ZenodoClient(token, sandbox)
-    deposit = zenodo_get_deposit(client.get_deposits(), metadata_file)
+    metadata = _read_metadata(metadata_file)
+    deposit = zenodo_get_deposit(client.get_deposits(), metadata)
 
     if deposit:
         print_json(data=deposit)
@@ -87,6 +88,51 @@ def get(
         so.pretty_print(
             f"No deposit found on Zenodo for metadata file '{metadata_file}'."
         )
+
+
+@app.command()
+def publish(
+    metadata_file: Path = Path(".zenodo.toml"),
+    /,
+    *,
+    file_path: Path | None = None,
+    sandbox: bool = False,
+    verbose: bool = False,
+) -> None:
+    """Create or update a Zenodo deposit.
+
+    Args:
+        metadata_file: The path to the metadata file.
+        file_path: The path to the file to upload.
+        sandbox: Whether to use the Zenodo sandbox environment for testing purposes.
+        verbose: Whether to print a log of the actions done.
+    """
+    token = get_token(sandbox)
+    client = ZenodoClient(token, sandbox)
+    metadata = _read_metadata(metadata_file)
+    deposit = zenodo_get_deposit(client.get_deposits(), metadata)
+    success_state = "updated"
+
+    if deposit:
+        if file_path:
+            deposit = client.new_version(deposit)
+            client.upload_file(deposit, file_path)
+        deposit = client.update_metadata(deposit, metadata)
+    else:
+        if not file_path:
+            raise ValueError(
+                "New deposits must have a file to upload. Please provide a file path "
+                "using the `--file-path` option."
+            )
+        success_state = "created"
+        deposit = client.create(metadata)
+        client.upload_file(deposit, file_path)
+
+    deposit = client.publish(deposit)
+
+    if verbose:
+        so.pretty_print(f"Zenodo deposit {success_state} successfully!")
+        print_json(data=deposit)
 
 
 def main() -> None:
