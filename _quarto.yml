@@ -3,7 +3,7 @@ project:
   render:
     # Ignore this folder, it is the Rust build folder.
     - "!target/"
-
+    - "*"
 
 website:
   title: "zen-do"
@@ -22,8 +22,6 @@ website:
         href: docs/guide/index.qmd
       - text: "Design"
         href: docs/design/index.qmd
-      # - text: "Reference"
-      #   href: docs/reference/index.qmd
     right:
       - text: "<img src='/_extensions/seedcase-project/seedcase-theme/logos/seedcase/a-part-of.svg' alt='Main Seedcase website' height='30px'>"
         href: "https://seedcase-project.org"
