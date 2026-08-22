@@ -56,6 +56,31 @@ pub struct RelatedIdentifier {
     pub scheme: Option<String>,
 }
 
+// `Box<>` is a container to hold some unknown type of objects. It allocates on
+// the heap, so we don't want to use this often, but reading is a good place for
+// it.
+// `dyn` is added by Rust analyzer/formatter, which is dynamically dispatched.
+// The program can't determine the exact error type until runtime.
+
+// TODO: Should this be `read_toml`? :thinking:
+
+/// Reads the Zenodo TOML metadata file
+///
+/// # Arguments
+///
+/// - `path`: This is the path to the TOML file.
+///
+/// # Errors
+///
+/// Outputs a `Box` of Errors if the file couldn't be read correctly or if the
+/// TOML couldn't be parsed.
+pub fn read_metadata(path: &str) -> Result<Metadata, Box<dyn std::error::Error>> {
+    // `?` means to grab any error types and output them as the `Result`.
+    let content: String = fs::read_to_string(path)?;
+    let metadata: Metadata = toml::from_str(&content)?;
+    Ok(metadata)
+}
+
 #[cfg(test)]
 mod tests {
     // To import all code from above in this file.
