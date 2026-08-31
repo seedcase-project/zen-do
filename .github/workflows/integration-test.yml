@@ -1,0 +1,39 @@
+name: Zenodo integration test
+
+on:
+  schedule:
+    # Run monthly
+    - cron: "0 3 1 * *"
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  zenodo-integration:
+    runs-on: ubuntu-latest
+
+    steps:
+      # This is a useful security step to check for unexpected outbound calls from the runner,
+      # which could indicate a compromised token or runner.
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # Install uv to manage the project environment.
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run Zenodo integration test in the sandbox
+        env:
+          ZENODO_SANDBOX_TOKEN: ${{ secrets.ZENODO_SANDBOX_TOKEN }}
+        run: |
+          uv run pytest tests/integration/test_publish.py
