@@ -1,12 +1,29 @@
 // TODO: Add module documentation.
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
+use std::fs;
+use std::error::Error;
+
+pub const EXAMPLE_METADATA: &str = r#"
+title = "Random"
+upload_type = "random"
+
+[[creators]]
+name = "Tip Top"
+affiliation = "University"
+orcid = "12345"
+
+[[related_identifiers]]
+identifier = "random"
+relation = "link"
+resource_type = "test"
+"#;
 
 // TODO: Include a check that the URNs are unique, maybe by making a specific
 // TODO: Include urn property? As in the Python?
 // type for it?
 /// Contains representing Zenodo metadata.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Metadata {
     /// The title of the deposit.
     pub title: String,
@@ -15,6 +32,7 @@ pub struct Metadata {
     /// The type of the deposit.
     pub upload_type: String,
 
+    // TODO: Don't allow empty vec, NonEmptyVec?
     /// The creators of the deposit.
     pub creators: Vec<Creator>,
 
@@ -23,7 +41,7 @@ pub struct Metadata {
 }
 
 /// The type containing the details of the creator/author of a Zenodo deposit.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Creator {
     /// The full name of the creator/author.
     pub name: String,
@@ -38,7 +56,7 @@ pub struct Creator {
 // TODO: Create a check for our URN id, `urn:zenodo:*`, maybe by making a
 // specific type for it?
 /// Model representing an identifier related to a Zenodo deposit.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct RelatedIdentifier {
     /// The value of the identifier (meaning, the identifier itself).
     pub identifier: String,
@@ -59,6 +77,7 @@ pub struct RelatedIdentifier {
 // `Box<>` is a container to hold some unknown type of objects. It allocates on
 // the heap, so we don't want to use this often, but reading is a good place for
 // it.
+
 // `dyn` is added by Rust analyzer/formatter, which is dynamically dispatched.
 // The program can't determine the exact error type until runtime.
 
@@ -74,12 +93,20 @@ pub struct RelatedIdentifier {
 ///
 /// Outputs a `Box` of Errors if the file couldn't be read correctly or if the
 /// TOML couldn't be parsed.
-pub fn read_metadata(path: &str) -> Result<Metadata, Box<dyn std::error::Error>> {
+pub fn read_metadata(path: &str) -> Result<Metadata, Box<dyn Error>> {
     // `?` means to grab any error types and output them as the `Result`.
     let content: String = fs::read_to_string(path)?;
     let metadata: Metadata = toml::from_str(&content)?;
     Ok(metadata)
 }
+
+// TODO: May have to use another way to write, to preserve comments and order. `toml_edit`?
+pub fn write_metadata(metadata: &Metadata, path: &str) -> Result<(), Box<dyn Error>> {
+  let toml_str: String = toml::to_string_pretty(metadata)?;
+  fs::write(path, toml_str)?;
+  Ok(())
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -87,23 +114,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_fully_read() {
-        let toml_str = r#"
-title = "Random"
-upload_type = "random"
+    fn test_parse_example() {
+        let metadata: Result<Metadata, _> = toml::from_str(EXAMPLE_METADATA);
+        println!("{:?}", metadata);
+        assert!(metadata.is_ok())
+    }
 
-[[creators]]
-name = "Jim"
-affiliation = "University"
-orcid = "12345"
+    #[test]
+    fn test_write_example() {
+        let metadata: Metadata = toml::from_str(&EXAMPLE_METADATA)?;
 
-[[related_identifiers]]
-identifier = "random"
-relation = "link"
-resource_type = "test"
-    "#;
-
-        let metadata: Result<Metadata, _> = toml::from_str(toml_str);
         println!("{:?}", metadata);
         assert!(metadata.is_ok())
     }
