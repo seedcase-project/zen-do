@@ -19,6 +19,10 @@ keywords = [
   "dissemination",
   "open-science",
 ]
+# From https://crates.io/category_slugs
 categories = ["command-line-utilities"]
 
 [dependencies]
+
+[lints.clippy]
+unwrap-used = "deny"
