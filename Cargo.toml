@@ -26,5 +26,6 @@ serde = { version = "1.0.229", features = ["derive"] }
 toml = "1.1.4"
 
 [lints.clippy]
-pedantic = "warn"
+# Needs to have priority set to indicate the order. `-1` means first.
+pedantic = { priority = -1, level = "warn" }
 unwrap-used = "deny"
