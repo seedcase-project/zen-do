@@ -18,6 +18,13 @@ orcid = "12345"
 identifier = "random"
 relation = "link"
 resource_type = "test"
+
+# This is a required ID for zen-do
+[[related_identifiers]]
+identifier = "urn:zenodo:my-org:project:book"
+relation = "isIdenticalTo"
+resource_type="other"
+scheme="urn"
 "#;
 
 // TODO: Include a check that the URNs are unique, maybe by making a specific
