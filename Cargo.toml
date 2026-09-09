@@ -26,4 +26,5 @@ serde = { version = "1.0.229", features = ["derive"] }
 toml = "1.1.4"
 
 [lints.clippy]
+pedantic = "warn"
 unwrap-used = "deny"
