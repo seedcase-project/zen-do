@@ -25,4 +25,6 @@ categories = ["command-line-utilities"]
 [dependencies]
 
 [lints.clippy]
+# Needs to have priority set to indicate the order. `-1` means first.
+pedantic = { priority = -1, level = "warn" }
 unwrap-used = "deny"
