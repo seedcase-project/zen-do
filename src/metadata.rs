@@ -1,9 +1,9 @@
 // TODO: Add module documentation.
 
 use serde::{Deserialize, Serialize};
-use std::fs;
-use std::path::{PathBuf, Path};
 use std::error::Error;
+use std::fs;
+use std::path::{Path, PathBuf};
 
 pub const EXAMPLE_METADATA: &str = r#"
 title = "Random"
@@ -95,7 +95,8 @@ pub struct RelatedIdentifier {
 /// Outputs a `Box` of Errors if the file couldn't be read correctly or if the
 /// TOML couldn't be parsed.
 pub fn read_metadata(path: &Path) -> Result<Metadata, Box<dyn Error>> {
-    // `&Path` is a borrowed immutable reference, since it points to where the file lives.
+    // `&Path` is a borrowed immutable reference, since it points to where the file
+    // lives.
 
     // `?` means to grab any error types and output them as the `Result`.
     let content: String = fs::read_to_string(path)?;
@@ -105,23 +106,25 @@ pub fn read_metadata(path: &Path) -> Result<Metadata, Box<dyn Error>> {
 
 /// Writes the Zenodo metadata to the TOML file.
 ///
-/// # Arguments:
+/// # Arguments
 ///
-/// - `metadata`: The `Metadata` struct that will be converted to TOML and saved to the `path`.
+/// - `metadata`: The `Metadata` struct that will be converted to TOML and saved
+///   to the `path`.
 /// - `path`: The path to the file to save the `metadata`.
 ///
-/// # Errors:
+/// # Errors
 ///
 /// Errors to writing to file, such as if there is a problem with the file
 /// itself or where it will be saved in.
 pub fn write_metadata(metadata: &Metadata, path: PathBuf) -> Result<(), Box<dyn Error>> {
-  // `PathBuf` is the owned path to the file, owned to ensure nothing else can
-  // write to it at the same time.
+    // `PathBuf` is the owned path to the file, owned to ensure nothing else can
+    // write to it at the same time.
 
-  // TODO: May have to use another way to write, to preserve comments and order. Maybe `toml_edit`?
-  let toml_str: String = toml::to_string_pretty(metadata)?;
-  fs::write(path, toml_str)?;
-  Ok(())
+    // TODO: May have to use another way to write, to preserve comments and order.
+    // Maybe `toml_edit`?
+    let toml_str: String = toml::to_string_pretty(metadata)?;
+    fs::write(path, toml_str)?;
+    Ok(())
 }
 
 #[cfg(test)]
@@ -139,7 +142,8 @@ mod tests {
 
     #[test]
     fn test_reading_metadata() {
-        // TODO: Refactor to write to memory representation of writing, not actual writing (less I/O in tests).
+        // TODO: Refactor to write to memory representation of writing, not actual
+        // writing (less I/O in tests).
         use std::io::Write;
 
         // `mut` since the file will be written to.
@@ -156,10 +160,7 @@ mod tests {
 
     #[test]
     fn test_writing_metadata() {
-        let path = tempfile::NamedTempFile::new()
-            .unwrap()
-            .path()
-            .to_path_buf();
+        let path = tempfile::NamedTempFile::new().unwrap().path().to_path_buf();
 
         let example: Metadata = toml::from_str(EXAMPLE_METADATA).unwrap();
         let write_result = write_metadata(&example, path);
