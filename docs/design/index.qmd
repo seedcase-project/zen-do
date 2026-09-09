@@ -37,3 +37,4 @@ Specifically, zen-do must:
   `_quarto.yml`).
 - List all deposits for a given account.
 - Allow a GitHub repository to be linked to one or more Zenodo deposits.
+- Installable via crates.io or with uv.
