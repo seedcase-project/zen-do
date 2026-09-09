@@ -13,19 +13,9 @@ from zen_do.zenodo_metadata import (
     ZenodoRelatedIdentifier,
 )
 
-app = so.setup_cli(
-    name="zen-do",
-    help="zen-do simplifies interacting with Zenodo for common publishing tasks.",
-)
-
 
 @app.command()
 def init(verbose: bool = False) -> None:
-    """Create an empty `.zenodo.toml` file that has all the metadata fields.
-
-    Args:
-        verbose: Whether to print a log of the actions done.
-    """
     metadata_path = Path(".zenodo.toml")
     if metadata_path.is_file():
         so.print_if_verbose(
@@ -52,11 +42,6 @@ def init(verbose: bool = False) -> None:
 
 @app.command()
 def list(sandbox: bool = False) -> None:
-    """List all Zenodo deposits in an account as raw JSON (from the Zenodo servers).
-
-    Args:
-        sandbox: Whether to use the Zenodo sandbox environment for testing purposes.
-    """
     token = get_token(sandbox)
     client = ZenodoClient(token, sandbox)
     deposits = client.get_deposits()
@@ -69,14 +54,8 @@ def list(sandbox: bool = False) -> None:
 
 @app.command()
 def get(
-    metadata_file: Path = Path(".zenodo.toml"), /, *, sandbox: bool = False
+    metadata_file: Path = Pathetting checked. The values are treated as regular (".zenodo.toml"), /, *, sandbox: bool = False
 ) -> None:
-    """Get the Zenodo deposit JSON based on the metadata file.
-
-    Args:
-        metadata_file: The path to the metadata file.
-        sandbox: Whether to use the Zenodo sandbox environment for testing purposes.
-    """
     token = get_token(sandbox)
     client = ZenodoClient(token, sandbox)
     deposit = zenodo_get_deposit(client.get_deposits(), metadata_file)
