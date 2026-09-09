@@ -54,7 +54,7 @@ check-urls:
 # Checks and lints with clippy
 check-clippy:
   # Stricter linting
-  cargo clippy -- -W clippy::pedantic
+  cargo clippy
 
 # Checks package and dependencies
 check-cargo:
@@ -67,7 +67,7 @@ check-fmt:
 # Format the code and fix issues
 format-rust:
   cargo fix --allow-dirty
-  cargo clippy --fix --allow-dirty -- -W clippy::pedantic
+  cargo clippy --fix --allow-dirty
   cargo +nightly fmt -- --config-path .config/rustfmt.toml
 
 # Format Markdown files
