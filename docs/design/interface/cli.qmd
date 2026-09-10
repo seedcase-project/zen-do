@@ -9,7 +9,7 @@ package's scope.
 
 {{< include /docs/includes/_design-status.qmd >}}
 
-## {{< var done >}} `init`
+## {{< var wip >}} `init`
 
 ```bash {filename="Terminal"}
 zen-do init --verbose
@@ -21,7 +21,7 @@ values filled in, excluding a partially filled in URN for the project. This
 simple command is helpful to get started with making a new Zenodo deposit, as
 well as standardizing the name and structure of the file.
 
-## {{< var done >}} `list`
+## {{< var wip >}} `list`
 
 ```bash {filename="Terminal"}
 zen-do list --sandbox
@@ -32,7 +32,7 @@ listed in the account connected to that token. Both the CLI and the internal
 Python interface are used in other functions like `publish()` to find whether a
 deposit exists or not.
 
-## {{< var done >}} `get`
+## {{< var wip >}} `get`
 
 ```bash {filename="Terminal"}
 zen-do get [METADATA_FILE] --sandbox
@@ -100,46 +100,6 @@ to keep synchronized with the `.zenodo.toml` file, including:
 
 The `--to` argument can be a single format or an array of formats, allowing
 users to convert to multiple formats in one command.
-
-```python
-from cyclopts import App, Parameter
-from pathlib import Path
-from typing import Annotated
-from enum import StrEnum
-
-
-class Format(StrEnum):
-    zenodo_json = ".zenodo.json"
-    citation_cff = "CITATION.cff"
-    pyproject_toml = "pyproject.toml"
-    quarto_yml = "_quarto.yml"
-    description = "DESCRIPTION"
-
-
-@app.command()
-def convert(
-    metadata_file: Path = Path(".zenodo.toml"),
-    /,
-    *,
-    to: Annotated[list[Format], Parameter(consume_multiple=True)],
-    verbose: bool = False,
-) -> None:
-    """Convert a metadata file, e.g. `.zenodo.toml`, to other formats.
-
-    Args:
-        metadata_file: The path to the metadata file to convert.
-        to: The formats to convert the metadata file to. Can be a single format
-            or an array of formats.
-        verbose: Whether to print a log of the actions done.
-    """
-    # Read metadata file (checking if the URN exists or not).
-    # metadata: Metadata = read_metadata(path=metadata_file)
-    # Convert to the given formats
-    # formats: list[str] = convert_to_formats(metadata, to)
-    # TODO: Consider how updating existing files will work, need to read other formats first?
-    # output_path: list[Path] = write_formats(formats)
-    print_if_verbose(verbose, f"Written the format(s) to files {output_paths}.")
-```
 
 ## {{< var planned >}} `update`
 
