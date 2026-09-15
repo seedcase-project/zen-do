@@ -1,0 +1,62 @@
+---
+title: "Installation"
+description: "Steps to install zen-do to use on the command-line."
+order: 0
+---
+
+Before installing zen-do, you need to have [Rust and
+Cargo](https://rust-lang.org/tools/install/) installed. zen-do currently is only
+available on the GitHub repository and needs to be built from the source files.
+You can download the repository and build the package by running the following
+command:
+
+```bash {filename="Terminal"}
+cargo install --git https://github.com/seedcase-project/zen-do
+```
+
+Cargo installs packages in different folders, depending on your operating
+system:
+
+*On MacOS or Linux:*
+
+```bash {filename="Terminal"}
+cd $HOME/.cargo/bin
+```
+
+*On Windows:*
+
+```bash {filename="Terminal"}
+cd %USERPROFILE%\.cargo\bin
+```
+
+::: callout-note
+Since zen-do is not yet on [crates.io](https://crates.io), you also need to have
+Git installed on your computer. When we officially release zen-do, you won't
+need Git to install zen-do and will be able to install using the command:
+
+```bash {filename="Terminal"}
+cargo install seedcase-propagate
+```
+:::
+
+To confirm that zen-do was installed correctly, run:
+
+```bash {filename="Terminal"}
+zen-do --version
+```
+
+<!-- TODO: uncomment when we have auto-completions
+## Shell auto-completions
+
+To enable shell auto-completions, run:
+
+```bash {filename="Terminal"}
+propagate --install-completion
+```
+
+::: callout-note
+Completions only work for bash, fish, and zsh shells.
+:::
+
+Once installed, you're ready to start using Propagate!
+-->

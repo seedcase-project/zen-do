@@ -1,3 +1,13 @@
 ---
 title: "Guide"
+description: >-
+  A guide to using zen-do for interacting with Zenodo.
+listing:
+  contents: .
+  type: grid
+  grid-columns: 1
+  sort: "order"
+  fields:
+    - title
+    - description
 ---
