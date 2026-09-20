@@ -1,0 +1,17 @@
+::: callout-tip
+All of the zen-do commands used on this page can also be used from
+[uv](https://docs.astral.sh/uv). Why use uv? Rather than first installing zen-do
+and then using a command it in, you can use `uvx` to both install and use right
+away. It handles correctly installing the tool in a way that your system needs.
+To use `uvx` on zen-do, it might look like:
+
+```bash {.filename="Terminal"}
+uvx zen-do
+```
+
+To upgrade zen-do with uv, you can run:
+
+```bash {.filename="Terminal"}
+uv tool upgrade --all
+```
+:::
