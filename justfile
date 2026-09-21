@@ -49,6 +49,7 @@ check-urls:
     --verbose \
     --exclude 'pre-commit\.ci' \
     --exclude 'github\.com' \
+    --exclude-path ".xml" \
     --exclude-path "_badges.qmd"
 
 # Checks and lints with clippy
