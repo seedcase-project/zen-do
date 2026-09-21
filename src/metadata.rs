@@ -1,12 +1,12 @@
 // TODO: Add module documentation.
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 // TODO: Include a check that the URNs are unique, maybe by making a specific
 // TODO: Include urn property? As in the Python?
 // type for it?
 /// Contains representing Zenodo metadata.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Metadata {
     /// The title of the deposit.
     pub title: String,
@@ -23,7 +23,7 @@ pub struct Metadata {
 }
 
 /// The type containing the details of the creator/author of a Zenodo deposit.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Creator {
     /// The full name of the creator/author.
     pub name: String,
@@ -38,7 +38,7 @@ pub struct Creator {
 // TODO: Create a check for our URN id, `urn:zenodo:*`, maybe by making a
 // specific type for it?
 /// Model representing an identifier related to a Zenodo deposit.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct RelatedIdentifier {
     /// The value of the identifier (meaning, the identifier itself).
     pub identifier: String,
@@ -79,7 +79,6 @@ resource_type = "test"
     "#;
 
         let metadata: Result<Metadata, _> = toml::from_str(toml_str);
-        println!("{:?}", metadata);
         assert!(metadata.is_ok())
     }
 }
