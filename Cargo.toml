@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 authors = [
   "Luke W. Johnston <lwjohnst@gmail.com>",
-  "Marton Vago <marton.vago95@gmail.com>",
+  "Fruzsina Vago <fruzsi.vago@gmail.com>",
 ]
 description = "Zenodo tasks from the command-line"
 readme = "README.md"
