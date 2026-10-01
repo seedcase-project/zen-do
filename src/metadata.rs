@@ -92,7 +92,7 @@ pub struct RelatedIdentifier {
 ///
 /// # Errors
 ///
-/// Outputs a `Box` of Errors if the file couldn't be read correctly or if the
+/// Outputs a `Box` containing an error if the file couldn't be read correctly or if the
 /// TOML couldn't be parsed.
 pub fn read_metadata(path: &Path) -> Result<Metadata, Box<dyn Error>> {
     // `&Path` is a borrowed immutable reference, since it points to where the file
@@ -114,8 +114,8 @@ pub fn read_metadata(path: &Path) -> Result<Metadata, Box<dyn Error>> {
 ///
 /// # Errors
 ///
-/// Errors to writing to file, such as if there is a problem with the file
-/// itself or where it will be saved in.
+/// Errors when writing to file, such as if there is a problem with the file
+/// itself or where it will be saved.
 pub fn write_metadata(metadata: &Metadata, path: PathBuf) -> Result<(), Box<dyn Error>> {
     // `PathBuf` is the owned path to the file, owned to ensure nothing else can
     // write to it at the same time.

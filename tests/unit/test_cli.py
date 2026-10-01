@@ -11,6 +11,11 @@ def _mock_zenodo_get_deposit(mocker):
 
 
 @fixture
+def _mock_read_metadata(mocker):
+    return mocker.patch("zen_do.cli._read_metadata")
+
+
+@fixture
 def _mock_client(mocker, monkeypatch):
     monkeypatch.setenv("ZENODO_TOKEN", "token")
     return mocker.patch("zen_do.cli.ZenodoClient")
@@ -48,6 +53,7 @@ def test_list_when_no_deposits_found(
 def test_get_when_deposit_found(
     capsys,
     _mock_client,
+    _mock_read_metadata,
     _mock_zenodo_get_deposit,
 ):
     deposit = example_deposit()
@@ -62,6 +68,7 @@ def test_get_when_deposit_found(
 def test_get_when_deposit_not_found(
     capsys,
     _mock_client,
+    _mock_read_metadata,
     _mock_zenodo_get_deposit,
 ):
     _mock_zenodo_get_deposit.return_value = None
