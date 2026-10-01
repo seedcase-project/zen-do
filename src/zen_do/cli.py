@@ -54,7 +54,7 @@ def list(sandbox: bool = False) -> None:
 
 @app.command()
 def get(
-    metadata_file: Path = Pathetting checked. The values are treated as regular (".zenodo.toml"), /, *, sandbox: bool = False
+    metadata_file: Path = Path(".zenodo.toml"), /, *, sandbox: bool = False
 ) -> None:
     token = get_token(sandbox)
     client = ZenodoClient(token, sandbox)
