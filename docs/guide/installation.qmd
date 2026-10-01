@@ -35,7 +35,7 @@ Git installed on your computer. When we officially release zen-do, you won't
 need Git to install zen-do and will be able to install using the command:
 
 ```bash {filename="Terminal"}
-cargo install seedcase-propagate
+cargo install zen-do
 ```
 :::
 
@@ -51,12 +51,12 @@ zen-do --version
 To enable shell auto-completions, run:
 
 ```bash {filename="Terminal"}
-propagate --install-completion
+zen-do --install-completion
 ```
 
 ::: callout-note
 Completions only work for bash, fish, and zsh shells.
 :::
 
-Once installed, you're ready to start using Propagate!
+Once installed, you're ready to start using zen-do!
 -->
