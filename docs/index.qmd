@@ -14,11 +14,6 @@ help others understand, verify, reproduce, and build on it. Making these outputs
 available also reduces duplicated effort and allows research to travel further
 than its original publication.
 
-There has recently been a push on this agenda, e.g., from the European
-Commission on [Open science in Horizon
-Europe](https://rea.ec.europa.eu/open-science_en?utm) and
-[UNESCO](https://www.unesco.org/en/legal-affairs/recommendation-open-science?hub=66535&utm_source=chatgpt.com)
-
 ## Why Zenodo?
 
 [Zenodo](https://zenodo.org/) provides a safe and persistent home for research
