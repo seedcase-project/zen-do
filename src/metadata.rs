@@ -92,8 +92,8 @@ pub struct RelatedIdentifier {
 ///
 /// # Errors
 ///
-/// Outputs a `Box` containing an error if the file couldn't be read correctly or if the
-/// TOML couldn't be parsed.
+/// Outputs a `Box` containing an error if the file couldn't be read correctly
+/// or if the TOML couldn't be parsed.
 pub fn read_metadata(path: &Path) -> Result<Metadata, Box<dyn Error>> {
     // `&Path` is a borrowed immutable reference, since it points to where the file
     // lives.
