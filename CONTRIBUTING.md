@@ -80,7 +80,7 @@ This is a brief description of some of the files in this repository.
     configuration file for formatting Rust code and comments.
   - `typos.toml`: [typos](https://github.com/crate-ci/typos) spell checker
     configuration file.
-  - `rumdl.toml`: [rumdl](https://rumdl.dev) configuration file for formatting
+  - `rumdl.toml`: [rumdl](https://github.com/rvben/rumdl) configuration file for formatting
     Markdown files in the project.
   - `cog.toml`: [Cocogitto](https://docs.cocogitto.io) configuration file for
     managing versions.
