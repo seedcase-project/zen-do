@@ -1,3 +1,77 @@
 ---
 title: "Overview"
 ---
+
+### Publishing is more than a paper
+
+Research does not end with a paper. Data, code, and other research outputs are
+valuable parts of the work and should be preserved, discoverable, and reusable,
+making them [FAIR](https://www.go-fair.org/fair-principles/). Sharing them
+should be a natural part of publishing --- not an extra burden.
+
+A paper tells others what you found; the data, code, methods, and workflows can
+help others understand, verify, reproduce, and build on it. Making these outputs
+available also reduces duplicated effort and allows research to travel further
+than its original publication.
+
+There has recently been a push on this agenda, e.g., from the European
+Commission on [Open science in Horizon
+Europe](https://rea.ec.europa.eu/open-science_en?utm) and
+[UNESCO](https://www.unesco.org/en/legal-affairs/recommendation-open-science?hub=66535&utm_source=chatgpt.com)
+
+## Why Zenodo?
+
+[Zenodo](https://zenodo.org/) provides a safe and persistent home for research
+outputs. It preserves files and metadata, makes them discoverable, and gives
+published records a DOI so they can be cited and reused. Zenodo is recommended
+as the open repository for EU-funded research outputs and can also be used for
+pre-registrations of research articles.
+
+## Why use Zen-do?
+
+The overall aim of the [Seedcase Project](https://seedcase-project.org) is to
+build tools that make data more
+[FAIR](https://www.go-fair.org/fair-principles/), easier to access and share,
+and more likely to be (re)used. To support this goal, Zen-do simplifies specific
+tasks.
+
+### Being FAIR should be easy.
+
+Publishing to Zenodo should not require learning another web interface or
+managing the same information in several places. `zen-do` provides a
+command-line interface (CLI) for preparing, managing, converting, and publishing
+Zenodo deposits from a metadata file and your existing research files.
+
+Describe your deposit once in `.zenodo.toml`, then use `zen-do` to manage the
+rest.
+
+Zen-do makes publishing research outputs to Zenodo part of your normal research
+workflow. It provides a simple way to keep the information about a deposit
+together with the work it describes, manage changes along the way, and publish
+when everything is ready.
+
+The goal is to remove the small but persistent obstacles that make sharing
+research feel like extra work: keeping metadata consistent, handling files,
+tracking drafts, and repeating steps through a web interface.
+
+With Zen-do, publishing becomes something you can prepare, update, and reproduce
+alongside your research.
+
+## Learning more
+
+This website contains a guide on how to use Propagate, reference documentation,
+and details about the design:
+
+- [How-to guide](/docs/guide/index.qmd): The guide section provides a
+  step-by-step introduction to Propagate, including installing, setting up the
+  web app, using the terminal interface, using the CLI, and setting
+  configurations.
+- [Reference](/docs/reference/index.qmd): The reference section contains
+  detailed information about Propagate's CLI and setting up a Propagate web app.
+- [Design](/docs/design/index.qmd): The design section describes the
+  architecture and interface of Propagate, the requirements, use-cases, and [C4
+  model](https://c4model.com/) diagrams.
+
+## Contributors
+
+{{< include /docs/includes/_contributors.qmd >}}
