@@ -4,14 +4,13 @@ version = "0.1.0"
 edition = "2024"
 authors = [
   "Luke W. Johnston <lwjohnst@gmail.com>",
-  "Marton Vago <marton.vago95@gmail.com>",
+  "Fruzsina Vago <fruzsi.vago@gmail.com>",
 ]
 description = "Zenodo tasks from the command-line"
 readme = "README.md"
 homepage = "https://zen-do.seedcase-project.org"
 repository = "https://github.com/seedcase-project/zen-do"
 license = "MIT"
-license-file = "LICENSE.md"
 keywords = [
   "zenodo-api",
   "zenodo",
@@ -19,6 +18,7 @@ keywords = [
   "dissemination",
   "open-science",
 ]
+# From https://crates.io/category_slugs
 categories = ["command-line-utilities"]
 
 [dependencies]
@@ -28,3 +28,8 @@ clap = { version = "4.6.6", features = ["derive"] }
 
 [dev-dependencies]
 tempfile = "3.27.0"
+
+[lints.clippy]
+# Needs to have priority set to indicate the order. `-1` means first.
+pedantic = { priority = -1, level = "warn" }
+unwrap-used = "deny"

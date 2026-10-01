@@ -15,26 +15,26 @@ interested in the internal workings of the package.
 This section describes the different actions and objects used throughout the
 package.
 
-  | Object     | Description                                                                                                                         |
-  | ---------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-  | deposit(s) | A Zenodo deposit is the combined set of files and metadata that make up the content that will eventually form the published record. |
-  | record(s)  | A Zenodo record is a given published set of metadata and files for a specific DOI.                                                  |
-  | metadata   | The metadata for a deposit, kept within a file `.zenodo.toml`.                                                                      |
-  | file(s)    | The files to add to a deposit.                                                                                                      |
-  | format     | The file formats for the Zenodo metadata file(s) to convert between.                                                                |
-  | token      | The Zenodo personal access token to authenticate with the Zenodo API.                                                               |
+  | Object       | Description                                                                                                                           |
+  | ------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+  | deposit(s)   | A Zenodo deposit is the combined set of files and metadata that make up the content that will eventually form the published record.   |
+  | record(s)    | A Zenodo record is a given published set of metadata and files for a specific DOI.                                                    |
+  | metadata     | The metadata for a deposit, kept within a file `.zenodo.toml`.                                                                        |
+  | file(s)      | The files to add to a deposit.                                                                                                        |
+  | format       | The file formats for the Zenodo metadata file(s) to convert between.                                                                  |
+  | token        | The Zenodo personal access token to authenticate with the Zenodo API.                                                                 |
 
   : Objects used in zen-do.
 
-  | Action  | Description                                                                                                                                       |
-  | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-  | init    | Create an empty metadata file to be filled in.                                                                                                    |
-  | list    | List all Zenodo deposits in an account.                                                                                                           |
-  | get     | Get a Zenodo deposit in an account from a metadata file.                                                                                          |
-  | convert | Convert metadata files to and from different formats.                                                                                             |
-  | update  | Updates an existing Zenodo deposit's metadata only (not file) based on the contents of a metadata file.                                           |
-  | publish | Publish a new Zenodo record from an existing or new Zenodo deposit based on the metadata file and, if given, updating the file(s) in the deposit. |
-  | discard | Discard a draft of or update to a Zenodo deposit (but not record).                                                                                |
+  | Action    | Description                                                                                                                                         |
+  | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | init      | Create an empty metadata file to be filled in.                                                                                                      |
+  | list      | List all Zenodo deposits in an account.                                                                                                             |
+  | get       | Get a Zenodo deposit in an account from a metadata file.                                                                                            |
+  | convert   | Convert metadata files to and from different formats.                                                                                               |
+  | update    | Updates an existing Zenodo deposit's metadata only (not file) based on the contents of a metadata file.                                             |
+  | publish   | Publish a new Zenodo record from an existing or new Zenodo deposit based on the metadata file and, if given, updating the file(s) in the deposit.   |
+  | discard   | Discard a draft of or update to a Zenodo deposit (but not record).                                                                                  |
 
   : Actions used in zen-do.
 
@@ -119,7 +119,7 @@ flowchart TB
 ### Container/component
 
 In C4, a [container diagram](https://c4model.com/diagrams/container) zooms in on
-the system boundary to show the *containers* within it while a a [component
+the system boundary to show the *containers* within it while a [component
 diagram](https://c4model.com/abstractions/component) is "a grouping of related
 functionality encapsulated behind a well-defined interface", like a class or a
 module. For zen-do, we have a single container (the CLI) so we combine the
