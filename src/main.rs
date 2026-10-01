@@ -14,7 +14,7 @@ struct Cli {
 #[derive(Subcommand, Debug)]
 enum Commands {
     /// Create an empty `.zenodo.toml` file that includes all the metadata
-    /// fields for a deposit to be can be filled in.
+    /// fields for a deposit to be filled in.
     Init,
 
     /// List all Zenodo deposits in an account as raw JSON (direct from the
@@ -24,7 +24,7 @@ enum Commands {
     /// Get the Zenodo deposit JSON based on the metadata file.
     Get(GetArgs),
 
-    /// Converts the `.zenodo.toml` metadata file into other formats (e.g.
+    /// Convert the `.zenodo.toml` metadata file into other formats (e.g.
     /// `CITATION.cff`).
     Convert(ConvertArgs),
 
@@ -39,16 +39,16 @@ enum Commands {
     /// deposit's/record's metadata, use `update`.
     Publish(PublishArgs),
 
-    /// Updates a Zenodo deposit's contents (and its record) with changes in the
-    /// `.zenodo.toml`. This doesn't create a new DOI, only updates the
-    /// metadata within the record (not any files).
+    /// Update a Zenodo deposit's/record's metadata with changes in
+    /// `.zenodo.toml`. This doesn't create a new DOI or change any files, it only updates the
+    /// metadata within the record.
     Update(UpdateArgs),
 }
 
 #[derive(Args, Debug)]
 struct SandboxArg {
     /// Whether to use the Zenodo sandbox environment for testing purposes.
-    #[arg(default_value_t = false)]
+    #[arg(long, short, default_value_t = false)]
     sandbox: bool,
 }
 
@@ -56,14 +56,14 @@ struct SandboxArg {
 struct MetadataFileArg {
     /// The path to the metadata file.
     #[arg(default_value = ".zenodo.toml")]
-    metadata_file: String,
+    metadata_file: PathBuf,
 }
 
 #[derive(Args, Debug)]
 struct DraftArg {
     /// Whether to create a draft Zenodo deposit, e.g. leave it in "editable"
     /// state and not publish it.
-    #[arg(default_value_t = false)]
+    #[arg(long, short, default_value_t = false)]
     draft: bool,
 }
 
@@ -108,8 +108,9 @@ struct PublishArgs {
     #[command(flatten)]
     metadata_file: MetadataFileArg,
 
-    /// The path to the file to upload.
-    file: Option<Vec<String>>,
+    /// The path(s) to the file(s) to upload.
+    #[arg(long, short, required = true)]
+    files: Vec<PathBuf>,
 
     #[command(flatten)]
     sandbox: SandboxArg,
