@@ -20,12 +20,12 @@ relation = "link"
 resource_type = "test"
 "#;
 
-// TODO: Include a check that the URNs are unique, maybe by making a specific type for it?
+// TODO: Include a check that the URNs are unique, maybe by making a specific
+// type for it?
 
 // TODO: Include urn property? As in the Python?
 
 /// Type representing Zenodo metadata.
-#[derive(Debug, Serialize, Deserialize)]
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct Metadata {
     /// The title of the deposit.
