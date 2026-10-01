@@ -2,8 +2,8 @@
 All of the zen-do commands used on this page can also be run using
 [uv](https://docs.astral.sh/uv). Why use uv? Rather than first installing zen-do
 and then running a command, you can use `uvx` to install and run it in one step.
-It handles correctly installing the tool in a way that your system needs.
-To use `uvx` with zen-do, run:
+It handles correctly installing the tool in a way that your system needs. To use
+`uvx` with zen-do, run:
 
 ```bash {.filename="Terminal"}
 uvx zen-do
