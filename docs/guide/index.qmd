@@ -1,7 +1,8 @@
 ---
 title: "Guide"
 description: >-
-  A guide to using zen-do for interacting with Zenodo.
+  A guide to using zen-do to interact with Zenodo deposits, such as getting
+  information about a deposit or publishing one.
 listing:
   contents: .
   type: grid
