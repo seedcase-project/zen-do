@@ -3,7 +3,7 @@
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 pub const EXAMPLE_METADATA: &str = r#"
 title = "Random"
@@ -97,8 +97,7 @@ pub struct RelatedIdentifier {
 /// Outputs a `Box` containing an error if the file couldn't be read correctly
 /// or if the TOML couldn't be parsed.
 pub fn read_metadata(path: &Path) -> Result<Metadata, Box<dyn Error>> {
-    // `&Path` is a borrowed immutable reference, since it points to where the file
-    // lives.
+    // `&Path` is a borrowed immutable reference to a file on the system.
 
     // `?` means to grab any error types and output them as the `Result`.
     let content: String = fs::read_to_string(path)?;
@@ -118,12 +117,7 @@ pub fn read_metadata(path: &Path) -> Result<Metadata, Box<dyn Error>> {
 ///
 /// Errors when writing to file, such as if there is a problem with the file
 /// itself or where it will be saved.
-pub fn write_metadata(metadata: &Metadata, path: PathBuf) -> Result<(), Box<dyn Error>> {
-    // `PathBuf` is the owned path to the file, owned to ensure nothing else can
-    // write to it at the same time.
-
-    // TODO: May have to use another way to write, to preserve comments and order.
-    // Maybe `toml_edit`?
+pub fn write_metadata(metadata: &Metadata, path: &Path) -> Result<(), Box<dyn Error>> {
     let toml_str: String = toml::to_string_pretty(metadata)?;
     fs::write(path, toml_str)?;
     Ok(())
@@ -145,7 +139,7 @@ mod tests {
     #[test]
     fn test_reading_metadata() {
         // TODO: Refactor to write to memory representation of writing, not actual
-        // writing (less I/O in tests).
+        // writing (less I/O in tests)?
         use std::io::Write;
 
         // `mut` since the file will be written to.
@@ -162,11 +156,17 @@ mod tests {
 
     #[test]
     fn test_writing_metadata() {
-        let path = tempfile::NamedTempFile::new().unwrap().path().to_path_buf();
+        // Rust suggested using this approach as it allows `path` to last longer
+        // as a value.  Since `binding` is an owned value, using `path()` on it
+        // allows the reference back to it.  See `rustc --explain E0716`
+        let binding = tempfile::NamedTempFile::new().unwrap();
+        let path = binding.path();
 
         let example: Metadata = toml::from_str(EXAMPLE_METADATA).unwrap();
         let write_result = write_metadata(&example, path);
+        let actual = read_metadata(path);
 
         assert!(write_result.is_ok());
+        assert_eq!(example, actual.unwrap());
     }
 }
