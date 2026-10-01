@@ -1,6 +1,7 @@
 // The `main.rs` file is the binary entry-point, e.g. for CLIs
 
 use clap::{Args, Parser, Subcommand};
+use std::path::PathBuf;
 
 // TODO: Include `verbose` flag everywhere with `clap-verbosity-flag`?
 /// Common publishing tasks with Zenodo from the command-line.
@@ -108,6 +109,7 @@ struct PublishArgs {
     #[command(flatten)]
     metadata_file: MetadataFileArg,
 
+    // TODO: Also as NonEmptyVec
     /// The path(s) to the file(s) to upload.
     #[arg(long, short, required = true)]
     files: Vec<PathBuf>,
