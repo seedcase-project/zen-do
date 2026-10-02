@@ -21,7 +21,7 @@ keywords = [
 # From https://crates.io/category_slugs
 categories = ["command-line-utilities"]
 # Only include these files (LICENSE and Cargo.toml are always included).
-include = ["src/*", "CHANGELOG.md", "README.md", "CITATION.cff"]
+include = ["src/*.rs", "CHANGELOG.md", "README.md", "CITATION.cff"]
 
 [dependencies]
 serde = { version = "1.0.229", features = ["derive"] }
