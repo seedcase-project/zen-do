@@ -3,7 +3,8 @@ project:
   render:
     # Ignore this folder, it is the Rust build folder.
     - "!target/"
-    - "*"
+    - "*.qmd"
+    - "*.md"
 
 website:
   title: "zen-do"
