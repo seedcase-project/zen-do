@@ -2,7 +2,7 @@
 title: "Command line"
 ---
 
-This documents the command-line interface (CLI) and its Python counterparts,
+This documents the command-line interface (CLI) and its Rust counterparts,
 including some function signatures and explanation of the choices we've made.
 This document is primarily to help us (the developers) stay focused on the
 package's scope.
@@ -29,7 +29,7 @@ zen-do list --sandbox
 
 The `list` command fetches the stored Zenodo token and gets all Zenodo deposits
 listed in the account connected to that token. Both the CLI and the internal
-Python interface are used in other functions like `publish()` to find whether a
+Rust interface are used in other functions like `publish()` to find whether a
 deposit exists or not.
 
 ## {{< var wip >}} `get`
@@ -42,8 +42,8 @@ The `get` command will get the Zenodo deposit JSON based on the metadata file
 provided. If the deposit doesn't exist, it will output a message about not
 finding a match. This is useful for checking if a deposit already exists for a
 given set of metadata, and if so, getting the deposit information to use for
-updating or publishing it. Internally uses the Python functions within `list()`
-to get the list of deposits and uses that to find the deposit that matches the
+updating or publishing it. Internally uses the Rust functions within `list()` to
+get the list of deposits and uses that to find the deposit that matches the
 content of the metadata file using the URN ID.
 
 ## {{< var planned >}} `convert`
@@ -82,7 +82,7 @@ to keep synchronized with the `.zenodo.toml` file, including:
   information for a repository when it is in the root of the repository. This
   contains only a subset of the metadata found in the `.zenodo.toml` file.
 - {{< var planned >}} `pyproject.toml`: While this file is almost entirely used
-  only for Python projects, it contains similar metadata fields to the
+  only for Rust projects, it contains similar metadata fields to the
   `.zenodo.toml` file, such as the project name, description, authors, and
   license.
 - {{< var planned >}} `codemeta.json`: This file is used to describe software

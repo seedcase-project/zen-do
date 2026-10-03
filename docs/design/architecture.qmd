@@ -152,13 +152,13 @@ flowchart TB
     end
 
     subgraph zen-do
-        init["init<br>[Python]"]
-        get["get<br>[Python]"]
-        list["list<br>[Python]"]
-        convert["convert<br>[Python]"]
-        update["update<br>[Python]"]
-        publish["publish<br>[Python]"]
-        discard["discard<br>[Python]"]
+        init["init<br>[Rust]"]
+        get["get<br>[Rust]"]
+        list["list<br>[Rust]"]
+        convert["convert<br>[Rust]"]
+        update["update<br>[Rust]"]
+        publish["publish<br>[Rust]"]
+        discard["discard<br>[Rust]"]
         deposit[/"Deposit<br>[Zenodo server]"/]:::external
         account[/"Account<br>[Zenodo server]"/]:::external
 

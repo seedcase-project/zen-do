@@ -36,6 +36,6 @@ keywords:
   - "dissemination"
   - "open science"
 license: MIT
-message: "If you use this Python package, please cite it using these metadata."
+message: "If you use this Rust package, please cite it using these metadata."
 repository-code: "https://github.com/seedcase-project/zen-do"
 url: "https://zen-do.seedcase-project.org"
