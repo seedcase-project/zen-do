@@ -57,6 +57,7 @@ to abide by its terms.
 The following people have contributed to this project by submitting pull
 requests :tada:
 
+[@DanMazJen](https://github.com/DanMazJen),
 [@fruvago](https://github.com/fruvago),
 [@lwjohnst86](https://github.com/lwjohnst86)
 

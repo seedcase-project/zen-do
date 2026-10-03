@@ -3,7 +3,9 @@ name = "zen-do"
 version = "0.1.0"
 edition = "2024"
 authors = [
+  "Signe Kirk Brødbæk <signekb@clin.au.dk>",
   "Luke W. Johnston <lwjohnst@gmail.com>",
+  "Daniel Skak Mazhari-Jensen <daskmaje@hst.aau.dk >",
   "Fruzsina Vago <fruzsi.vago@gmail.com>",
 ]
 description = "Zenodo tasks from the command-line"
