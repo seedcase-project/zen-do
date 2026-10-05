@@ -15,14 +15,14 @@ interested in the internal workings of the package.
 This section describes the different actions and objects used throughout the
 package.
 
-  | Object       | Description                                                                                                                                                                                                        |
-  | ------------ | -------------------------------------------------------------------------------------------------------------------------------------                                                                              |
-  | deposit(s)   | A Zenodo deposit is the combined set of files and metadata that make up the content that will eventually form the published record.                                                                                |
-  | record(s)    | A Zenodo record is a given published set of metadata and files for a specific DOI.                                                                                                                                 |
-  | metadata     | The metadata for a deposit, kept within `.zenodo.toml`, see the [Inputs](/docs/design/interface/inputs.qmd) page.                                                                                                  |
-  | file(s)      | The files to add to a deposit.                                                                                                                                                                                     |
-  | format       | The file formats for the Zenodo metadata file(s) to convert between.                                                                                                                                               |
-  | token        | The Zenodo personal access token to authenticate with the Zenodo API.                                                                                                                                              |
+  | Object       | Description                                                                                                                           |
+  | ------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+  | deposit(s)   | A Zenodo deposit is the combined set of files and metadata that make up the content that will eventually form the published record.   |
+  | record(s)    | A Zenodo record is a given published set of metadata and files for a specific DOI.                                                    |
+  | metadata     | The metadata for a deposit, kept within `.zenodo.toml`, see the [Inputs](/docs/design/interface/inputs.qmd) page.                     |
+  | file(s)      | The files to add to a deposit.                                                                                                        |
+  | format       | The file formats for the Zenodo metadata file(s) to convert between.                                                                  |
+  | token        | The Zenodo personal access token to authenticate with the Zenodo API.                                                                 |
 
   : Objects used in zen-do.
 
