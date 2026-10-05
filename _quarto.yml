@@ -13,7 +13,6 @@ website:
   page-navigation: true
   navbar:
     pinned: true
-    title: false
     logo: "_extensions/seedcase-project/seedcase-theme/logos/seedcase/icon.svg"
     logo-alt: "Seedcase logo: Main page"
     left:
