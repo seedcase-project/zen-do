@@ -5,13 +5,13 @@ and then running a command, you can use `uvx` to install and run it in one step.
 It handles correctly installing the tool in a way that your system needs. To use
 `uvx` with zen-do, run:
 
-```bash {.filename="Terminal"}
+```bash {filename="Terminal"}
 uvx zen-do
 ```
 
 To upgrade zen-do with uv, you can run:
 
-```bash {.filename="Terminal"}
+```bash {filename="Terminal"}
 uv tool upgrade --all
 ```
 :::
