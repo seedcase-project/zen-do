@@ -9,7 +9,7 @@ on:
 permissions: read-all
 
 jobs:
-  release:
+  github-release:
     if: "!startsWith(github.event.head_commit.message, 'build: 🔖 update version')"
     runs-on: ubuntu-latest
     # To generate releases, this job needs write access to the repository contents.
@@ -20,11 +20,15 @@ jobs:
     concurrency:
       group: release-group
       cancel-in-progress: true
+
+    # Used by the publishing job
+    outputs:
+      has_changes: ${{ steps.check_changes.outputs.has_changes }}
     steps:
       # This is a useful security step to check for unexpected outbound calls from the runner,
       # which could indicate a compromised token or runner.
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
         with:
           egress-policy: audit
 
@@ -55,10 +59,11 @@ jobs:
         uses: cocogitto/cocogitto-action@52d0023b4396897f1815648e553db2ab8d782f3a # v4.2.0
         with:
           command: check
+          args: "--from-latest-tag"
 
       # Install uv to use git-cliff and rumdl
       - name: Set up uv
-        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           enable-cache: true
 
@@ -89,3 +94,34 @@ jobs:
           gh release create "${version}" \
             --title "Release ${version}" \
             --notes-file RELEASE_NOTES.md
+
+  publish-crates-io:
+    name: "Publish to crates.io"
+    runs-on: ubuntu-latest
+    if: ${{ needs.github-release.outputs.has_changes }}
+    permissions:
+      # Required for authentication to crates.io via trusted publishing.
+      id-token: write
+    environment:
+      name: "crates-io"
+    needs:
+      - github-release
+    steps:
+      # This is a useful security step to check for unexpected outbound calls from the runner,
+      # which could indicate a compromised token or runner.
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Authenticate with crates.io
+        id: auth
+        uses: rust-lang/crates-io-auth-action@v1
+
+      - name: Publish to crates.io
+        run: cargo publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}

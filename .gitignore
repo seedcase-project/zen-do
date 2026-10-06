@@ -4,6 +4,7 @@ _ignore
 bin/
 dev/
 _temp/
+*.pyc
 
 # Temporary files
 *.tmp
