@@ -1,8 +1,12 @@
 // The `main.rs` file is the binary entry-point, e.g. for CLIs
 
-use clap::{Args, Parser, Subcommand};
-use std::path::PathBuf;
+mod metadata;
+mod zenodo_client;
 
+use clap::{Args, Parser, Subcommand};
+use metadata::read_metadata;
+use std::path::PathBuf;
+use zenodo_client::ZenodoClient;
 // TODO: Include `verbose` flag everywhere with `clap-verbosity-flag`?
 /// Common publishing tasks with Zenodo from the command-line.
 #[derive(Parser)]
@@ -41,8 +45,8 @@ enum Commands {
     Publish(PublishArgs),
 
     /// Update a Zenodo deposit's/record's metadata with changes in
-    /// `.zenodo.toml`. This doesn't create a new DOI or change any files, it only updates the
-    /// metadata within the record.
+    /// `.zenodo.toml`. This doesn't create a new DOI or change any files, it
+    /// only updates the metadata within the record.
     Update(UpdateArgs),
 }
 
@@ -133,7 +137,7 @@ struct ConvertArgs {
     to: Vec<String>,
 }
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Cli::parse();
 
     match &args.command {
@@ -155,12 +159,16 @@ fn main() {
         #[allow(unused_variables)]
         Commands::Discard(args) => todo!("Not started yet"),
 
-        // TODO: Remove once implemented
-        #[allow(unused_variables)]
-        Commands::Publish(args) => todo!("Not started yet"),
+        Commands::Publish(args) => {
+            let metadata = read_metadata(&args.metadata_file.metadata_file)?;
+            let client = ZenodoClient::new("token", args.sandbox.sandbox)?;
+            let record = client.create(&metadata)?;
+            println!("New record created at: {}", record.links.html);
+        }
 
         // TODO: Remove once implemented
         #[allow(unused_variables)]
         Commands::Update(args) => todo!("Not started yet"),
     }
+    Ok(())
 }
