@@ -27,7 +27,7 @@ enum Commands {
     /// `CITATION.cff`).
     Convert(ConvertArgs),
 
-    /// Discards deposit draft changes. 
+    /// Discards deposit draft changes.
     ///
     /// When running `update` or `publish` with  `--draft`, the deposit
     /// is left in an "editable" state. `discard` removes
@@ -40,8 +40,8 @@ enum Commands {
     /// use `update`.
     Publish(PublishArgs),
 
-    /// Updates a deposit's or record's metadata from `.zenodo.toml`. 
-    /// 
+    /// Updates a deposit's or record's metadata from `.zenodo.toml`.
+    ///
     /// Doesn't create a new DOI or change any files, only updates the
     /// metadata.
     Update(UpdateArgs),
