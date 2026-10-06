@@ -19,6 +19,28 @@ releases we've made so far, along with what was changed within each release.
 Commits from bots, like `dependabot` or `pre-commit-ci`, are not included in the
 changelog.
 
+## [0.12.1](https://github.com/seedcase-project/zen-do/compare/0.12.0..0.12.1) - 2026-10-06
+
+### ♻️ Refactor
+
+- Set up CLI command structs
+  [#168](https://github.com/seedcase-project/zen-do/pull/168) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([97f105c](https://github.com/seedcase-project/zen-do/commit/97f105c46745db076f35830a82692f7434a92980))
+
+### 📝 Documentation
+
+- Add overview page [#194](https://github.com/seedcase-project/zen-do/pull/194)
+  by [`@DanMazJen`](https://github.com/DanMazJen)
+  ([02ee016](https://github.com/seedcase-project/zen-do/commit/02ee016f79d347d4d335c11f55445e1b8792e437))
+
+### 👩‍💻 Miscellaneous
+
+- Ignore typos in CHANGELOG, lots of false positives
+  [#215](https://github.com/seedcase-project/zen-do/pull/215) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([01f3557](https://github.com/seedcase-project/zen-do/commit/01f355721b864c768d9893b944e63004c561de7c))
+
 ## [0.12.0](https://github.com/seedcase-project/zen-do/compare/0.11.0..0.12.0) - 2026-10-06
 
 ### ✨ Features
