@@ -4,5 +4,6 @@ extend-exclude = [
   "*.css",
   ".quarto/*",
   "_site/*",
-  "*.svg"
+  "*.svg",
+  "CHANGELOG.md",
 ]
