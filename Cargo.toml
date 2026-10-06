@@ -16,7 +16,7 @@ license = "MIT"
 keywords = [
   "zenodo-api",
   "zenodo",
-  "continuous-deployment",
+  "continuous-delivery",
   "dissemination",
   "open-science",
 ]
