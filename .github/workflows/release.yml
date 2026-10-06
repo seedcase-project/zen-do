@@ -67,6 +67,11 @@ jobs:
         with:
           enable-cache: true
 
+      - name: Install cargo-edit for set-version
+        uses: baptiste0928/cargo-install@8195d4f734a149db85385bb4102b42efcd373759 # v3.5.0
+        with:
+          crate: cargo-edit
+
       - name: Check if there are releasable changes
         continue-on-error: true
         id: check_changes
