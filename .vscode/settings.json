@@ -15,6 +15,9 @@
     "perf"
   ],
   "conventional-branch.format": "{Type}/{Branch}",
+  "[just]": {
+    "editor.defaultFormatter": "nefrob.vscode-just-syntax"
+  },
   "[quarto][qmd][md]": {
     "editor.defaultFormatter": "jolars.panache"
   },
