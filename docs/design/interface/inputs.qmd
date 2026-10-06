@@ -6,15 +6,33 @@ Most of zen-do's functionality takes one or more of these main inputs:
 
 ## `.zenodo.toml` metadata file
 
-This file contains the metadata for the deposit. It should represent the "source
-of truth", as any action taken by zen-do when interacting with the Zenodo API
-will use this file and overwrite anything in the Zenodo deposit.
+The only allowable metadata file format that zen-do uses is
+[TOML](https://toml.io/en/), which is a simple, human-readable format that is
+easy to write and read. Why TOML rather than Zenodo's suggested JSON format?
+JSON is not a friendly format for humans to write and read, it doesn't allow
+comments, and doesn't support multi-line strings, which can be useful for
+writing long descriptions. TOML is the opposite, as it allows comments,
+multi-line strings, and is more human-friendly.
+
+The file is named `.zenodo.toml` and contains all the metadata for a Zenodo
+deposit. It should represent the "source of truth", as any action taken by
+zen-do when interacting with the Zenodo API will use this file and overwrite
+anything in the Zenodo deposit.
 
 ::: callout-note
-For the `convert` command, the input is actually a format other than the
-`.zenodo.toml` file, such as the `.zenodo.json` file. But the same or similar
-metadata is contained in those other formats.
+The `.zenodo.toml` file can be converted to and from other formats, such as
+`.zenodo.json`, `_quarto.yml`, `pyproject.toml`, and `CITATION.cff` (filling in
+the relevant fields in those other formats) using the `convert` command. This
+command is the only command that takes other formats as input.
 :::
+
+We use the design pattern of "one `.zenodo.toml` file for one Zenodo deposit",
+so this file must be given (or present in the working directory) for many of the
+actions to work. There must also be a unique ["related
+identifier"](https://developers.zenodo.org/#representation) for this (new or
+existing) deposit added to this `.zenodo.toml` file in order to identify it
+within the list of deposits of a user's account. This is described in more
+detail in the [interface](/docs/design/interface/index.qmd) documentation.
 
 For repositories that have or will have multiple deposits, there will also be
 multiple `.zenodo.toml` files, one for each deposit. For most use-cases, you
