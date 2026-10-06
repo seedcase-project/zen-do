@@ -7,7 +7,7 @@ pre_bump_hooks = [
   "RUST_LOG='none' uvx git-cliff --tag {{version}}",
   "cargo set-version {{version}}",
   "uvx --from panache-cli panache format CHANGELOG.md --quiet",
-  "git commit CHANGELOG.md -m 'build: 🔖 update version to {{version}} [skip ci]'",
+  "git commit CHANGELOG.md Cargo.toml -m 'build: 🔖 update version to {{version}} [skip ci]'",
 ]
 post_bump_hooks = ["git push", "git push --tags"]
 
