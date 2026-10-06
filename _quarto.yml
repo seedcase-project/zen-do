@@ -3,7 +3,8 @@ project:
   render:
     # Ignore this folder, it is the Rust build folder.
     - "!target/"
-    - "*"
+    - "*.qmd"
+    - "*.md"
 
 website:
   title: "zen-do"
@@ -12,7 +13,6 @@ website:
   page-navigation: true
   navbar:
     pinned: true
-    title: false
     logo: "_extensions/seedcase-project/seedcase-theme/logos/seedcase/icon.svg"
     logo-alt: "Seedcase logo: Main page"
     left:
