@@ -34,8 +34,8 @@ guide](/docs/guide/index.qmd){.btn .about-link}
 ::::: landing-page-block
 ::::::: hero-text
 zen-do is a command-line interface (CLI) tool for preparing, managing, and
-publishing Zenodo deposits from a metadata file and your existing research
-files.
+publishing Zenodo deposits from a metadata file and your existing research files
+(e.g., code, data, metadata, documentation).
 
 ## :sparkles: Key features
 
@@ -46,9 +46,6 @@ files.
 - Convert metadata between formats such as `.zenodo.toml`, `.zenodo.json`,
   `_quarto.yml`, `pyproject.toml`, and `CITATION.cff`
 - Publish and update projects from the terminal.
-
-zen-do focuses on publishing your project (e.g., code, data, metadata,
-documentation etc.).
 :::::::
 :::::
 :::
