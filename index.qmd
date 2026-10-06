@@ -14,6 +14,8 @@ Propagate logo." width="150px"}
 ![](_extensions/seedcase-project/seedcase-theme/logos/propagate/font.svg){fig-alt="Seedcase
 Propagate font." height="50px"}
 -->
+# zen-do
+
 ## {{< meta tagline >}}
 
 [Overview](/docs/index.qmd){.btn .about-link} [Explore
@@ -34,20 +36,21 @@ guide](/docs/guide/index.qmd){.btn .about-link}
 ::: hero-banner
 ::::: landing-page-block
 ::::::: hero-text
-Zen-do is a command-line interface (CLI) tool for preparing, managing,
-converting, and publishing Zenodo deposits from a metadata file and your
-existing research files.
+zen-do is a command-line interface (CLI) tool for preparing, managing, and
+publishing Zenodo deposits from a metadata file and your existing research
+files.
 
 ## :sparkles: Key features
 
-- Quickly and easily initiate a `.zenodo.toml` template file for preparing your
-  project to be published on Zenodo.
-- Manage all your projects within your Zenodo account from one interface.
-- Convert metadata between formats, e.g., from human-readable`.toml` to the
-  commonly used, but less readable, `.json`.
-- Publish and iteratively update projects when you need it from your terminal.
+- Quickly and easily initiate a [`.zenodo.toml`
+  file](docs/design/interface/inputs.qmd) for preparing your project to be
+  published on Zenodo.
+- Manage all projects within your Zenodo account from the terminal.
+- Convert metadata between formats such as `.zenodo.toml`, `.zenodo.json`,
+  `_quarto.yml`, `pyproject.toml`, and `CITATION.cff`
+- Publish and update projects from the terminal.
 
-Zen-do focuses on publishing your project (e.g., code, data, metadata,
+zen-do focuses on publishing your project (e.g., code, data, metadata,
 documentation etc.). For creating a standardized and comprehensive archive of
 your research project --- a [**Data Package**](https://datapackage.org/) ---
 see, [Sprout](https://sprout.seedcase-project.org). For making human-readable
@@ -61,13 +64,13 @@ documentation of the data package, see
 ::::: hero-text
 ## About the Seedcase Project
 
-Zen-do is part of the [**Seedcase Project**](https://seedcase-project.org),
+zen-do is part of the [**Seedcase Project**](https://seedcase-project.org),
 which helps research projects manage and process data in line with the
 [FAIR](https://www.go-fair.org/fair-principles/) principles.
 
 ::::::: text-center
-[Start making your data
-package](https://template-data-package.seedcase-project.org){.btn
+[Discover more of our
+products](https://seedcase-project.org/docs/products){.btn
 .about-link}
 :::::::
 :::::
