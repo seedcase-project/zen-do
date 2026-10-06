@@ -41,16 +41,11 @@ be in the same folder*.
 
 <!-- TODO: Convert into an executable code chunk -->
 
-```bash {.filename="Terminal"}
-zen-do init
-```
 
 This creates an empty `.zenodo.toml` file. Open it up and you'll see something
 like below:
 
-<!-- TODO: Replace with  -->
 
-```toml {.filename=".zenodo.toml"}
 title = ""
 upload_type = ""
 
@@ -78,7 +73,6 @@ deposit with that identifier already exists on your Zenodo account.
 
 In our case, we can update the field with:
 
-```toml {.filename=".zenodo.toml"}
 ...
 identifier = "urn:zenodo:seedcase-project:zen-do:analysis-report-pdf"
 ...
@@ -95,9 +89,6 @@ PDF, you don't yet have a deposit. In this case, when you run `zen-do publish`,
 it will create that deposit for you. If you want to check whether a deposit
 already exists, you can use `zen-do get`:
 
-```bash {.filename="Terminal"}
-zen-do get
-```
 
 By default, running `zen-do publish` will create a new deposit and immediately
 publish a new record from that deposit. When creating deposits for the first
@@ -109,17 +100,11 @@ needs the file to upload along with the `.zenodo.toml` file, which it looks for
 in the current directory by default. Using `publish` will always prompt you to
 confirm your actions, as some actions are irreversible (see note below).
 
-```bash {.filename="Terminal"}
-zen-do publish --file analysis-report.pdf --sandbox --draft
-```
 
 Next, open up the Zenodo sandbox and check the draft deposit. Does everything
 look ok? Great! Because you made a draft, you could either manually click
 "publish" or you could try it with zen-do. Let's publish with zen-do!
 
-```bash {.filename="Terminal"}
-zen-do publish --file analysis-report.pdf --sandbox
-```
 
 Now when you go to your Zenodo sandbox account, you'll see that there is a new
 record for the deposit.
@@ -133,17 +118,15 @@ officially publish the report on Zenodo! It's as easy as removing the
 ::: callout-important
 Be **very** careful and certain about what you officially publish on Zenodo (not
 the sandbox). Once something has been published and a record with a DOI has been
-created, it **cannot** be deleted!
+created, it **cannot** be deleted fully!
 :::
 
-```bash {.filename="Terminal"}
 zen-do publish --file analysis-report.pdf
 ```
 
 You've now created an official record and associated DOI for your analysis! You
 can check it by using `get`:
 
-```bash {.filename="Terminal"}
 zen-do get
 ```
 
@@ -151,9 +134,6 @@ zen-do get
 If you want to include zen-do in a GitHub workflow or some continuous delivery
 process, you can use the `--confirm` argument to bypass the prompt.
 
-```bash {.filename="Terminal"}
-zen-do publish --file analysis-report.pdf --confirm
-```
 :::
 
 ## Publishing another record
@@ -164,9 +144,6 @@ frequent changes, such as a book or course material, you'll probably want to
 create a new record for those new changes to the file or files. Publishing a new
 record of an existing deposit is as easy as using the same command as above!
 
-```bash {.filename="Terminal"}
-zen-do publish --file analysis-report.pdf
-```
 
 ::: callout-important
 In order to update a deposit with a new file and to create a new record, zen-do
