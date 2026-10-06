@@ -19,6 +19,22 @@ releases we've made so far, along with what was changed within each release.
 Commits from bots, like `dependabot` or `pre-commit-ci`, are not included in the
 changelog.
 
+## [0.12.2](https://github.com/seedcase-project/zen-do/compare/0.12.1..0.12.2) - 2026-10-06
+
+### ♻️ Refactor
+
+- Move Python `example_metadata()` into Rust
+  [#169](https://github.com/seedcase-project/zen-do/pull/169) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([b659190](https://github.com/seedcase-project/zen-do/commit/b659190a5290e733c0226cc6602b6dd1fad1ae32))
+
+### 👩‍💻 Miscellaneous
+
+- Update `Cargo.lock` after updating version during release
+  [#216](https://github.com/seedcase-project/zen-do/pull/216) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([3ec7442](https://github.com/seedcase-project/zen-do/commit/3ec7442b2fb8ec177a99e7ebecd64de62a8011e3))
+
 ## [0.12.1](https://github.com/seedcase-project/zen-do/compare/0.12.0..0.12.1) - 2026-10-06
 
 ### ♻️ Refactor
