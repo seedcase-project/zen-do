@@ -57,8 +57,9 @@ to abide by its terms.
 The following people have contributed to this project by submitting pull
 requests :tada:
 
-[@lwjohnst86](https://github.com/lwjohnst86),
-[@martonvago](https://github.com/martonvago)
+[@DanMazJen](https://github.com/DanMazJen),
+[@fruvago](https://github.com/fruvago),
+[@lwjohnst86](https://github.com/lwjohnst86)
 
 ## Licensing
 
@@ -68,13 +69,13 @@ This project is licensed under the [MIT License](LICENSE.md).
 
 If you use this package in your work, please cite it as follows:
 
-Johnston L.W., Vago M. zen-do: Tasks to get Zenodo to do from the
+Johnston L.W., Vago F. zen-do: Tasks to get Zenodo to do from the
 command line URL: https://zen-do.seedcase-project.org
 
 Or as a BibTeX entry:
 
     @misc{YourReferenceHere,
-    author = {Johnston, Luke William and Vago, Marton},
+    author = {Johnston, Luke William and Vago, Fruzsina},
     title = {zen-do: Tasks to get Zenodo to do from the command line},
     url = {https://zen-do.seedcase-project.org}
     }
