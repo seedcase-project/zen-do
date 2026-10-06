@@ -4,7 +4,7 @@ use clap::{Args, Parser, Subcommand};
 use std::path::PathBuf;
 
 // TODO: Include `verbose` flag everywhere with `clap-verbosity-flag`?
-/// Common publishing tasks with Zenodo from the command-line.
+/// Common publishing tasks with Zenodo from the terminal.
 #[derive(Parser)]
 #[command(author, version)]
 struct Cli {
@@ -14,55 +14,56 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
-    /// Create an empty `.zenodo.toml` file that includes all the metadata
-    /// fields for a deposit to be filled in.
+    /// Create a `.zenodo.toml` file with all deposit metadata fields.
     Init,
 
-    /// List all Zenodo deposits in an account as raw JSON (direct from the
-    /// Zenodo servers).
+    /// List all deposits in your Zenodo account as raw JSON.
     List(ListArgs),
 
-    /// Get the Zenodo deposit JSON based on the metadata file.
+    /// Get the JSON of the deposit described by `.zenodo.toml`.
     Get(GetArgs),
 
-    /// Convert the `.zenodo.toml` metadata file into other formats (e.g.
+    /// Convert `.zenodo.toml` into other formats (e.g.
     /// `CITATION.cff`).
     Convert(ConvertArgs),
 
-    /// Discards changes made to a Deposit (in the editable state). Whenever you
-    /// use `--draft` in the other commands like `update` or `publish`, you
-    /// change the Deposit into an "editable" state. Using `discard` removes
-    /// any changes and changes the Deposit back to the uneditable state.
+    /// Discards deposit draft changes. 
+    ///
+    /// When running `update` or `publish` with  `--draft`, the deposit
+    /// is left in an "editable" state. `discard` removes
+    /// any changes and returns the deposit to its uneditable state.
     Discard(DiscardArgs),
 
-    /// Create or update a Zenodo deposit and then publish it as a record.
-    /// Requires uploading a new file. If you only want to update the
-    /// deposit's/record's metadata, use `update`.
+    /// Publishes a Zenodo deposit as a record.
+    ///
+    /// Creates the record if it doesn't exist. To change only the metadata,
+    /// use `update`.
     Publish(PublishArgs),
 
-    /// Update a Zenodo deposit's/record's metadata with changes in
-    /// `.zenodo.toml`. This doesn't create a new DOI or change any files, it only updates the
-    /// metadata within the record.
+    /// Updates a deposit's or record's metadata from `.zenodo.toml`. 
+    /// 
+    /// Doesn't create a new DOI or change any files, only updates the
+    /// metadata.
     Update(UpdateArgs),
 }
 
 #[derive(Args, Debug)]
 struct SandboxArg {
-    /// Whether to use the Zenodo sandbox environment for testing purposes.
+    /// Whether to use the Zenodo sandbox environment (for testing).
     #[arg(long, short, default_value_t = false)]
     sandbox: bool,
 }
 
 #[derive(Args, Debug)]
 struct MetadataFileArg {
-    /// The path to the metadata file.
+    /// The path to `.zenodo.toml`.
     #[arg(default_value = ".zenodo.toml")]
     metadata_file: PathBuf,
 }
 
 #[derive(Args, Debug)]
 struct DraftArg {
-    /// Whether to create a draft Zenodo deposit, e.g. leave it in "editable"
+    /// Whether to create a draft Zenodo deposit, i.e., leave it in an "editable"
     /// state and not publish it.
     #[arg(long, short, default_value_t = false)]
     draft: bool,
