@@ -20,9 +20,6 @@ Propagate font." height="50px"}
 
 [Overview](/docs/index.qmd){.btn .about-link} [Explore
 guide](/docs/guide/index.qmd){.btn .about-link}
-<!--TODO: Add examples button when the section has been created
-[See examples](/docs/examples/index.qmd){.btn .about-link}
--->
 :::::::
 :::::
 :::
@@ -51,11 +48,7 @@ files.
 - Publish and update projects from the terminal.
 
 zen-do focuses on publishing your project (e.g., code, data, metadata,
-documentation etc.). For creating a standardized and comprehensive archive of
-your research project --- a [**Data Package**](https://datapackage.org/) ---
-see, [Sprout](https://sprout.seedcase-project.org). For making human-readable
-documentation of the data package, see
-[Flower](https://flower.seedcase-project.org).
+documentation etc.).
 :::::::
 :::::
 :::
