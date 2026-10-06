@@ -1,6 +1,6 @@
 [package]
 name = "zen-do"
-version = "0.1.0"
+version = "0.12.2"
 edition = "2024"
 authors = [
   "Signe Kirk Brødbæk <signekb@clin.au.dk>",
@@ -16,7 +16,7 @@ license = "MIT"
 keywords = [
   "zenodo-api",
   "zenodo",
-  "continuous-deployment",
+  "continuous-delivery",
   "dissemination",
   "open-science",
 ]
@@ -38,4 +38,4 @@ tempfile = "3.27.0"
 [lints.clippy]
 # Needs to have priority set to indicate the order. `-1` means first.
 pedantic = { priority = -1, level = "warn" }
-unwrap-used = "deny"
+unwrap_used = "deny"
