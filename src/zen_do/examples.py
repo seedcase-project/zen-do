@@ -3,33 +3,9 @@ from zen_do.zenodo_client import (
     ZenodoResponse,
 )
 from zen_do.zenodo_metadata import (
-    ZenodoCreator,
     ZenodoMetadata,
     ZenodoRelatedIdentifier,
 )
-
-
-def example_metadata(
-    title: str = "Test Book", urn: str = "urn:zenodo:my-org:project:book"
-) -> ZenodoMetadata:
-    """A set of example Zenodo metadata."""
-    return ZenodoMetadata(
-        title=title,
-        upload_type="poster",
-        creators=[
-            ZenodoCreator(
-                name="Doe, Jane", affiliation="University of Testfalia", orcid="ABC"
-            )
-        ],
-        related_identifiers=[
-            ZenodoRelatedIdentifier(
-                identifier=urn,
-                relation="isIdenticalTo",
-                resource_type="other",
-                scheme="urn",
-            )
-        ],
-    )
 
 
 def example_deposit(
