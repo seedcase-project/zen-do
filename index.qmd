@@ -39,10 +39,10 @@ publishing Zenodo deposits from a metadata file and your existing research files
 
 ## :sparkles: Key features
 
-- Quickly and easily initiate a [`.zenodo.toml`
+- Quickly and easily initialize a [`.zenodo.toml`
   file](docs/design/interface/inputs.qmd) for preparing your project to be
   published on Zenodo.
-- Manage all projects within your Zenodo account from the terminal.
+- Manage your project on your Zenodo account from the terminal.
 - Convert metadata between formats such as `.zenodo.toml`, `.zenodo.json`,
   `_quarto.yml`, `pyproject.toml`, and `CITATION.cff`
 - Publish and update projects from the terminal.
