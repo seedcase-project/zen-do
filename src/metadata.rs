@@ -140,8 +140,11 @@ pub fn write_metadata(metadata: &Metadata, path: &Path) -> Result<(), Box<dyn Er
 ///
 /// Errors when writing to file, such as if there is a problem with the file
 /// itself or where it will be saved.
-pub fn init(verbose: bool) -> Result<(), Box<dyn Error>> {
+pub fn init() -> Result<(), Box<dyn Error>> {
     let metadata_path = PathBuf::from(".zenodo.toml");
+
+    // Should be an initArg??
+    let verbose = true;
 
     if metadata_path.is_file() {
         if verbose {
@@ -150,6 +153,7 @@ pub fn init(verbose: bool) -> Result<(), Box<dyn Error>> {
         return Ok(());
     }
 
+    // Makes it difficult to do a good unit test... Changing dir with parallel test execution
     let project_cd = env::current_dir()?;
 
     let project_name = project_cd
@@ -227,5 +231,10 @@ mod tests {
 
         assert!(write_result.is_ok());
         assert_eq!(example, actual.unwrap());
+    }
+
+    #[test]
+    fn test_init_command_no_prior_file() {
+      //d
     }
 }
