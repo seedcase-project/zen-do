@@ -2,8 +2,8 @@
 
 use serde::{Deserialize, Serialize};
 use std::error::Error;
-use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
+use std::{env, fs};
 
 pub const EXAMPLE_METADATA: &str = r#"
 title = "Random"
@@ -130,6 +130,58 @@ pub fn write_metadata(metadata: &Metadata, path: &Path) -> Result<(), Box<dyn Er
     Ok(())
 }
 
+/// Create a `.zenodo.toml` file with all deposit metadata fields
+///
+/// # Arguments
+///
+/// - `verbose`: Write feedback in the terminal
+///
+/// # Errors
+///
+/// Errors when writing to file, such as if there is a problem with the file
+/// itself or where it will be saved.
+pub fn init(verbose: bool) -> Result<(), Box<dyn Error>> {
+    let metadata_path = PathBuf::from(".zenodo.toml");
+
+    if metadata_path.is_file() {
+        if verbose {
+            println!("A `.zenodo.toml` file already exists in this directory.");
+        }
+        return Ok(());
+    }
+
+    let project_cd = env::current_dir()?;
+
+    let project_name = project_cd
+        .file_name()
+        .and_then(|name| name.to_str())
+        .ok_or("Current directory contains unsupported characters")?;
+
+    let metadata = Metadata {
+        title: String::new(),
+        upload_type: String::new(),
+        creators: vec![Creator {
+            name: String::new(),
+            affiliation: String::new(),
+            orcid: String::new(),
+        }],
+        related_identifiers: vec![RelatedIdentifier {
+            identifier: format!("urn:zenodo:<github-org>:{project_name}"),
+            relation: "isIdenticalTo".to_string(),
+            resource_type: "other".to_string(),
+            scheme: Some("urn".to_string()),
+        }],
+    };
+
+    write_metadata(&metadata, &metadata_path)?;
+
+    if verbose {
+        print!("Created an empty `.zenodo.toml` file.");
+    }
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     // To import all code from above in this file.
@@ -145,8 +197,8 @@ mod tests {
 
     #[test]
     fn test_reading_metadata() {
-        // TODO: Refactor to write to memory representation of writing, not actual
-        // writing (less I/O in tests)?
+        // TODO: Refactor to write to memory representation of writing, not
+        // actual writing (less I/O in tests)?
         use std::io::Write;
 
         // `mut` since the file will be written to.
