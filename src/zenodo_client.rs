@@ -3,6 +3,7 @@ use reqwest::blocking::{Client, Response};
 use reqwest::header::{AUTHORIZATION, HeaderMap, HeaderValue};
 use serde::Deserialize;
 use serde_json::Value;
+use std::fmt::Write;
 use std::time::Duration;
 
 #[derive(Deserialize)]
@@ -83,7 +84,7 @@ fn raise_for_status_with_reason(
 
     if let Some(errors) = body.get("errors").and_then(Value::as_array) {
         for error in errors {
-            reason.push_str(&format!("\n- {error}"));
+            write!(reason, "\n- {error}")?;
         }
     }
 
