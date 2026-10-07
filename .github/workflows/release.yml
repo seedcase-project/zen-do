@@ -82,6 +82,7 @@ jobs:
           else
             echo "has_changes=false" >> $GITHUB_OUTPUT
           fi
+          echo $has_changes
 
       - name: Create tag and update changelog
         if: steps.check_changes.outputs.has_changes == 'true'
@@ -103,7 +104,7 @@ jobs:
   publish-crates-io:
     name: "Publish to crates.io"
     runs-on: ubuntu-latest
-    if: ${{ needs.github-release.outputs.has_changes }}
+    if: needs.github-release.outputs.has_changes == 'true'
     permissions:
       # Required for authentication to crates.io via trusted publishing.
       id-token: write
