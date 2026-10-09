@@ -2,8 +2,8 @@
 
 use serde::{Deserialize, Serialize};
 use std::error::Error;
-use std::path::{Path, PathBuf};
 use std::fs;
+use std::path::{Path, PathBuf};
 
 pub const EXAMPLE_METADATA: &str = r#"
 title = "Random"
@@ -154,8 +154,8 @@ pub fn init(project_cd: PathBuf) -> Result<(), Box<dyn Error>> {
         return Ok(());
     }
 
-    // Makes it difficult to do a good unit test... Changing dir with parallel test execution
-    // now in mainlet project_cd = env::current_dir()?;
+    // Makes it difficult to do a good unit test... Changing dir with parallel
+    // test execution now in mainlet project_cd = env::current_dir()?;
 
     let project_name = project_cd
         .file_name()
@@ -236,7 +236,6 @@ mod tests {
 
     #[test]
     fn test_init_command_no_prior_file() {
-
         let temp_dir = tempfile::tempdir().unwrap();
 
         init(temp_dir.path().to_path_buf()).unwrap();

@@ -66,8 +66,8 @@ struct MetadataFileArg {
 
 #[derive(Args, Debug)]
 struct DraftArg {
-    /// Whether to create a draft Zenodo deposit, i.e., leave it in an "editable"
-    /// state and not publish it.
+    /// Whether to create a draft Zenodo deposit, i.e., leave it in an
+    /// "editable" state and not publish it.
     #[arg(long, short, default_value_t = false)]
     draft: bool,
 }
@@ -144,7 +144,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::Init => {
             let project_cd = env::current_dir()?;
             init(project_cd)
-        },
+        }
         // TODO: Remove once implemented
         #[allow(unused_variables)]
         Commands::List(args) => todo!("Not started yet"),
