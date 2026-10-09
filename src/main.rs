@@ -2,6 +2,9 @@
 
 use clap::{Args, Parser, Subcommand};
 use std::path::PathBuf;
+mod metadata;
+use metadata::init;
+use std::env;
 
 // TODO: Include `verbose` flag everywhere with `clap-verbosity-flag`?
 /// Common publishing tasks with Zenodo from the terminal.
@@ -63,8 +66,8 @@ struct MetadataFileArg {
 
 #[derive(Args, Debug)]
 struct DraftArg {
-    /// Whether to create a draft Zenodo deposit, i.e., leave it in an "editable"
-    /// state and not publish it.
+    /// Whether to create a draft Zenodo deposit, i.e., leave it in an
+    /// "editable" state and not publish it.
     #[arg(long, short, default_value_t = false)]
     draft: bool,
 }
@@ -134,12 +137,14 @@ struct ConvertArgs {
     to: Vec<String>,
 }
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Cli::parse();
 
     match &args.command {
-        Commands::Init => todo!("Not started yet"),
-
+        Commands::Init => {
+            let project_cd = env::current_dir()?;
+            init(&project_cd)
+        }
         // TODO: Remove once implemented
         #[allow(unused_variables)]
         Commands::List(args) => todo!("Not started yet"),
