@@ -3,7 +3,7 @@
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::path::{Path, PathBuf};
-use std::{env, fs};
+use std::fs;
 
 pub const EXAMPLE_METADATA: &str = r#"
 title = "Random"
@@ -134,14 +134,15 @@ pub fn write_metadata(metadata: &Metadata, path: &Path) -> Result<(), Box<dyn Er
 ///
 /// # Arguments
 ///
+/// - `project_cd`: The current directory of the terminal
 /// - `verbose`: Write feedback in the terminal
 ///
 /// # Errors
 ///
 /// Errors when writing to file, such as if there is a problem with the file
 /// itself or where it will be saved.
-pub fn init() -> Result<(), Box<dyn Error>> {
-    let metadata_path = PathBuf::from(".zenodo.toml");
+pub fn init(project_cd: PathBuf) -> Result<(), Box<dyn Error>> {
+    let metadata_path = project_cd.join(".zenodo.toml");
 
     // Should be an initArg??
     let verbose = true;
@@ -154,7 +155,7 @@ pub fn init() -> Result<(), Box<dyn Error>> {
     }
 
     // Makes it difficult to do a good unit test... Changing dir with parallel test execution
-    let project_cd = env::current_dir()?;
+    // now in mainlet project_cd = env::current_dir()?;
 
     let project_name = project_cd
         .file_name()
@@ -235,6 +236,21 @@ mod tests {
 
     #[test]
     fn test_init_command_no_prior_file() {
-      //d
+
+        let temp_dir = tempfile::tempdir().unwrap();
+
+        init(temp_dir.path().to_path_buf()).unwrap();
+
+        let metadata_file = temp_dir.path().join(".zenodo.toml");
+
+        // 1. Was the file created?
+        assert!(metadata_file.is_file());
+
+        // 2. Can read_metadata parse it?
+        let metadata = read_metadata(&metadata_file).unwrap();
+
+        assert_eq!(metadata.title, "");
+        assert_eq!(metadata.upload_type, "");
+        assert_eq!(metadata.creators.len(), 1);
     }
 }

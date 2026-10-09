@@ -4,6 +4,8 @@ use clap::{Args, Parser, Subcommand};
 use std::path::PathBuf;
 mod metadata;
 use metadata::init;
+use std::env;
+
 // TODO: Include `verbose` flag everywhere with `clap-verbosity-flag`?
 /// Common publishing tasks with Zenodo from the terminal.
 #[derive(Parser)]
@@ -139,8 +141,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Cli::parse();
 
     match &args.command {
-        Commands::Init => init(),//todo!("Not started yet"),
-
+        Commands::Init => {
+            let project_cd = env::current_dir()?;
+            init(project_cd)
+        },
         // TODO: Remove once implemented
         #[allow(unused_variables)]
         Commands::List(args) => todo!("Not started yet"),
