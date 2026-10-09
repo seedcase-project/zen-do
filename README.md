@@ -59,7 +59,8 @@ requests :tada:
 
 [@DanMazJen](https://github.com/DanMazJen),
 [@fruvago](https://github.com/fruvago),
-[@lwjohnst86](https://github.com/lwjohnst86)
+[@lwjohnst86](https://github.com/lwjohnst86),
+[@signekb](https://github.com/signekb)
 
 ## Licensing
 
@@ -69,13 +70,14 @@ This project is licensed under the [MIT License](LICENSE.md).
 
 If you use this package in your work, please cite it as follows:
 
-Johnston L.W., Vago F. zen-do: Tasks to get Zenodo to do from the
-command line URL: https://zen-do.seedcase-project.org
+Brødbæk S.K., Johnston L.W., Mazhari-Jensen D.S., Vago F. zen-do: Tasks
+to get Zenodo to do from the command line URL:
+https://zen-do.seedcase-project.org
 
 Or as a BibTeX entry:
 
     @misc{YourReferenceHere,
-    author = {Johnston, Luke William and Vago, Fruzsina},
+    author = {Brødbæk, Signe Kirk and Johnston, Luke William and Mazhari-Jensen, Daniel Skak and Vago, Fruzsina},
     title = {zen-do: Tasks to get Zenodo to do from the command line},
     url = {https://zen-do.seedcase-project.org}
     }
