@@ -1,0 +1,11 @@
+::: callout-note
+Zenodo's terms can sometimes be a bit confusing. The two main terms are:
+
+- Deposit: A Zenodo deposit is the set of files and metadata that will
+  eventually form a published record. For a given output (e.g. an academic
+  paper), there is only one deposit. However, the information contained in a
+  deposit can still be updated or changed.
+- Record: A Zenodo record is a published set of files and metadata with a
+  specific DOI. There can be multiple records for any given deposit. A record is
+  something you can't change. This is sometimes called "version".
+:::
