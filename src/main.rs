@@ -143,7 +143,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     match &args.command {
         Commands::Init => {
             let project_cd = env::current_dir()?;
-            init(project_cd)
+            init(&project_cd)
         }
         // TODO: Remove once implemented
         #[allow(unused_variables)]

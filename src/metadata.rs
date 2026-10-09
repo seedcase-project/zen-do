@@ -3,7 +3,7 @@
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 pub const EXAMPLE_METADATA: &str = r#"
 title = "Random"
@@ -141,7 +141,7 @@ pub fn write_metadata(metadata: &Metadata, path: &Path) -> Result<(), Box<dyn Er
 ///
 /// Errors when writing to file, such as if there is a problem with the file
 /// itself or where it will be saved.
-pub fn init(project_cd: PathBuf) -> Result<(), Box<dyn Error>> {
+pub fn init(project_cd: &Path) -> Result<(), Box<dyn Error>> {
     let metadata_path = project_cd.join(".zenodo.toml");
 
     // Should be an initArg??
@@ -238,7 +238,7 @@ mod tests {
     fn test_init_command_no_prior_file() {
         let temp_dir = tempfile::tempdir().unwrap();
 
-        init(temp_dir.path().to_path_buf()).unwrap();
+        init(temp_dir.path()).unwrap();
 
         let metadata_file = temp_dir.path().join(".zenodo.toml");
 
