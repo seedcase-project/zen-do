@@ -3,7 +3,9 @@
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
+use clap::Args;
+use std::env;
 
 pub const EXAMPLE_METADATA: &str = r#"
 title = "Random"
@@ -48,6 +50,26 @@ pub struct Metadata {
 
     /// Identifiers related to the deposit.
     pub related_identifiers: Vec<RelatedIdentifier>,
+}
+
+impl Metadata {
+    fn new(project_name: &str) -> Self {
+        Self {
+            title: String::new(),
+            upload_type: String::new(),
+            creators: vec![Creator {
+                name: String::new(),
+                affiliation: String::new(),
+                orcid: String::new(),
+            }],
+            related_identifiers: vec![RelatedIdentifier {
+                identifier: format!("urn:zenodo:<github-org>:{project_name}"),
+                relation: "isIdenticalTo".to_string(),
+                resource_type: "other".to_string(),
+                scheme: Some("urn".to_string()),
+            }],
+        }
+    }
 }
 
 /// The type containing the details of the creator/author of a Zenodo deposit.
@@ -130,59 +152,46 @@ pub fn write_metadata(metadata: &Metadata, path: &Path) -> Result<(), Box<dyn Er
     Ok(())
 }
 
+#[derive(Args, Debug)]
+pub struct InitArgs {
+    /// The directory to initiate the `.zenodo.toml` in.
+    #[arg(default_value = ".")]
+    pub path: PathBuf,
+
+    // clap handles setting verbose to true with -v or --verbose
+    #[arg(short, long)]
+    pub verbose: bool,
+}
 /// Create a `.zenodo.toml` file with all deposit metadata fields
 ///
 /// # Arguments
 ///
-/// - `project_cd`: The current directory of the terminal
-/// - `verbose`: Write feedback in the terminal
+/// - `args`: The arguments given to the function.
 ///
 /// # Errors
 ///
 /// Errors when writing to file, such as if there is a problem with the file
 /// itself or where it will be saved.
-pub fn init(project_cd: &Path) -> Result<(), Box<dyn Error>> {
-    let metadata_path = project_cd.join(".zenodo.toml");
-
-    // Should be an initArg??
-    let verbose = true;
+pub fn init(args: &InitArgs) -> Result<(), Box<dyn Error>> {
+    let metadata_path = args.path.join(".zenodo.toml");
 
     if metadata_path.is_file() {
-        if verbose {
-            println!("A `.zenodo.toml` file already exists in this directory.");
+        if args.verbose {
+        // TODO: Implement an actual error e.g. with thiserror/anyhow.
+        return Err("A `.zenodo.toml` file already exists in this directory.".into());
         }
-        return Ok(());
     }
 
-    // Makes it difficult to do a good unit test... Changing dir with parallel
-    // test execution now in mainlet project_cd = env::current_dir()?;
-
-    let project_name = project_cd
+    let current_dir = env::current_dir()?;
+    // Rust cannot display a PathBuf, so we need to convert it to a str. A str is restricted to utf-8.
+    let project_name = current_dir
         .file_name()
         .and_then(|name| name.to_str())
         .ok_or("Current directory contains unsupported characters")?;
 
-    let metadata = Metadata {
-        title: String::new(),
-        upload_type: String::new(),
-        creators: vec![Creator {
-            name: String::new(),
-            affiliation: String::new(),
-            orcid: String::new(),
-        }],
-        related_identifiers: vec![RelatedIdentifier {
-            identifier: format!("urn:zenodo:<github-org>:{project_name}"),
-            relation: "isIdenticalTo".to_string(),
-            resource_type: "other".to_string(),
-            scheme: Some("urn".to_string()),
-        }],
-    };
+    let metadata = Metadata::new(&project_name);
 
     write_metadata(&metadata, &metadata_path)?;
-
-    if verbose {
-        print!("Created an empty `.zenodo.toml` file.");
-    }
 
     Ok(())
 }
@@ -238,7 +247,10 @@ mod tests {
     fn test_init_command_no_prior_file() {
         let temp_dir = tempfile::tempdir().unwrap();
 
-        init(temp_dir.path()).unwrap();
+        init(&InitArgs {
+            path: temp_dir.path().to_path_buf(),
+            verbose: false,
+        }).unwrap();
 
         let metadata_file = temp_dir.path().join(".zenodo.toml");
 

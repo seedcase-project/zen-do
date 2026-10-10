@@ -2,9 +2,7 @@
 
 use clap::{Args, Parser, Subcommand};
 use std::path::PathBuf;
-mod metadata;
-use metadata::init;
-use std::env;
+use zen_do::metadata::{init, InitArgs};
 
 // TODO: Include `verbose` flag everywhere with `clap-verbosity-flag`?
 /// Common publishing tasks with Zenodo from the terminal.
@@ -18,7 +16,7 @@ struct Cli {
 #[derive(Subcommand, Debug)]
 enum Commands {
     /// Create a `.zenodo.toml` file with all deposit metadata fields.
-    Init,
+    Init(InitArgs),
 
     /// List all deposits in your Zenodo account as raw JSON.
     List(ListArgs),
@@ -141,9 +139,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Cli::parse();
 
     match &args.command {
-        Commands::Init => {
-            let project_cd = env::current_dir()?;
-            init(&project_cd)
+        Commands::Init(args) => {
+            //let project_cd = env::current_dir()?;
+            init(args)?;
+
+            if args.verbose {
+                print!("Created an empty `.zenodo.toml` file.");
+            }
+            Ok(())
         }
         // TODO: Remove once implemented
         #[allow(unused_variables)]
