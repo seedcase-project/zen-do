@@ -1,9 +1,9 @@
 // The `main.rs` file is the binary entry-point, e.g. for CLIs
 
+use ::zen_do::metadata::{Metadata, write_metadata};
 use clap::{Args, Parser, Subcommand};
-use std::path::PathBuf;
 use std::error::Error;
-use::zen_do::metadata::*;
+use std::path::PathBuf;
 
 // TODO: Include `verbose` flag everywhere with `clap-verbosity-flag`?
 /// Common publishing tasks with Zenodo from the terminal.
@@ -154,7 +154,6 @@ struct ConvertArgs {
 /// Errors when writing to file, such as if there is a problem with the file
 /// itself or where it will be saved.
 pub fn init(args: &InitArgs) -> Result<(), Box<dyn Error>> {
-
     // makes any relative path explicit
     let path = std::fs::canonicalize(&args.path)?;
 
@@ -182,16 +181,14 @@ fn main() {
     let args = Cli::parse();
 
     match &args.command {
-        Commands::Init(args) => {
-            match init(args) {
-                Ok(()) => {
-                    print!("Created an empty `.zenodo.toml` file.");
-                }
-                Err(err) => {
-                    eprint!("Error: {err}");
-                }
+        Commands::Init(args) => match init(args) {
+            Ok(()) => {
+                print!("Created an empty `.zenodo.toml` file.");
             }
-        }
+            Err(err) => {
+                eprint!("Error: {err}");
+            }
+        },
         // TODO: Remove once implemented
         #[allow(unused_variables)]
         Commands::List(args) => todo!("Not started yet"),
@@ -218,18 +215,18 @@ fn main() {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     // To import all code from above in this file.
     use super::*;
+    use ::zen_do::metadata::read_metadata;
     #[test]
 
     fn test_init_command_no_prior_file() {
         let temp_dir = tempfile::tempdir().unwrap();
 
         init(&InitArgs {
-            path: temp_dir.path().to_path_buf()
+            path: temp_dir.path().to_path_buf(),
         })
         .unwrap();
 

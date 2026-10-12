@@ -51,6 +51,7 @@ pub struct Metadata {
 }
 
 impl Metadata {
+    #[must_use]
     pub fn new(project_name: &str) -> Self {
         Self {
             title: String::new(),
