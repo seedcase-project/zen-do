@@ -1,11 +1,9 @@
 // TODO: Add module documentation.
 
-use clap::Args;
 use serde::{Deserialize, Serialize};
-use std::env;
 use std::error::Error;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 pub const EXAMPLE_METADATA: &str = r#"
 title = "Random"
@@ -53,7 +51,7 @@ pub struct Metadata {
 }
 
 impl Metadata {
-    fn new(project_name: &str) -> Self {
+    pub fn new(project_name: &str) -> Self {
         Self {
             title: String::new(),
             upload_type: String::new(),
@@ -152,52 +150,6 @@ pub fn write_metadata(metadata: &Metadata, path: &Path) -> Result<(), Box<dyn Er
     Ok(())
 }
 
-#[derive(Args, Debug)]
-pub struct InitArgs {
-    /// The directory to initiate the `.zenodo.toml` in.
-    #[arg(default_value = ".")]
-    pub path: PathBuf,
-
-    // clap handles setting verbose to true with -v or --verbose
-    #[arg(short, long)]
-    pub verbose: bool,
-}
-/// Create a `.zenodo.toml` file with all deposit metadata fields
-///
-/// # Arguments
-///
-/// - `args`: The arguments given to the function.
-///
-/// # Errors
-///
-/// Errors when writing to file, such as if there is a problem with the file
-/// itself or where it will be saved.
-pub fn init(args: &InitArgs) -> Result<(), Box<dyn Error>> {
-    let metadata_path = args.path.join(".zenodo.toml");
-
-    if metadata_path.is_file() {
-        if args.verbose {
-            // TODO: Implement an actual error e.g. with thiserror/anyhow.
-            return Err("A `.zenodo.toml` file already exists in this directory.".into());
-        }
-        return Ok(());
-    }
-
-    let current_dir = env::current_dir()?;
-    // Rust cannot display a PathBuf, so we need to convert it to a str. A str
-    // is restricted to utf-8.
-    let project_name = current_dir
-        .file_name()
-        .and_then(|name| name.to_str())
-        .ok_or("Current directory contains unsupported characters")?;
-
-    let metadata = Metadata::new(project_name);
-
-    write_metadata(&metadata, &metadata_path)?;
-
-    Ok(())
-}
-
 #[cfg(test)]
 mod tests {
     // To import all code from above in this file.
@@ -243,28 +195,5 @@ mod tests {
 
         assert!(write_result.is_ok());
         assert_eq!(example, actual.unwrap());
-    }
-
-    #[test]
-    fn test_init_command_no_prior_file() {
-        let temp_dir = tempfile::tempdir().unwrap();
-
-        init(&InitArgs {
-            path: temp_dir.path().to_path_buf(),
-            verbose: false,
-        })
-        .unwrap();
-
-        let metadata_file = temp_dir.path().join(".zenodo.toml");
-
-        // 1. Was the file created?
-        assert!(metadata_file.is_file());
-
-        // 2. Can read_metadata parse it?
-        let metadata = read_metadata(&metadata_file).unwrap();
-
-        assert_eq!(metadata.title, "");
-        assert_eq!(metadata.upload_type, "");
-        assert_eq!(metadata.creators.len(), 1);
     }
 }
