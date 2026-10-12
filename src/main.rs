@@ -2,7 +2,7 @@
 
 use clap::{Args, Parser, Subcommand};
 use std::path::PathBuf;
-use zen_do::metadata::{init, InitArgs};
+use zen_do::metadata::{InitArgs, init};
 
 // TODO: Include `verbose` flag everywhere with `clap-verbosity-flag`?
 /// Common publishing tasks with Zenodo from the terminal.

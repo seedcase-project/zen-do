@@ -1,11 +1,11 @@
 // TODO: Add module documentation.
 
+use clap::Args;
 use serde::{Deserialize, Serialize};
+use std::env;
 use std::error::Error;
 use std::fs;
 use std::path::{Path, PathBuf};
-use clap::Args;
-use std::env;
 
 pub const EXAMPLE_METADATA: &str = r#"
 title = "Random"
@@ -177,19 +177,21 @@ pub fn init(args: &InitArgs) -> Result<(), Box<dyn Error>> {
 
     if metadata_path.is_file() {
         if args.verbose {
-        // TODO: Implement an actual error e.g. with thiserror/anyhow.
-        return Err("A `.zenodo.toml` file already exists in this directory.".into());
+            // TODO: Implement an actual error e.g. with thiserror/anyhow.
+            return Err("A `.zenodo.toml` file already exists in this directory.".into());
         }
+        return Ok(());
     }
 
     let current_dir = env::current_dir()?;
-    // Rust cannot display a PathBuf, so we need to convert it to a str. A str is restricted to utf-8.
+    // Rust cannot display a PathBuf, so we need to convert it to a str. A str
+    // is restricted to utf-8.
     let project_name = current_dir
         .file_name()
         .and_then(|name| name.to_str())
         .ok_or("Current directory contains unsupported characters")?;
 
-    let metadata = Metadata::new(&project_name);
+    let metadata = Metadata::new(project_name);
 
     write_metadata(&metadata, &metadata_path)?;
 
@@ -250,7 +252,8 @@ mod tests {
         init(&InitArgs {
             path: temp_dir.path().to_path_buf(),
             verbose: false,
-        }).unwrap();
+        })
+        .unwrap();
 
         let metadata_file = temp_dir.path().join(".zenodo.toml");
 
