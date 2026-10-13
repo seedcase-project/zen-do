@@ -19,6 +19,42 @@ releases we've made so far, along with what was changed within each release.
 Commits from bots, like `dependabot` or `pre-commit-ci`, are not included in the
 changelog.
 
+## [0.13.0](https://github.com/seedcase-project/zen-do/compare/0.12.2..0.13.0) - 2026-10-13
+
+### ✨ Features
+
+- Add `init` command [#220](https://github.com/seedcase-project/zen-do/pull/220)
+  by [`@DanMazJen`](https://github.com/DanMazJen)
+  ([84d7a73](https://github.com/seedcase-project/zen-do/commit/84d7a7319484e9765987ad0c9e52c46233130bf6))
+
+### 📝 Documentation
+
+- Add landing page [#193](https://github.com/seedcase-project/zen-do/pull/193)
+  by [`@DanMazJen`](https://github.com/DanMazJen)
+  ([5509d1b](https://github.com/seedcase-project/zen-do/commit/5509d1b0232a3e5fbd24d592e28b39f7af9a4d5f))
+- "Rust" -> "Python" when describing `pyproject.toml`
+  [#225](https://github.com/seedcase-project/zen-do/pull/225) by
+  [`@signekb`](https://github.com/signekb)
+  ([943a630](https://github.com/seedcase-project/zen-do/commit/943a630faf272d5f0ec0af64751eb7fada11bac8))
+
+### 👷 CI/CD
+
+- Fix if condition to release to crates.io only on changes
+  [#218](https://github.com/seedcase-project/zen-do/pull/218) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([97952e8](https://github.com/seedcase-project/zen-do/commit/97952e804d2dd2395e241c6d6fab4633d23d63df))
+
+### 👩‍💻 Miscellaneous
+
+- Reduce keyword to less than 20 (max)
+  [#217](https://github.com/seedcase-project/zen-do/pull/217) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([8df152b](https://github.com/seedcase-project/zen-do/commit/8df152b8300d3d148ab3f60e4b61ccbcec73ba91))
+- Update contributor list
+  [#221](https://github.com/seedcase-project/zen-do/pull/221) by
+  [`@DanMazJen`](https://github.com/DanMazJen)
+  ([ab8e340](https://github.com/seedcase-project/zen-do/commit/ab8e34031021ae1d1c64d8e00a45904091372588))
+
 ## [0.12.2](https://github.com/seedcase-project/zen-do/compare/0.12.1..0.12.2) - 2026-10-06
 
 ### ♻️ Refactor
