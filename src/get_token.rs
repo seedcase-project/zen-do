@@ -56,7 +56,6 @@ fn non_empty(token: String) -> Result<String, Box<dyn std::error::Error>> {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
