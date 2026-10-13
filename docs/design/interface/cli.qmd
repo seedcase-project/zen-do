@@ -12,14 +12,15 @@ package's scope.
 ## {{< var wip >}} `init`
 
 ```bash {filename="Terminal"}
-zen-do init --verbose
+zen-do init [PATH] --verbose
 ```
 
-This will create an empty `.zenodo.toml` file in the working directory that
-contains all the metadata fields available for a Zenodo deposit, but with no
-values filled in, excluding a partially filled in URN for the project. This
-simple command is helpful to get started with making a new Zenodo deposit, as
-well as standardizing the name and structure of the file.
+This will create an empty `.zenodo.toml` file that contains all the metadata
+fields available for a Zenodo deposit, but with no values filled in, excluding a
+partially filled in URN for the project. The file is by default stored in the
+current directory (i.e., `.`) but can be specified as a relative or absolute
+path. This simple command is helpful to get started with making a new Zenodo
+deposit, as well as standardizing the name and structure of the file.
 
 ## {{< var wip >}} `list`
 
