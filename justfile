@@ -79,7 +79,7 @@ format-md:
 
 # Formats the justfile
 format-justfile:
-    just --fmt
+    just --fmt --unstable
 
 # Run the tests in the `src/` or `tests/` directories
 test-rust:
