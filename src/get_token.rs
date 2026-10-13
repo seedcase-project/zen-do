@@ -1,5 +1,3 @@
-use keyring::Entry;
-
 const SERVICE_NAME: &str = "zen-do";
 
 /// Gets the Zenodo token from the system keyring or environment variables.
@@ -40,7 +38,12 @@ pub fn get_token(sandbox: bool) -> Result<String, Box<dyn std::error::Error>> {
 }
 
 fn get_keyring_token(token_name: &str) -> Result<String, Box<dyn std::error::Error>> {
-    let token = Entry::new(SERVICE_NAME, token_name)?.get_password()?;
+    // Set up the platform's keyring on first use.
+    let _ = keyring::Entry::store_status();
+    // Use `keyring_core` for new entry, bc `keyring` don't create entries when the
+    // platform's keyring isn't available (as in the CI), even if another store is
+    // set.
+    let token = keyring_core::Entry::new(SERVICE_NAME, token_name)?.get_password()?;
     non_empty(token)
 }
 
@@ -69,19 +72,20 @@ mod tests {
     fn use_empty_mock_keyring() {
         // Initialise the real store first, so it doesn't replace the mock when
         // get_token() is called.
-        let _ = Entry::store_status();
+        let _ = keyring::Entry::store_status();
         keyring_core::set_default_store(mock::Store::new().expect("a mock store is created"));
     }
 
     fn use_failing_keyring() {
         // Initialise the real store first, so it isn't set up again in get_token()
         // after being removed.
-        let _ = Entry::store_status();
+        let _ = keyring::Entry::store_status();
         keyring_core::unset_default_store();
     }
 
     fn set_keyring_token(token_name: &str, token: &str) {
-        let entry = Entry::new(SERVICE_NAME, token_name).expect("a mock entry is created");
+        let entry =
+            keyring_core::Entry::new(SERVICE_NAME, token_name).expect("a mock entry is created");
         entry.set_password(token).expect("password is set");
     }
 
