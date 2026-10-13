@@ -4,6 +4,8 @@ const SERVICE_NAME: &str = "zen-do";
 
 /// Gets the Zenodo token from the system keyring or environment variables.
 ///
+/// Tokens must be named either `ZENODO_TOKEN` or `ZENODO_SANDBOX_TOKEN`.
+///
 /// # Arguments
 ///
 /// - `sandbox`: Whether to get the token for the Zenodo sandbox environment or
