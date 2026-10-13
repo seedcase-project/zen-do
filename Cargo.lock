@@ -1432,7 +1432,7 @@ dependencies = [
 
 [[package]]
 name = "zen-do"
-version = "0.12.2"
+version = "0.13.0"
 dependencies = [
  "clap",
  "keyring",

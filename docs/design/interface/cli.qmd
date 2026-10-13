@@ -12,14 +12,15 @@ package's scope.
 ## {{< var wip >}} `init`
 
 ```bash {filename="Terminal"}
-zen-do init --verbose
+zen-do init [PATH] --verbose
 ```
 
-This will create an empty `.zenodo.toml` file in the working directory that
-contains all the metadata fields available for a Zenodo deposit, but with no
-values filled in, excluding a partially filled in URN for the project. This
-simple command is helpful to get started with making a new Zenodo deposit, as
-well as standardizing the name and structure of the file.
+This will create an empty `.zenodo.toml` file that contains all the metadata
+fields available for a Zenodo deposit, but with no values filled in, excluding a
+partially filled in URN for the project. The file is by default stored in the
+current directory (i.e., `.`) but can be specified as a relative or absolute
+path. This simple command is helpful to get started with making a new Zenodo
+deposit, as well as standardizing the name and structure of the file.
 
 ## {{< var wip >}} `list`
 
@@ -82,7 +83,7 @@ to keep synchronized with the `.zenodo.toml` file, including:
   information for a repository when it is in the root of the repository. This
   contains only a subset of the metadata found in the `.zenodo.toml` file.
 - {{< var planned >}} `pyproject.toml`: While this file is almost entirely used
-  only for Rust projects, it contains similar metadata fields to the
+  only for Python projects, it contains similar metadata fields to the
   `.zenodo.toml` file, such as the project name, description, authors, and
   license.
 - {{< var planned >}} `codemeta.json`: This file is used to describe software
