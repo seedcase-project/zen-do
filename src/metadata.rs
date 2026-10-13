@@ -33,7 +33,7 @@ scheme="urn"
 // TODO: Include urn property? As in the Python?
 
 /// Type representing Zenodo metadata.
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct Metadata {
     /// The title of the deposit.
     pub title: String,
@@ -54,19 +54,13 @@ impl Metadata {
     #[must_use]
     pub fn new(project_name: &str) -> Self {
         Self {
-            title: String::new(),
-            upload_type: String::new(),
-            creators: vec![Creator {
-                name: String::new(),
-                affiliation: String::new(),
-                orcid: String::new(),
-            }],
             related_identifiers: vec![RelatedIdentifier {
                 identifier: format!("urn:zenodo:<github-org>:{project_name}"),
                 relation: "isIdenticalTo".to_string(),
                 resource_type: "other".to_string(),
                 scheme: Some("urn".to_string()),
             }],
+            ..Default::default()
         }
     }
 }
