@@ -33,7 +33,7 @@ scheme="urn"
 // TODO: Include urn property? As in the Python?
 
 /// Type representing Zenodo metadata.
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct Metadata {
     /// The title of the deposit.
     pub title: String,
@@ -50,8 +50,24 @@ pub struct Metadata {
     pub related_identifiers: Vec<RelatedIdentifier>,
 }
 
+impl Metadata {
+    #[must_use]
+    pub fn new(project_name: &str) -> Self {
+        Self {
+            creators: vec![Creator::default()],
+            related_identifiers: vec![RelatedIdentifier {
+                identifier: format!("urn:zenodo:<github-org>:{project_name}"),
+                relation: "isIdenticalTo".to_string(),
+                resource_type: "other".to_string(),
+                scheme: Some("urn".to_string()),
+            }],
+            ..Default::default()
+        }
+    }
+}
+
 /// The type containing the details of the creator/author of a Zenodo deposit.
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct Creator {
     /// The full name of the creator/author.
     pub name: String,
@@ -66,7 +82,7 @@ pub struct Creator {
 // TODO: Create a check for our URN id, `urn:zenodo:*`, maybe by making a
 // specific type for it?
 /// Model representing an identifier related to a Zenodo deposit.
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct RelatedIdentifier {
     /// The value of the identifier (meaning, the identifier itself).
     pub identifier: String,
@@ -145,8 +161,8 @@ mod tests {
 
     #[test]
     fn test_reading_metadata() {
-        // TODO: Refactor to write to memory representation of writing, not actual
-        // writing (less I/O in tests)?
+        // TODO: Refactor to write to memory representation of writing, not
+        // actual writing (less I/O in tests)?
         use std::io::Write;
 
         // `mut` since the file will be written to.
