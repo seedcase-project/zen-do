@@ -54,6 +54,7 @@ impl Metadata {
     #[must_use]
     pub fn new(project_name: &str) -> Self {
         Self {
+            creators: vec![Creator::default()],
             related_identifiers: vec![RelatedIdentifier {
                 identifier: format!("urn:zenodo:<github-org>:{project_name}"),
                 relation: "isIdenticalTo".to_string(),
@@ -66,7 +67,7 @@ impl Metadata {
 }
 
 /// The type containing the details of the creator/author of a Zenodo deposit.
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct Creator {
     /// The full name of the creator/author.
     pub name: String,
@@ -81,7 +82,7 @@ pub struct Creator {
 // TODO: Create a check for our URN id, `urn:zenodo:*`, maybe by making a
 // specific type for it?
 /// Model representing an identifier related to a Zenodo deposit.
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct RelatedIdentifier {
     /// The value of the identifier (meaning, the identifier itself).
     pub identifier: String,
