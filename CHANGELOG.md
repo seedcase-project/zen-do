@@ -19,6 +19,15 @@ releases we've made so far, along with what was changed within each release.
 Commits from bots, like `dependabot` or `pre-commit-ci`, are not included in the
 changelog.
 
+## [0.13.1](https://github.com/seedcase-project/zen-do/compare/0.13.0..0.13.1) - 2026-10-15
+
+### ♻️ Refactor
+
+- Convert `get_token()` to Rust
+  [#223](https://github.com/seedcase-project/zen-do/pull/223) by
+  [`@signekb`](https://github.com/signekb)
+  ([95837ea](https://github.com/seedcase-project/zen-do/commit/95837ea117daa06cfca3b0bb2ed6c6f78f112bd2))
+
 ## [0.13.0](https://github.com/seedcase-project/zen-do/compare/0.12.2..0.13.0) - 2026-10-13
 
 ### ✨ Features
