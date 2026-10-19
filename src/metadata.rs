@@ -30,7 +30,18 @@ scheme="urn"
 // TODO: Include a check that the URNs are unique, maybe by making a specific
 // type for it?
 
-// TODO: Include urn property? As in the Python?
+// A method to get the zen-do URN from metadata
+impl Metadata {
+    /// Returns the zen-do URN identifier.
+    // Returns `None` if no related identifier starts with `urn:zenodo:`.
+    #[must_use]
+    pub fn get_urn(&self) -> Option<&str> {
+        self.related_identifiers
+            .iter()
+            .find(|id| id.identifier.starts_with("urn:zenodo:"))
+            .map(|id| id.identifier.as_str())
+    }
+}
 
 /// Type representing Zenodo metadata.
 #[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
@@ -191,5 +202,14 @@ mod tests {
 
         assert!(write_result.is_ok());
         assert_eq!(example, actual.unwrap());
+    }
+    #[test]
+    fn test_get_urn() {
+        let metadata: Metadata =
+            toml::from_str(EXAMPLE_METADATA).expect("Failed to parse metadata");
+
+        let urn = metadata.get_urn().expect("Missing zen-do URN");
+
+        assert_eq!("urn:zenodo:my-org:project:book", urn);
     }
 }
