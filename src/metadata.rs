@@ -86,6 +86,15 @@ impl ZendoUrn {
     pub fn placeholder(project_name: &str) -> Self {
         Self(format!("urn:zenodo:<github-org>:{project_name}:<output-type>"))
     }
+
+    pub fn get_zendo_urn(&self) -> &str {
+        &self.0
+    }
+}
+
+pub fn get_zendo_urn(path: &Path) -> Result<String, Box<dyn Error>> {
+    let metadata = read_metadata(path)?;
+    Ok(metadata.zendo_urn.get_zendo_urn().to_string())
 }
 
 impl Metadata {
@@ -225,4 +234,26 @@ mod tests {
         assert!(write_result.is_ok());
         assert_eq!(example, actual.unwrap());
     }
+
+    #[test]
+fn test_get_zendo_urn() {
+    let temp_dir = tempfile::tempdir().unwrap();
+    let metadata_file = temp_dir.path().join(".zenodo.toml");
+
+    std::fs::write(
+        &metadata_file,
+        r#"
+        title = ""
+        upload_type = ""
+        zendo_urn = "urn:zenodo:my-org:my-project"
+        creators = []
+        related_identifiers = []
+        "#,
+    )
+    .unwrap();
+
+    let urn = get_zendo_urn(&metadata_file).unwrap();
+
+    assert_eq!(urn, "urn:zenodo:my-org:my-project");
+}
 }

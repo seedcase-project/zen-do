@@ -240,7 +240,9 @@ mod tests {
 
         // Remove placeholder:
         let contents = std::fs::read_to_string(&metadata_file).unwrap();
-        let contents = contents.replace("<github-org>", "my-org");
+        let contents = contents
+            .replace("<github-org>", "my-org")
+            .replace("<output-type>", "docs");
         std::fs::write(&metadata_file, contents).unwrap();
 
         // 3. Can read_metadata parse it?
