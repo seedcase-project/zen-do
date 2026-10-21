@@ -1,6 +1,7 @@
 // TODO: Add module documentation.
 
 use serde::{Deserialize, Serialize};
+use std::convert::TryFrom;
 use std::error::Error;
 use std::fs;
 use std::path::Path;
@@ -8,6 +9,9 @@ use std::path::Path;
 pub const EXAMPLE_METADATA: &str = r#"
 title = "Random"
 upload_type = "random"
+
+# This is a required ID for zen-do
+zendo_urn = "urn:zenodo:my-org:project:book"
 
 [[creators]]
 name = "Tip Top"
@@ -18,17 +22,42 @@ orcid = "12345"
 identifier = "random"
 relation = "link"
 resource_type = "test"
-
-# This is a required ID for zen-do
-[[related_identifiers]]
-identifier = "urn:zenodo:my-org:project:book"
-relation = "isIdenticalTo"
-resource_type="other"
-scheme="urn"
 "#;
 
 // TODO: Include a check that the URNs are unique, maybe by making a specific
 // type for it?
+
+// Create deserialize check for the zen-do urn:
+#[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
+#[serde(try_from = "String")]
+pub struct ZendoUrn(String);
+
+impl TryFrom<String> for ZendoUrn {
+    type Error = String;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        // white spaces
+        let value = value.trim();
+
+        let Some(identifier) = value.strip_prefix("urn:zenodo:") else {
+            return Err("zenodo.toml field 'zendo_urn' must start with 'urn:zenodo:'".into());
+        };
+
+        let components: Vec<&str> = identifier.split(':').collect();
+
+        if components.len() < 2 || components.iter().any(|part| part.is_empty()) {
+            return Err("zenodo.toml field 'zendo_urn' must contain non-empty identifier components".into());
+        }
+
+        if components.iter().any(|part| {
+            matches!(*part, "<github-org>" | "<output-type>")
+        }) {
+            return Err("zenodo.toml field 'zendo_urn' must not contain placeholder values (e.g., <github-org>)".into());
+        }
+
+        Ok(Self(value.to_owned()))
+    }
+}
 
 // TODO: Include urn property? As in the Python?
 
@@ -42,6 +71,9 @@ pub struct Metadata {
     /// The type of the deposit.
     pub upload_type: String,
 
+    /// The zen-do URN
+    pub zendo_urn: ZendoUrn,
+
     // TODO: Don't allow empty vec, NonEmptyVec?
     /// The creators of the deposit.
     pub creators: Vec<Creator>,
@@ -50,17 +82,20 @@ pub struct Metadata {
     pub related_identifiers: Vec<RelatedIdentifier>,
 }
 
+impl ZendoUrn {
+    pub fn placeholder(project_name: &str) -> Self {
+        Self(format!("urn:zenodo:<github-org>:{project_name}:<output-type>"))
+    }
+}
+
 impl Metadata {
     #[must_use]
     pub fn new(project_name: &str) -> Self {
         Self {
+            zendo_urn: ZendoUrn::placeholder(project_name),
+            //zendo_urn: ZendoUrn::placeholder(urn.clone()),
             creators: vec![Creator::default()],
-            related_identifiers: vec![RelatedIdentifier {
-                identifier: format!("urn:zenodo:<github-org>:{project_name}"),
-                relation: "isIdenticalTo".to_string(),
-                resource_type: "other".to_string(),
-                scheme: Some("urn".to_string()),
-            }],
+            related_identifiers: vec![RelatedIdentifier::default()],
             ..Default::default()
         }
     }
@@ -79,8 +114,6 @@ pub struct Creator {
     pub orcid: String,
 }
 
-// TODO: Create a check for our URN id, `urn:zenodo:*`, maybe by making a
-// specific type for it?
 /// Model representing an identifier related to a Zenodo deposit.
 #[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct RelatedIdentifier {
