@@ -46,12 +46,15 @@ impl TryFrom<String> for ZendoUrn {
         let components: Vec<&str> = identifier.split(':').collect();
 
         if components.len() < 2 || components.iter().any(|part| part.is_empty()) {
-            return Err("zenodo.toml field 'zendo_urn' must contain non-empty identifier components".into());
+            return Err(
+                "zenodo.toml field 'zendo_urn' must contain non-empty identifier components".into(),
+            );
         }
 
-        if components.iter().any(|part| {
-            matches!(*part, "<github-org>" | "<output-type>")
-        }) {
+        if components
+            .iter()
+            .any(|part| matches!(*part, "<github-org>" | "<output-type>"))
+        {
             return Err("zenodo.toml field 'zendo_urn' must not contain placeholder values (e.g., <github-org>)".into());
         }
 
@@ -83,18 +86,24 @@ pub struct Metadata {
 }
 
 impl ZendoUrn {
+    // Only used for writing with init - compiler will not read a placeholder
+    #[must_use]
     pub fn placeholder(project_name: &str) -> Self {
-        Self(format!("urn:zenodo:<github-org>:{project_name}:<output-type>"))
+        Self(format!(
+            "urn:zenodo:<github-org>:{project_name}:<output-type>"
+        ))
     }
-
-    pub fn get_zendo_urn(&self) -> &str {
+    // Method that returns a reference to the inner string without copying it.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
         &self.0
     }
 }
 
+/// Reads the Zendo URN from metadata at the given path.
 pub fn get_zendo_urn(path: &Path) -> Result<String, Box<dyn Error>> {
     let metadata = read_metadata(path)?;
-    Ok(metadata.zendo_urn.get_zendo_urn().to_string())
+    Ok(metadata.zendo_urn.as_str().to_string())
 }
 
 impl Metadata {
@@ -236,24 +245,24 @@ mod tests {
     }
 
     #[test]
-fn test_get_zendo_urn() {
-    let temp_dir = tempfile::tempdir().unwrap();
-    let metadata_file = temp_dir.path().join(".zenodo.toml");
+    fn test_get_zendo_urn() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let metadata_file = temp_dir.path().join(".zenodo.toml");
 
-    std::fs::write(
-        &metadata_file,
-        r#"
+        std::fs::write(
+            &metadata_file,
+            r#"
         title = ""
         upload_type = ""
         zendo_urn = "urn:zenodo:my-org:my-project"
         creators = []
         related_identifiers = []
         "#,
-    )
-    .unwrap();
+        )
+        .unwrap();
 
-    let urn = get_zendo_urn(&metadata_file).unwrap();
+        let urn = get_zendo_urn(&metadata_file).unwrap();
 
-    assert_eq!(urn, "urn:zenodo:my-org:my-project");
-}
+        assert_eq!(urn, "urn:zenodo:my-org:my-project");
+    }
 }

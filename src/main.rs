@@ -261,9 +261,11 @@ mod tests {
         // Create an existing metadata file.
         std::fs::write(&metadata_file, "").unwrap();
 
-        assert!(init(&InitArgs {
-            path: temp_dir.path().to_path_buf(),
+        assert!(
+            init(&InitArgs {
+                path: temp_dir.path().to_path_buf(),
             })
-        .is_err());
+            .is_err()
+        );
     }
 }
