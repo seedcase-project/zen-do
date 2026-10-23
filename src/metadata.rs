@@ -11,7 +11,7 @@ title = "Random"
 upload_type = "random"
 
 # This is a required ID for zen-do
-zendo_urn = "urn:zenodo:my-org:project:book"
+zendo_id = "my-org:project:book"
 
 [[creators]]
 name = "Tip Top"
@@ -30,24 +30,20 @@ resource_type = "test"
 // Create deserialize check for the zen-do urn:
 #[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
 #[serde(try_from = "String")]
-pub struct ZendoUrn(String);
+pub struct ZendoId(String);
 
-impl TryFrom<String> for ZendoUrn {
+impl TryFrom<String> for ZendoId {
     type Error = String;
 
     fn try_from(value: String) -> Result<Self, Self::Error> {
         // white spaces
-        let value = value.trim();
-
-        let Some(identifier) = value.strip_prefix("urn:zenodo:") else {
-            return Err("zenodo.toml field 'zendo_urn' must start with 'urn:zenodo:'".into());
-        };
+        let identifier = value.trim();
 
         let components: Vec<&str> = identifier.split(':').collect();
 
         if components.len() < 2 || components.iter().any(|part| part.is_empty()) {
             return Err(
-                "zenodo.toml field 'zendo_urn' must contain non-empty identifier components".into(),
+                "The field `zendo_id` in the Zenodo TOML file must have at least two parts separated by a ´:´ (an example is given when using the `init` command).".into(),
             );
         }
 
@@ -55,14 +51,12 @@ impl TryFrom<String> for ZendoUrn {
             .iter()
             .any(|part| matches!(*part, "<github-org>" | "<output-type>"))
         {
-            return Err("zenodo.toml field 'zendo_urn' must not contain placeholder values (e.g., <github-org>)".into());
+            return Err("The field `zendo_id` in the Zenodo TOML file cannot contain placeholder values (e.g., <github-org>). Please fill them in with actual values.".into());
         }
 
-        Ok(Self(value.to_owned()))
+        Ok(Self(value.clone()))
     }
 }
-
-// TODO: Include urn property? As in the Python?
 
 /// Type representing Zenodo metadata.
 #[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
@@ -74,8 +68,9 @@ pub struct Metadata {
     /// The type of the deposit.
     pub upload_type: String,
 
-    /// The zen-do URN
-    pub zendo_urn: ZendoUrn,
+    /// The zen-do identifier that identifies whether a deposit can be tracked
+    /// by zen-do.
+    pub zendo_id: ZendoId,
 
     // TODO: Don't allow empty vec, NonEmptyVec?
     /// The creators of the deposit.
@@ -85,13 +80,11 @@ pub struct Metadata {
     pub related_identifiers: Vec<RelatedIdentifier>,
 }
 
-impl ZendoUrn {
+impl ZendoId {
     // Only used for writing with init - compiler will not read a placeholder
     #[must_use]
     pub fn placeholder(project_name: &str) -> Self {
-        Self(format!(
-            "urn:zenodo:<github-org>:{project_name}:<output-type>"
-        ))
+        Self(format!("<github-org>:{project_name}:<output-type>"))
     }
     // Method that returns a reference to the inner string without copying it.
     #[must_use]
@@ -100,18 +93,17 @@ impl ZendoUrn {
     }
 }
 
-/// Reads the Zendo URN from metadata at the given path.
-pub fn get_zendo_urn(path: &Path) -> Result<String, Box<dyn Error>> {
-    let metadata = read_metadata(path)?;
-    Ok(metadata.zendo_urn.as_str().to_string())
+/// Gets the Zendo ID from metadata struct.
+#[must_use]
+pub fn get_zendo_id(metadata: &Metadata) -> String {
+    metadata.zendo_id.as_str().to_string()
 }
 
 impl Metadata {
     #[must_use]
     pub fn new(project_name: &str) -> Self {
         Self {
-            zendo_urn: ZendoUrn::placeholder(project_name),
-            //zendo_urn: ZendoUrn::placeholder(urn.clone()),
+            zendo_id: ZendoId::placeholder(project_name),
             creators: vec![Creator::default()],
             related_identifiers: vec![RelatedIdentifier::default()],
             ..Default::default()
@@ -245,7 +237,7 @@ mod tests {
     }
 
     #[test]
-    fn test_get_zendo_urn() {
+    fn test_get_zendo_id() {
         let temp_dir = tempfile::tempdir().unwrap();
         let metadata_file = temp_dir.path().join(".zenodo.toml");
 
@@ -254,15 +246,17 @@ mod tests {
             r#"
         title = ""
         upload_type = ""
-        zendo_urn = "urn:zenodo:my-org:my-project"
+        zendo_id = "my-org:my-project"
         creators = []
         related_identifiers = []
         "#,
         )
         .unwrap();
 
-        let urn = get_zendo_urn(&metadata_file).unwrap();
+        let metadata = read_metadata(metadata_file.as_path()).unwrap();
 
-        assert_eq!(urn, "urn:zenodo:my-org:my-project");
+        let urn = get_zendo_id(&metadata);
+
+        assert_eq!(urn, "my-org:my-project");
     }
 }
