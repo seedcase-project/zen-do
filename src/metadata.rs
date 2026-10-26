@@ -36,10 +36,7 @@ impl TryFrom<String> for ZendoId {
     type Error = String;
 
     fn try_from(value: String) -> Result<Self, Self::Error> {
-        // white spaces
-        let identifier = value.trim();
-
-        let components: Vec<&str> = identifier.split(':').collect();
+        let components: Vec<&str> = value.split(':').collect();
 
         if components.len() < 2 || components.iter().any(|part| part.is_empty()) {
             return Err(
@@ -54,7 +51,16 @@ impl TryFrom<String> for ZendoId {
             return Err("The field `zendo_id` in the Zenodo TOML file cannot contain placeholder values (e.g., <github-org>). Please fill them in with actual values.".into());
         }
 
-        Ok(Self(value.clone()))
+        let is_valid = components.iter().all(|part| {
+            part.chars()
+                .all(|c| c.is_alphanumeric() || c == '-' || c == '_' || c == '.')
+        });
+
+        if !is_valid {
+            return Err("The field `zendo_id` in the Zenodo TOML file can only contain alphanumeric characters in addition to `-`, `_`, `.`. It will also contain `:` as a separator".into());
+        }
+
+        Ok(Self(value))
     }
 }
 
@@ -91,12 +97,6 @@ impl ZendoId {
     pub fn as_str(&self) -> &str {
         &self.0
     }
-}
-
-/// Gets the Zendo ID from metadata struct.
-#[must_use]
-pub fn get_zendo_id(metadata: &Metadata) -> String {
-    metadata.zendo_id.as_str().to_string()
 }
 
 impl Metadata {
@@ -255,8 +255,28 @@ mod tests {
 
         let metadata = read_metadata(metadata_file.as_path()).unwrap();
 
-        let urn = get_zendo_id(&metadata);
+        let urn = metadata.zendo_id.as_str();
 
         assert_eq!(urn, "my-org:my-project");
+    }
+
+    #[test]
+    fn test_zendo_id_character_space() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let metadata_file = temp_dir.path().join(".zenodo.toml");
+
+        std::fs::write(
+            &metadata_file,
+            r#"
+        title = ""
+        upload_type = ""
+        zendo_id = "my/org:my project"
+        creators = []
+        related_identifiers = []
+        "#,
+        )
+        .unwrap();
+
+        assert!(read_metadata(metadata_file.as_path()).is_err());
     }
 }
