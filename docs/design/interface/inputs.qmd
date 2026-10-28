@@ -31,8 +31,8 @@ so this file must be given (or present in the working directory) for many of the
 actions to work. There must also be a unique ["related
 identifier"](https://developers.zenodo.org/#representation) for this (new or
 existing) deposit added to this `.zenodo.toml` file in order to identify it
-within the list of deposits of a user's account. This is described in more
-detail in the [interface](/docs/design/interface/index.qmd) documentation.
+within the list of deposits of a user's account. This is achieved through the
+`zendo_id` described in @sec-zendo-id.
 
 For repositories that have or will have multiple deposits, there will also be
 multiple `.zenodo.toml` files, one for each deposit. For most use-cases, you
@@ -52,7 +52,7 @@ PDF itself (not the source files) could be in `.pdf.zenodo.toml` (or
 are kept in the same location but have different names to reflect their
 contents.
 
-### Unique ID between metadata and deposit
+### Unique ID between metadata and deposit {#sec-zendo-id}
 
 The functionality of zen-do depends on being able to determine whether a given
 metadata file has a corresponding Zenodo deposit on their servers or not. This
@@ -65,36 +65,47 @@ add the deposit ID to the metadata file. This is not how we want zen-do to
 behave.
 
 So instead of using the ID created by Zenodo, we define our own ID and list it
-in the `related_identifiers` of the metadata. We do not use the repository URL
+in the `zendo_id` of the `.zenodo.toml` file. We do not use the repository URL
 as the ID because we want to be able to create multiple deposits for the same
 repository, e.g., one for the source code and one for the documentation. We
-decided on using a URN ID that looks like:
+decided on using an ID that looks like:
 
 ```text
-urn:zenodo:<unique-id>:<optional-sub-id>
+zendo_id = "<github-org>:<repo-name>:<output-type>"
 ```
 
-The only required parts are the `urn:zenodo` prefix and the `<unique-id>`. But
-if the user wants to have multiple deposits for the same `<unique-id>`, they
-should use the optional `<optional-sub-id>` to distinguish between those
-outputs. If the metadata file is hosted on a GitHub repository, we recommend:
+The `zendo_id` field has two requirements:
+
+1. It most consist of at least two words sperarated by `:`
+2. Characters can only consist of
+   [alphanumericals](https://en.wikipedia.org/wiki/Alphanumericals), `-`, `_`,
+   and `.`, as well as the use of `:` as a separator.
+
+If the user wants to have multiple deposits for the same project (e.g.,
+`seedcase-project:zendo`), they should append additional `<optional-sub-id>` to
+distinguish between those outputs. If the metadata file is hosted on a GitHub
+repository, we recommend:
 
 ```text
-urn:zenodo:<github-username>:<repo-name>:<output-type>
+zendo_id = `<github-username>:<repo-name>:<output-type>`
 ```
 
 So if we made a metadata file for the zen-do repository to upload the
 documentation as a PDF as a deposit, it might look like
-`urn:zenodo:seedcase-project:zen-do:docs`. If we wanted to make a deposit for
-the same repository but for the source code instead, it might look like
-`urn:zenodo:seedcase-project:zen-do:source`. The final `<output_type>` part is
-used to distinguish between different types of deposits for the same repository
-and is arbitrary and up to the user to decide on the name.
+`seedcase-project:zen-do:docs`. If we wanted to make a deposit for the same
+repository but for the source code instead, it might look like
+`seedcase-project:zen-do:source`. The final `<output-type>` part is used to
+distinguish between different types of deposits for the same repository and is
+arbitrary and up to the user to decide on the name.
 
-Because we depend on this URN, all metadata files must have this URN in the
-`related_identifiers` field in the `.zenodo.toml` file. This also means that the
-user needs to manually add it and manually decide on an ID that is unique enough
-for their purposes.
+The `zendo_id` is ultimately converted to a related identifier using the
+`isIdenticalTo` relation and URN `scheme` of the [Zenodo
+API](https://developers.zenodo.org/#representation).
+
+Because we depend on this URN, all metadata files must have a unique name in the
+`zendo_id` field of the `.zenodo.toml` file. This also means that the user needs
+to manually add it and manually decide on an ID that is unique enough for their
+purposes.
 
 ## Zenodo access token
 

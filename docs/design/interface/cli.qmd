@@ -17,8 +17,8 @@ zen-do init [PATH] --verbose
 
 This will create an empty `.zenodo.toml` file that contains all the metadata
 fields available for a Zenodo deposit, but with no values filled in, excluding a
-partially filled in URN for the project. The file is by default stored in the
-current directory (i.e., `.`) but can be specified as a relative or absolute
+partially filled in `zendo_id` for the project. The file is by default stored in
+the current directory (i.e., `.`) but can be specified as a relative or absolute
 path. This simple command is helpful to get started with making a new Zenodo
 deposit, as well as standardizing the name and structure of the file.
 
@@ -45,7 +45,7 @@ finding a match. This is useful for checking if a deposit already exists for a
 given set of metadata, and if so, getting the deposit information to use for
 updating or publishing it. Internally uses the Rust functions within `list()` to
 get the list of deposits and uses that to find the deposit that matches the
-content of the metadata file using the URN ID.
+content of the metadata file using the `zendo_id`.
 
 ## {{< var planned >}} `convert`
 
@@ -140,13 +140,13 @@ zen-do publish [METADATA-FILE] --file [FILE1,FILE2] --draft --sandbox
 
 The `publish` command takes a metadata file (`.zenodo.toml`) as well as some
 files in `--file` and uploads them to Zenodo. If a Deposit doesn't exist (based
-on the presence of the URN), a Deposit will be created. If a Deposit does exist,
-the metadata will be overwritten by the metadata in the file, all files will be
-deleted and the new files will be uploaded instead. If `--draft` is used, the
-Deposit doesn't get formally published as a new Record, otherwise it will
-immediately be created into a Record with a corresponding DOI. If `--sandbox` is
-used, the Deposit and Record will be created in the sandbox environment on
-Zenodo.
+on the presence of the `zendo_id`), a Deposit will be created. If a Deposit does
+exist, the metadata will be overwritten by the metadata in the file, all files
+will be deleted and the new files will be uploaded instead. If `--draft` is
+used, the Deposit doesn't get formally published as a new Record, otherwise it
+will immediately be created into a Record with a corresponding DOI. If
+`--sandbox` is used, the Deposit and Record will be created in the sandbox
+environment on Zenodo.
 
 Unlike the `update` command, this *requires* files to upload and will also
 create a new version and thus a new DOI. If only the metadata needs to be
