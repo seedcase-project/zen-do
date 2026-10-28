@@ -126,6 +126,7 @@ pub struct Creator {
 
 /// Model representing an identifier related to a Zenodo deposit.
 #[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
+#[serde(try_from = "RelatedIdentifierUserInputCheck")]
 pub struct RelatedIdentifier {
     /// The value of the identifier (meaning, the identifier itself).
     pub identifier: String,
@@ -141,6 +142,40 @@ pub struct RelatedIdentifier {
 
     /// The scheme followed by the identifier.
     pub scheme: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct RelatedIdentifierUserInputCheck {
+    pub identifier: String,
+    pub relation: String,
+    pub resource_type: String,
+    pub scheme: Option<String>,
+}
+
+impl TryFrom<RelatedIdentifierUserInputCheck> for RelatedIdentifier {
+    type Error = String;
+
+    fn try_from(
+        related_identifier_user_input: RelatedIdentifierUserInputCheck,
+    ) -> Result<Self, Self::Error> {
+        if related_identifier_user_input
+            .identifier
+            .starts_with("urn:zendo:")
+            && related_identifier_user_input.relation == "isIdenticalTo"
+        {
+            return Err(
+                "Manual setup of zen-do URN is not allowed. Please use the field `zendo_id` (an example is given when using the `init` command)."
+                    .into(),
+            );
+        }
+
+        Ok(Self {
+            identifier: related_identifier_user_input.identifier,
+            relation: related_identifier_user_input.relation,
+            resource_type: related_identifier_user_input.resource_type,
+            scheme: related_identifier_user_input.scheme,
+        })
+    }
 }
 
 // `Box<>` is a container to hold some unknown type of objects. It allocates on
@@ -278,5 +313,33 @@ mod tests {
         .unwrap();
 
         assert!(read_metadata(metadata_file.as_path()).is_err());
+    }
+
+    #[test]
+    fn test_user_manually_setting_zendo_urn_related_identifier() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let metadata_file = temp_dir.path().join(".zenodo.toml");
+
+        std::fs::write(
+            &metadata_file,
+            r#"
+        title = ""
+        upload_type = ""
+        zendo_id = "my-org:my project"
+        creators = []
+        related_identifiers = [
+            { identifier = "urn:zendo:my-org:my-project", relation = "isIdenticalTo", resource_type = "software", scheme = "urn" }
+        ]
+        "#,
+        )
+        .unwrap();
+
+        let err = read_metadata(metadata_file.as_path()).unwrap_err();
+        assert!(
+            err.to_string().contains(
+                "Manual setup of zen-do URN is not allowed. Please use the field `zendo_id`"
+            ),
+            "Unexpected error: {err}"
+        );
     }
 }
