@@ -48,16 +48,16 @@ impl TryFrom<String> for ZendoId {
             .iter()
             .any(|part| matches!(*part, "<github-org>" | "<output-type>"))
         {
-            return Err("The field `zendo_id` in the Zenodo TOML file cannot contain placeholder values (e.g., <github-org>). Please fill them in with actual values.".into());
+            return Err("The field `zendo_id` in the Zenodo TOML file cannot contain placeholder values (e.g., `<github-org>`). Please fill them in with actual values.".into());
         }
 
-        let is_valid = components.iter().all(|part| {
+        let correct_characters = components.iter().all(|part| {
             part.chars()
                 .all(|c| c.is_alphanumeric() || c == '-' || c == '_' || c == '.')
         });
 
-        if !is_valid {
-            return Err("The field `zendo_id` in the Zenodo TOML file can only contain alphanumeric characters in addition to `-`, `_`, `.`. It will also contain `:` as a separator".into());
+        if !correct_characters {
+            return Err("The field `zendo_id` in the Zenodo TOML file can only contain alphanumeric characters in addition to `-`, `_`, `.`. It will also contain `:` as a separator.".into());
         }
 
         Ok(Self(value))
@@ -126,7 +126,7 @@ pub struct Creator {
 
 /// Model representing an identifier related to a Zenodo deposit.
 #[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
-#[serde(try_from = "RelatedIdentifierUserInputCheck")]
+#[serde(try_from = "RelatedIdentifierCheck")]
 pub struct RelatedIdentifier {
     /// The value of the identifier (meaning, the identifier itself).
     pub identifier: String,
@@ -145,23 +145,23 @@ pub struct RelatedIdentifier {
 }
 
 #[derive(Debug, Deserialize)]
-struct RelatedIdentifierUserInputCheck {
+struct RelatedIdentifierCheck {
     pub identifier: String,
     pub relation: String,
     pub resource_type: String,
     pub scheme: Option<String>,
 }
 
-impl TryFrom<RelatedIdentifierUserInputCheck> for RelatedIdentifier {
+impl TryFrom<RelatedIdentifierCheck> for RelatedIdentifier {
     type Error = String;
 
     fn try_from(
-        related_identifier_user_input: RelatedIdentifierUserInputCheck,
+        related_identifier: RelatedIdentifierCheck,
     ) -> Result<Self, Self::Error> {
-        if related_identifier_user_input
+        if related_identifier
             .identifier
             .starts_with("urn:zendo:")
-            && related_identifier_user_input.relation == "isIdenticalTo"
+            && related_identifier.relation == "isIdenticalTo"
         {
             return Err(
                 "Manual setup of zen-do URN is not allowed. Please use the field `zendo_id` (an example is given when using the `init` command)."
@@ -170,10 +170,10 @@ impl TryFrom<RelatedIdentifierUserInputCheck> for RelatedIdentifier {
         }
 
         Ok(Self {
-            identifier: related_identifier_user_input.identifier,
-            relation: related_identifier_user_input.relation,
-            resource_type: related_identifier_user_input.resource_type,
-            scheme: related_identifier_user_input.scheme,
+            identifier: related_identifier.identifier,
+            relation: related_identifier.relation,
+            resource_type: related_identifier.resource_type,
+            scheme: related_identifier.scheme,
         })
     }
 }
