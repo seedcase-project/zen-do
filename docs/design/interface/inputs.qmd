@@ -76,13 +76,13 @@ zendo_id = "<github-org>:<repo-name>:<output-type>"
 
 The `zendo_id` field has two requirements:
 
-1. It most consist of at least two words sperarated by `:`
+1. It must consist of at least two words sperarated by `:`.
 2. Characters can only consist of
    [alphanumericals](https://en.wikipedia.org/wiki/Alphanumericals), `-`, `_`,
    and `.`, as well as the use of `:` as a separator.
 
 If the user wants to have multiple deposits for the same project (e.g.,
-`seedcase-project:zendo`), they should append additional `<optional-sub-id>` to
+`seedcase-project:zen-do`), they should append additional `<optional-sub-id>` to
 distinguish between those outputs. If the metadata file is hosted on a GitHub
 repository, we recommend:
 
@@ -98,9 +98,11 @@ repository but for the source code instead, it might look like
 distinguish between different types of deposits for the same repository and is
 arbitrary and up to the user to decide on the name.
 
-The `zendo_id` is ultimately converted to a related identifier using the
-`isIdenticalTo` relation and URN `scheme` of the [Zenodo
-API](https://developers.zenodo.org/#representation).
+The `zendo_id` is converted to a `related_identifier`, where a prefix
+`urn:zen-do:` is added to the `zendo_id` and used in the `identifier` field, the
+`relation` field is set to `isIdenticalTo`, and the `scheme` is set to `urn`.
+See the [ZenodoAPI](https://developers.zenodo.org/#representation) for more
+details on how Zenodo structures its `related_identifier` fields.
 
 Because we depend on this URN, all metadata files must have a unique name in the
 `zendo_id` field of the `.zenodo.toml` file. This also means that the user needs
