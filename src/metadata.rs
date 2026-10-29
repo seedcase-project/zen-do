@@ -155,12 +155,8 @@ struct RelatedIdentifierCheck {
 impl TryFrom<RelatedIdentifierCheck> for RelatedIdentifier {
     type Error = String;
 
-    fn try_from(
-        related_identifier: RelatedIdentifierCheck,
-    ) -> Result<Self, Self::Error> {
-        if related_identifier
-            .identifier
-            .starts_with("urn:zendo:")
+    fn try_from(related_identifier: RelatedIdentifierCheck) -> Result<Self, Self::Error> {
+        if related_identifier.identifier.starts_with("urn:zendo:")
             && related_identifier.relation == "isIdenticalTo"
         {
             return Err(
