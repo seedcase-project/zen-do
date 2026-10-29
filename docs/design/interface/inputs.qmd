@@ -101,7 +101,7 @@ arbitrary and up to the user to decide on the name.
 The `zendo_id` is converted to a `related_identifier`, where a prefix
 `urn:zen-do:` is added to the `zendo_id` and used in the `identifier` field, the
 `relation` field is set to `isIdenticalTo`, and the `scheme` is set to `urn`.
-See the [ZenodoAPI](https://developers.zenodo.org/#representation) for more
+See the [Zenodo API](https://developers.zenodo.org/#representation) for more
 details on how Zenodo structures its `related_identifier` fields.
 
 Because we depend on this URN, all metadata files must have a unique name in the
