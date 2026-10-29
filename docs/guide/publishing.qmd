@@ -5,9 +5,9 @@ description: |
 order: 1
 ---
 
-The main purpose of zen-do is to simplify the process of publishing records on Zenodo.
-This page walks you through how to use zen-do to create and publish a record on
-Zenodo.
+The main purpose of zen-do is to simplify the process of publishing records on
+Zenodo. This page walks you through how to use zen-do to create and publish a
+record on Zenodo.
 
 {{< include /docs/includes/_deposit-vs-record.qmd >}}
 
@@ -19,12 +19,13 @@ TOML file). You can create an empty one with the `zen-do init` command.
 
 {{< include /docs/includes/_use-uv.qmd >}}
 
-The file
-or files that will be part of the published record must be in the same folder as
-the `.zenodo.toml` file or in a subfolder within that folder (see our [design docs](/docs/design/interface/inputs.qmd) for more details about this). This allows you to
-organise your files in different ways depending on what you want to publish. For
-example, you could have one Zenodo deposit per Git repository or one deposit
-for a [Quarto](https://quarto.org) output file in a folder.
+The file or files that will be part of the published record must be in the same
+folder as the `.zenodo.toml` file or in a subfolder within that folder (see our
+[design docs](/docs/design/interface/inputs.qmd) for more details about this).
+This allows you to organise your files in different ways depending on what you
+want to publish. For example, you could have one Zenodo deposit per Git
+repository or one deposit for a [Quarto](https://quarto.org) output file in a
+folder.
 
 However, a single folder could contain multiple deposits. For example, one
 deposit could contain the source files for creating a Quarto book (such as the
@@ -35,11 +36,10 @@ different prefixes (e.g. `.zenodo.toml` for the Git repository and
 
 For now, we'll keep it simple. We want to create a Zenodo deposit and record for
 a PDF output of a scientific analysis done in a Quarto document. In this guide,
-the PDF file will be called `analysis-report.pdf`. 
+the PDF file will be called `analysis-report.pdf`.
 
-We start with creating an
-empty `.zenodo.toml` file in the folder that has the Quarto document (note that they must
-be in the same folder).
+We start with creating an empty `.zenodo.toml` file in the folder that has the
+Quarto document (note that they must be in the same folder).
 
 <!-- TODO: Convert into an executable code chunk -->
 
@@ -47,8 +47,8 @@ be in the same folder).
 zen-do init
 ```
 
-This creates an empty `.zenodo.toml` file. If you open it, you should see something
-like below:
+This creates an empty `.zenodo.toml` file. If you open it, you should see
+something like below:
 
 ```toml {filename=".zenodo.toml"}
 title = ""
@@ -66,15 +66,16 @@ resource_type="other"
 scheme="urn"
 ```
 
-There is one very important array of tables, `[[related_identifiers]]`,  in this file that zen-do needs to correctly
-create a new deposit and record and to update an existing deposit and create a
-new record from that deposit. In `[[related_identifiers]]`, the `identifier` key has
-a value starting with the prefix `urn:zen-do:`. The identifier should
-follow the format
-`urn:zen-do:GITHUB-USER:GITHUB-REPO:OUTPUT-NAME`. If you don't use GitHub, follow
-the naming scheme `YOUR-NAME:PROJECT-NAME:OUTPUT-NAME`. This helps to ensure that the URN
-will be (very likely) unique to your deposit and allow zen-do to identify if any
-deposit with that identifier already exists on your Zenodo account.
+There is one very important array of tables, `[[related_identifiers]]`, in this
+file that zen-do needs to correctly create a new deposit and record and to
+update an existing deposit and create a new record from that deposit. In
+`[[related_identifiers]]`, the `identifier` key has a value starting with the
+prefix `urn:zen-do:`. The identifier should follow the format
+`urn:zen-do:GITHUB-USER:GITHUB-REPO:OUTPUT-NAME`. If you don't use GitHub,
+follow the naming scheme `YOUR-NAME:PROJECT-NAME:OUTPUT-NAME`. This helps to
+ensure that the URN will be (very likely) unique to your deposit and allow
+zen-do to identify if any deposit with that identifier already exists on your
+Zenodo account.
 
 In our case, we can update the value with:
 
@@ -84,9 +85,9 @@ identifier = "urn:zenodo:seedcase-project:zen-do:analysis-report-pdf"
 ...
 ```
 
-Once you've filled it in, you can fill in the other values in the
-`.zenodo.toml` file. After you've filled in the `.zenodo.toml` file, it's time
-to create a deposit!
+Once you've filled it in, you can fill in the other values in the `.zenodo.toml`
+file. After you've filled in the `.zenodo.toml` file, it's time to create a
+deposit!
 
 ## Creating a (draft) deposit
 
@@ -104,10 +105,11 @@ publish a new record from that deposit. When creating deposits for the first
 time, it's good practice to use the [Zenodo
 sandbox](https://sandbox.zenodo.org/) and make a draft first, then check the
 metadata in the newly created draft deposit. If that looks correct, you can then
-try creating a record in the sandbox. So, let's try making a draft in Zenodo's sandbox. zen-do's `publish` command
-needs the file to upload along with the `.zenodo.toml` file, which it looks for
-in the current directory by default. Using `publish` will always prompt you to
-confirm your actions, as some actions are irreversible (see note below).
+try creating a record in the sandbox. So, let's try making a draft in Zenodo's
+sandbox. zen-do's `publish` command needs the file to upload along with the
+`.zenodo.toml` file, which it looks for in the current directory by default.
+Using `publish` will always prompt you to confirm your actions, as some actions
+are irreversible (see note below).
 
 ```bash {filename="Terminal"}
 zen-do publish --file analysis-report.pdf --sandbox --draft
@@ -121,8 +123,8 @@ look ok? Great! Because you made a draft, you could either manually click
 zen-do publish --file analysis-report.pdf --sandbox
 ```
 
-Now when you go to your Zenodo sandbox account, you should see a new
-record for the deposit.
+Now when you go to your Zenodo sandbox account, you should see a new record for
+the deposit.
 
 ## Publishing your first record
 
@@ -169,14 +171,14 @@ zen-do publish --file analysis-report.pdf
 ```
 
 ::: callout-important
-To update a deposit with a new file and create a new record including that file, zen-do
-**requires** the `identifier` mentioned above with the `urn:zenodo:` prefix in the `.zenodo.toml`.
-Otherwise, zen-do can't match the deposit in your account with the
-metadata in the `.zenodo.toml` file.
+To update a deposit with a new file and create a new record including that file,
+zen-do **requires** the `identifier` mentioned above with the `urn:zenodo:`
+prefix in the `.zenodo.toml`. Otherwise, zen-do can't match the deposit in your
+account with the metadata in the `.zenodo.toml` file.
 :::
 
 ::: callout-tip
-If you only want to update the metadata, *but not change the file*, use
-the `zen-do update` command. This command doesn't create a new record and only
-edits the metadata of an existing deposit or record.
+If you only want to update the metadata, *but not change the file*, use the
+`zen-do update` command. This command doesn't create a new record and only edits
+the metadata of an existing deposit or record.
 :::
