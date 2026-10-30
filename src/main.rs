@@ -220,8 +220,8 @@ mod tests {
     // To import all code from above in this file.
     use super::*;
     use ::zen_do::metadata::read_metadata;
-    #[test]
 
+    #[test]
     fn test_init_command_no_prior_file() {
         let temp_dir = tempfile::tempdir().unwrap();
 
@@ -235,11 +235,37 @@ mod tests {
         // 1. Was the file created?
         assert!(metadata_file.is_file());
 
-        // 2. Can read_metadata parse it?
+        // 2. Should fail to read due to placeholder value:
+        assert!(read_metadata(&metadata_file).is_err());
+
+        // Remove placeholder:
+        let contents = std::fs::read_to_string(&metadata_file).unwrap();
+        let contents = contents
+            .replace("<github-org>", "my-org")
+            .replace("<output-type>", "docs");
+        std::fs::write(&metadata_file, contents).unwrap();
+
+        // 3. Can read_metadata parse it?
         let metadata = read_metadata(&metadata_file).unwrap();
 
         assert_eq!(metadata.title, "");
         assert_eq!(metadata.upload_type, "");
         assert_eq!(metadata.creators.len(), 1);
+    }
+
+    #[test]
+    fn test_init_command_with_prior_file() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let metadata_file = temp_dir.path().join(".zenodo.toml");
+
+        // Create an existing metadata file.
+        std::fs::write(&metadata_file, "").unwrap();
+
+        assert!(
+            init(&InitArgs {
+                path: temp_dir.path().to_path_buf(),
+            })
+            .is_err()
+        );
     }
 }
