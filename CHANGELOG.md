@@ -19,6 +19,22 @@ releases we've made so far, along with what was changed within each release.
 Commits from bots, like `dependabot` or `pre-commit-ci`, are not included in the
 changelog.
 
+## [0.14.0](https://github.com/seedcase-project/zen-do/compare/0.13.1..0.14.0) - 2026-10-30
+
+### ✨ Features
+
+- Add `ZendoId` type and `zendo_id` TOML field
+  [#230](https://github.com/seedcase-project/zen-do/pull/230) by
+  [`@DanMazJen`](https://github.com/DanMazJen)
+  ([adda891](https://github.com/seedcase-project/zen-do/commit/adda89175d6a22a8f50a645000563bbeee8fc71d))
+
+### 📝 Documentation
+
+- Use of `zendo_id` in `.zenodo.toml`
+  [#231](https://github.com/seedcase-project/zen-do/pull/231) by
+  [`@DanMazJen`](https://github.com/DanMazJen)
+  ([542059e](https://github.com/seedcase-project/zen-do/commit/542059e8084698fcb7ab574f5dd5cbb2c3c95d09))
+
 ## [0.13.1](https://github.com/seedcase-project/zen-do/compare/0.13.0..0.13.1) - 2026-10-15
 
 ### ♻️ Refactor

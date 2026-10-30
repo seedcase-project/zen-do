@@ -1,6 +1,7 @@
 // TODO: Add module documentation.
 
 use serde::{Deserialize, Serialize};
+use std::convert::TryFrom;
 use std::error::Error;
 use std::fs;
 use std::path::Path;
@@ -8,6 +9,9 @@ use std::path::Path;
 pub const EXAMPLE_METADATA: &str = r#"
 title = "Random"
 upload_type = "random"
+
+# This is a required ID for zen-do
+zendo_id = "my-org:project:book"
 
 [[creators]]
 name = "Tip Top"
@@ -18,19 +22,47 @@ orcid = "12345"
 identifier = "random"
 relation = "link"
 resource_type = "test"
-
-# This is a required ID for zen-do
-[[related_identifiers]]
-identifier = "urn:zenodo:my-org:project:book"
-relation = "isIdenticalTo"
-resource_type="other"
-scheme="urn"
 "#;
 
 // TODO: Include a check that the URNs are unique, maybe by making a specific
 // type for it?
 
-// TODO: Include urn property? As in the Python?
+// Create deserialize check for the zen-do urn:
+#[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
+#[serde(try_from = "String")]
+pub struct ZendoId(String);
+
+impl TryFrom<String> for ZendoId {
+    type Error = String;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        let components: Vec<&str> = value.split(':').collect();
+
+        if components.len() < 2 || components.iter().any(|part| part.is_empty()) {
+            return Err(
+                "The field `zendo_id` in the Zenodo TOML file must have at least two parts separated by a ´:´ (an example is given when using the `init` command).".into(),
+            );
+        }
+
+        if components
+            .iter()
+            .any(|part| matches!(*part, "<github-org>" | "<output-type>"))
+        {
+            return Err("The field `zendo_id` in the Zenodo TOML file cannot contain placeholder values (e.g., `<github-org>`). Please fill them in with actual values.".into());
+        }
+
+        let correct_characters = components.iter().all(|part| {
+            part.chars()
+                .all(|c| c.is_alphanumeric() || c == '-' || c == '_' || c == '.')
+        });
+
+        if !correct_characters {
+            return Err("The field `zendo_id` in the Zenodo TOML file can only contain alphanumeric characters in addition to `-`, `_`, `.`. It will also contain `:` as a separator.".into());
+        }
+
+        Ok(Self(value))
+    }
+}
 
 /// Type representing Zenodo metadata.
 #[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
@@ -42,6 +74,10 @@ pub struct Metadata {
     /// The type of the deposit.
     pub upload_type: String,
 
+    /// The zen-do identifier that identifies whether a deposit can be tracked
+    /// by zen-do.
+    pub zendo_id: ZendoId,
+
     // TODO: Don't allow empty vec, NonEmptyVec?
     /// The creators of the deposit.
     pub creators: Vec<Creator>,
@@ -50,17 +86,26 @@ pub struct Metadata {
     pub related_identifiers: Vec<RelatedIdentifier>,
 }
 
+impl ZendoId {
+    // Only used for writing with init - compiler will not read a placeholder
+    #[must_use]
+    pub fn placeholder(project_name: &str) -> Self {
+        Self(format!("<github-org>:{project_name}:<output-type>"))
+    }
+    // Method that returns a reference to the inner string without copying it.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
 impl Metadata {
     #[must_use]
     pub fn new(project_name: &str) -> Self {
         Self {
+            zendo_id: ZendoId::placeholder(project_name),
             creators: vec![Creator::default()],
-            related_identifiers: vec![RelatedIdentifier {
-                identifier: format!("urn:zenodo:<github-org>:{project_name}"),
-                relation: "isIdenticalTo".to_string(),
-                resource_type: "other".to_string(),
-                scheme: Some("urn".to_string()),
-            }],
+            related_identifiers: vec![RelatedIdentifier::default()],
             ..Default::default()
         }
     }
@@ -79,10 +124,9 @@ pub struct Creator {
     pub orcid: String,
 }
 
-// TODO: Create a check for our URN id, `urn:zenodo:*`, maybe by making a
-// specific type for it?
 /// Model representing an identifier related to a Zenodo deposit.
 #[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
+#[serde(try_from = "RelatedIdentifierCheck")]
 pub struct RelatedIdentifier {
     /// The value of the identifier (meaning, the identifier itself).
     pub identifier: String,
@@ -98,6 +142,36 @@ pub struct RelatedIdentifier {
 
     /// The scheme followed by the identifier.
     pub scheme: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct RelatedIdentifierCheck {
+    pub identifier: String,
+    pub relation: String,
+    pub resource_type: String,
+    pub scheme: Option<String>,
+}
+
+impl TryFrom<RelatedIdentifierCheck> for RelatedIdentifier {
+    type Error = String;
+
+    fn try_from(related_identifier: RelatedIdentifierCheck) -> Result<Self, Self::Error> {
+        if related_identifier.identifier.starts_with("urn:zendo:")
+            && related_identifier.relation == "isIdenticalTo"
+        {
+            return Err(
+                "Manual setup of zen-do URN is not allowed. Please use the field `zendo_id` (an example is given when using the `init` command)."
+                    .into(),
+            );
+        }
+
+        Ok(Self {
+            identifier: related_identifier.identifier,
+            relation: related_identifier.relation,
+            resource_type: related_identifier.resource_type,
+            scheme: related_identifier.scheme,
+        })
+    }
 }
 
 // `Box<>` is a container to hold some unknown type of objects. It allocates on
@@ -191,5 +265,77 @@ mod tests {
 
         assert!(write_result.is_ok());
         assert_eq!(example, actual.unwrap());
+    }
+
+    #[test]
+    fn test_get_zendo_id() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let metadata_file = temp_dir.path().join(".zenodo.toml");
+
+        std::fs::write(
+            &metadata_file,
+            r#"
+        title = ""
+        upload_type = ""
+        zendo_id = "my-org:my-project"
+        creators = []
+        related_identifiers = []
+        "#,
+        )
+        .unwrap();
+
+        let metadata = read_metadata(metadata_file.as_path()).unwrap();
+
+        let urn = metadata.zendo_id.as_str();
+
+        assert_eq!(urn, "my-org:my-project");
+    }
+
+    #[test]
+    fn test_zendo_id_character_space() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let metadata_file = temp_dir.path().join(".zenodo.toml");
+
+        std::fs::write(
+            &metadata_file,
+            r#"
+        title = ""
+        upload_type = ""
+        zendo_id = "my/org:my project"
+        creators = []
+        related_identifiers = []
+        "#,
+        )
+        .unwrap();
+
+        assert!(read_metadata(metadata_file.as_path()).is_err());
+    }
+
+    #[test]
+    fn test_user_manually_setting_zendo_urn_related_identifier() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let metadata_file = temp_dir.path().join(".zenodo.toml");
+
+        std::fs::write(
+            &metadata_file,
+            r#"
+        title = ""
+        upload_type = ""
+        zendo_id = "my-org:my project"
+        creators = []
+        related_identifiers = [
+            { identifier = "urn:zendo:my-org:my-project", relation = "isIdenticalTo", resource_type = "software", scheme = "urn" }
+        ]
+        "#,
+        )
+        .unwrap();
+
+        let err = read_metadata(metadata_file.as_path()).unwrap_err();
+        assert!(
+            err.to_string().contains(
+                "Manual setup of zen-do URN is not allowed. Please use the field `zendo_id`"
+            ),
+            "Unexpected error: {err}"
+        );
     }
 }
