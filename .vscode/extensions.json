@@ -17,7 +17,8 @@
     "usernamehw.errorlens",
     "vadimcn.vscode-lldb",
     "rust-lang.rust-analyzer",
-    "jolars.panache"
+    "jolars.panache",
+    "nefrob.vscode-just-syntax"
   ],
   "unwantedRecommendations": []
 }
