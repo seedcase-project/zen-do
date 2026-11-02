@@ -1,0 +1,34 @@
+---
+title: "Rust library"
+---
+
+This document describes the design of the Rust library and of the individual CLI
+commands, as well as tracking the implementation status. This document is split
+into the functions for the CLI and the library implementing the CLI.
+
+{{< include /docs/includes/_design-status.qmd >}}
+
+The shapes, fill colours, and bolding of the boxes in the diagrams below have
+specific meanings.
+
+- All parallelograms are all input or output.
+- Light gray parallelograms with bold edges are input arguments.
+- Rectangular boxes are actions or processes, such as a function.
+- Cylindrical boxes are internal types, such as Rust structs.
+- Diamond boxes are decision points that represent "if" conditions.
+
+## CLI code
+
+All the CLI functions take one argument: `args`. The type of the `args` depends
+on the function name, but their struct type is always the function name with
+`Args` as the suffix (e.g. `ListArgs`). These structs are created when Rust
+parses the command when it is used on the CLI.
+
+Many functions or methods return a `Result` type. In those cases, the desigm
+diagrams assume that the error will contain the correct message and be send to
+`stderr`. So arrows and boxes are not included for errors to simplify the
+diagrams.
+
+The `init` CLI command isn't shown here as it is a very simple command to create
+an `.zenodo.toml` file with empty `Metadata` fields.
+
