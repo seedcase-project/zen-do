@@ -105,48 +105,57 @@ users to convert to multiple formats in one command.
 ## {{< var planned >}} `update` {#cli-update}
 
 ```bash
-zen-do update [METADATA-FILE] --sandbox --draft
+zen-do update [METADATA-FILE] --sandbox --draft --yes
 ```
 
 The `update` command takes a `.zenodo.toml` metadata file and updates the
-contents with the Zenodo Deposit, which also updates the Record. It doesn't lead
-to a new DOI, as it doesn't change the files in the Deposit. This command is
+contents with the Zenodo deposit, which also updates the record. It doesn't lead
+to a new DOI, as it doesn't change the files in the deposit. This command is
 useful if you have a typo in one of the fields or forgot to add some
 information, but you don't want to re-upload the same file and create a new DOI.
 
 It has one required argument, `[METADATA-FILE]` that by default looks for the
 `.zenodo.toml` file in the working directory. The optional argument `--sandbox`
-is to update a Deposit in the sandbox environment. The second optional argument
-`--draft` will update the Deposit without publishing to the Record, to enable
-checking the Deposit before publishing.
+is to update a deposit in the sandbox environment. The second optional argument
+`--draft` will update the deposit without publishing to the record, to enable
+checking the deposit before publishing. Lastly, normally the `update` command
+will prompt for confirmation before continuing. With the `--yes` flag, this
+bypasses that confirmation, which can be useful in continuous delivery
+workflows.
+
+If no deposit exists then `update` will fail. A deposit needs to first be
+published with `publish` before any content can be updated.
 
 ## {{< var planned >}} `discard` {#cli-discard}
 
 ```bash
-zen-do discard [METADATA-FILE] --sandbox
+zen-do discard [METADATA-FILE] --sandbox --yes
 ```
 
-The `discard` command cancels a Deposit that is in the "editable" state. This
+The `discard` command cancels a deposit that is in the "editable" state. This
 happens when using the `--draft` argument in e.g. `update` or `publish`. This is
-useful if you make a mistake with starting a Deposit and want to cancel while
+useful if you make a mistake with starting a deposit and want to cancel while
 staying within the CLI. Like the other commands `--sandbox` will discard changes
-in the editable state for Deposits on the Zenodo sandbox.
+in the editable state for deposits on the Zenodo sandbox. The `--yes` flag, like
+in the `update` command, will bypass the confirmation prompt given when
+`discard` is used.
 
 ## {{< var planned >}} `publish` {#cli-publish}
 
 ```bash
-zen-do publish [METADATA-FILE] --file [FILE1,FILE2] --draft --sandbox
+zen-do publish [METADATA-FILE] --file [FILE1,FILE2] --draft --sandbox --yes
 ```
 
 The `publish` command takes a metadata file (`.zenodo.toml`) as well as some
-files in `--file` and uploads them to Zenodo. If a Deposit doesn't exist (based
-on the presence of the `zendo_id`), a Deposit will be created. If a Deposit does
+files in `--file` and uploads them to Zenodo. If a deposit doesn't exist (based
+on the presence of the `zendo_id`), a deposit will be created. If a deposit does
 exist, the metadata will be overwritten by the metadata in the file, all files
 will be deleted and the new files will be uploaded instead. If `--draft` is
-used, the Deposit doesn't get formally published as a new Record, otherwise it
-will immediately be created into a Record with a corresponding DOI. If
-`--sandbox` is used, the Deposit and Record will be created in the sandbox
-environment on Zenodo.
+used, the deposit doesn't get formally published as a new record, otherwise it
+will immediately be created into a record with a corresponding DOI. If
+`--sandbox` is used, the deposit and record will be created in the sandbox
+environment on Zenodo. The `--yes` flag, like the other commands, is used to
+bypass the confirmation prompt.
 
 Unlike the `update` command, this *requires* files to upload and will also
 create a new version and thus a new DOI. If only the metadata needs to be
