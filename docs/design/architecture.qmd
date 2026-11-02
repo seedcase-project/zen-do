@@ -17,7 +17,7 @@ package.
 
   | Object       | Description                                                                                                               |
   | ------------ | ------------------------------------------------------------------------------------------------------------------------- |
-  | deposit(s)   | A Zenodo deposit is the combined set of files and metadata uploaded to Zenodo that can be made into a published record.   |
+  | deposit(s)   | A Zenodo deposit is the combined set of files and metadata uploaded to Zenodo. When published, it becomes a record.       |
   | record(s)    | A Zenodo record is a deposit that has been permanently published and assigned a DOI.                                      |
   | metadata     | The metadata for a deposit, kept within `.zenodo.toml`, see the [Inputs](/docs/design/interface/inputs.qmd) page.         |
   | file(s)      | The files to add to a deposit.                                                                                            |
