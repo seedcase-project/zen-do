@@ -36,7 +36,7 @@ deposit exists or not.
 ## {{< var wip >}} `get` {#cli-get}
 
 ```bash {filename="Terminal"}
-zen-do get [METADATA_FILE] --sandbox
+zen-do get [METADATA-FILE] --sandbox
 ```
 
 The `get` command will get the Zenodo deposit JSON based on the metadata file
@@ -50,7 +50,7 @@ content of the metadata file using the `zendo_id`.
 ## {{< var wip >}} `convert` {#cli-convert}
 
 ```bash {filename="Terminal"}
-zen-do convert [METADATA_FILE] --to [FORMAT]
+zen-do convert [METADATA-FILE] --to [FORMAT]
 ```
 
 There are many different file formats and standards that contain similar or even
@@ -74,18 +74,17 @@ than having to handle conversions between all possible pairs of formats.
 There are several different formats that we've encountered that would be useful
 to keep synchronized with the `.zenodo.toml` file, including:
 
-- {{< var planned >}} `.zenodo.json`: This is the file format that Zenodo looks
-  for in their existing [GitHub release to record
+- {{< var wip >}} `.zenodo.json`: This is the file format that Zenodo looks for
+  in their existing [GitHub release to record
   integration](https://help.zenodo.org/docs/github/describe-software/). Both the
   JSON and TOML formats are equivalent in content.
-- {{< var planned >}} `CITATION.cff`: GitHub uses this file to [display the
+- {{< var wip >}} `CITATION.cff`: GitHub uses this file to [display the
   citation](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-citation-files)
   information for a repository when it is in the root of the repository. This
   contains only a subset of the metadata found in the `.zenodo.toml` file.
-- {{< var planned >}} `pyproject.toml`: While this file is almost entirely used
-  only for Python projects, it contains similar metadata fields to the
-  `.zenodo.toml` file, such as the project name, description, authors, and
-  license.
+- {{< var wip >}} `pyproject.toml`: While this file is almost entirely used only
+  for Python projects, it contains similar metadata fields to the `.zenodo.toml`
+  file, such as the project name, description, authors, and license.
 - {{< var planned >}} `codemeta.json`: This file is used to describe software
   metadata in a machine-readable format, following the
   [CodeMeta](https://codemeta.github.io/) standard. It contains similar metadata

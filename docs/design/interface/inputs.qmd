@@ -71,7 +71,7 @@ repository, e.g., one for the source code and one for the documentation. We
 decided on using an ID that looks like:
 
 ```text
-zendo_id = "<github-org>:<repo-name>:<output-type>"
+zendo_id = "<github-username>:<repo-name>:<output-type>"
 ```
 
 The `zendo_id` field has two requirements:
@@ -87,7 +87,7 @@ distinguish between those outputs. If the metadata file is hosted on a GitHub
 repository, we recommend:
 
 ```text
-zendo_id = `<github-username>:<repo-name>:<output-type>`
+zendo_id = "<github-username>:<repo-name>:<output-type>"
 ```
 
 So if we made a metadata file for the zen-do repository to upload the
