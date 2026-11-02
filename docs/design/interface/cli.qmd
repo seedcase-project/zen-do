@@ -9,7 +9,7 @@ package's scope.
 
 {{< include /docs/includes/_design-status.qmd >}}
 
-## {{< var wip >}} `init`
+## {{< var wip >}} `init` {#cli-init}
 
 ```bash {filename="Terminal"}
 zen-do init [PATH] --verbose
@@ -22,7 +22,7 @@ the current directory (i.e., `.`) but can be specified as a relative or absolute
 path. This simple command is helpful to get started with making a new Zenodo
 deposit, as well as standardizing the name and structure of the file.
 
-## {{< var wip >}} `list`
+## {{< var wip >}} `list` {#cli-list}
 
 ```bash {filename="Terminal"}
 zen-do list --sandbox
@@ -33,7 +33,7 @@ listed in the account connected to that token. Both the CLI and the internal
 Rust interface are used in other functions like `publish()` to find whether a
 deposit exists or not.
 
-## {{< var wip >}} `get`
+## {{< var wip >}} `get` {#cli-get}
 
 ```bash {filename="Terminal"}
 zen-do get [METADATA_FILE] --sandbox
@@ -47,7 +47,7 @@ updating or publishing it. Internally uses the Rust functions within `list()` to
 get the list of deposits and uses that to find the deposit that matches the
 content of the metadata file using the `zendo_id`.
 
-## {{< var planned >}} `convert`
+## {{< var wip >}} `convert` {#cli-convert}
 
 ```bash {filename="Terminal"}
 zen-do convert [METADATA_FILE] --to [FORMAT]
@@ -102,7 +102,7 @@ to keep synchronized with the `.zenodo.toml` file, including:
 The `--to` argument can be a single format or an array of formats, allowing
 users to convert to multiple formats in one command.
 
-## {{< var planned >}} `update`
+## {{< var planned >}} `update` {#cli-update}
 
 ```bash
 zen-do update [METADATA-FILE] --sandbox --draft
@@ -120,7 +120,7 @@ is to update a Deposit in the sandbox environment. The second optional argument
 `--draft` will update the Deposit without publishing to the Record, to enable
 checking the Deposit before publishing.
 
-## {{< var planned >}} `discard`
+## {{< var planned >}} `discard` {#cli-discard}
 
 ```bash
 zen-do discard [METADATA-FILE] --sandbox
@@ -132,7 +132,7 @@ useful if you make a mistake with starting a Deposit and want to cancel while
 staying within the CLI. Like the other commands `--sandbox` will discard changes
 in the editable state for Deposits on the Zenodo sandbox.
 
-## {{< var planned >}} `publish`
+## {{< var planned >}} `publish` {#cli-publish}
 
 ```bash
 zen-do publish [METADATA-FILE] --file [FILE1,FILE2] --draft --sandbox
