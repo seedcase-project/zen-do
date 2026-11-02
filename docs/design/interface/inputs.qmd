@@ -65,17 +65,12 @@ add the deposit ID to the metadata file. This is not how we want zen-do to
 behave.
 
 So instead of using the ID created by Zenodo, we define our own ID and list it
-in the `zendo_id` of the `.zenodo.toml` file. We do not use the repository URL
-as the ID because we want to be able to create multiple deposits for the same
-repository, e.g., one for the source code and one for the documentation. We
-decided on using an ID that looks like:
+in the `zendo_id` of the `.zenodo.toml` file. We decided on using an ID that
+looks like:
 
+```toml
+zendo_id = "<user>:<project>:<optional-output-type>"
 ```
-
-::: callout-note
-You can also use a GitHub organisation as the username like so:
-`"<github-org>:<repo-name>:<output-type>"`.
-:::
 
 The `zendo_id` field has two requirements:
 
@@ -84,21 +79,32 @@ The `zendo_id` field has two requirements:
    [alphanumericals](https://en.wikipedia.org/wiki/Alphanumericals), `-`, `_`,
    and `.`, as well as the use of `:` as a separator.
 
-If the user wants to have multiple deposits for the same project (e.g.,
-`seedcase-project:zen-do`), they should append additional `<optional-sub-id>` to
-distinguish between those outputs. If the metadata file is hosted on a GitHub
-repository, we recommend:
+In the case above, `user` is the Zenodo account holder's name and `project` is
+the name of the project. If the user wants to have multiple deposits for the
+same project (e.g., `seedcase-project:zen-do`), they should append additional
+`<optional-output-type>` to distinguish between those outputs. If the metadata
+file is hosted on a GitHub repository, we recommend:
 
-zendo_id = "<github-username>:<repo-name>:<output-type>"
+```toml
+zendo_id = "<github-username>:<repo-name>:<optional-output-type>"
 ```
+
+::: callout-note
+You can also use a GitHub organisation as the username like so:
+`"<github-orgname>:<repo-name>:<output-type>"`.
+:::
+
+We do not use the repository URL as the ID because we want option to be able to
+create multiple deposits for the same repository, e.g., one for the source code
+and one for the documentation.
 
 So if we made a metadata file for the zen-do repository to upload the
 documentation as a PDF as a deposit, it might look like
 `seedcase-project:zen-do:docs`. If we wanted to make a deposit for the same
 repository but for the source code instead, it might look like
-`seedcase-project:zen-do:source`. The final `<output-type>` part is used to
-distinguish between different types of deposits for the same repository and is
-arbitrary and up to the user to decide on the name.
+`seedcase-project:zen-do:source`. The final `<optional-output-type>` part is
+used to distinguish between different types of deposits for the same repository
+and is arbitrary and up to the user to decide on the name.
 
 The `zendo_id` is converted to a `related_identifier`, where a prefix
 `urn:zen-do:` is added to the `zendo_id` and used in the `identifier` field, the
