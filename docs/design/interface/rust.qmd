@@ -107,12 +107,76 @@ flowchart TD
     classDef inputs fill:lightgray,stroke-width:3px
 ```
 
+### {{< var wip >}} `discard()` {#cli-discard}
+
+This relatively simple function, like [`get()`](#cli-get), has an internal
+`discard_deposit()` method that is used in other CLI functions. However, unlike
+`get_deposit()` that requires a bit more steps, the [discard Zenodo
+API](https://developers.zenodo.org/#discard) request used in `discard_deposit()`
+is a (mostly) simple `POST` to the `discard` endpoint.
+
+```{mermaid}
+%%| label: fig-discard-cli
+%%| fig-cap: "The flow of input and output through the `discard()` CLI function."
+%%| fig-alt: >-
+%%|   Diagram showing the flow of input and output through the CLI function.
+%%|   Details about the shapes and what they mean are described at the top of
+%%|   the document.
+
+flowchart TD
+    sandbox[/"--sandbox"/]:::inputs
+    metadata_file[/"[metadata-file]"/]:::inputs
+    token["get_token()"]
+    request[("Request::new()")]
+    read_metadata["read_metadata()"]
+    metadata[("Metadata {...}")]
+    has_deposit["has_deposit()"]
+    is_editable["is_editable()"]
+    discard_deposit["discard_deposit()"]
+    output[/"Response<br>or nothing"/]
+
+    decision_editable{"editable?"}
+
+    metadata_file -->
+      read_metadata -->
+      metadata -->|add ID| request
+
+    request --> discard_deposit
+
+    sandbox & token -->
+      request -->
+      has_deposit -->
+      is_editable --> decision_editable
+      decision_editable -->|true| discard_deposit -->
+      output
+
+    decision_editable -->|false| output
+
+    classDef inputs fill:lightgray,stroke-width:3px
+```
+
 ## Library code
+
+`Deposit {...}`
+
+:   A struct that represents the JSON response received from Zenodo. Mainly
+    needed for updating the `deposit.metadata` object and for the `deposit.id`
+    fields. The list of fields in the deposit are shown on
+    [Zenodo](https://developers.zenodo.org/?shell#entities). Some fields are not
+    converted from the Zenodo JSON representation to our `Deposit` struct as
+    they aren't needed by zen-do nor needed during communication with the Zenodo
+    API. Specifically `doi_url`, `created`, `modified`, and `title` are not
+    kept.
 
 `enum Formats`
 
 :   This `enum` contains all the different formats we convert to, as listed in
     the [CLI](cli.qmd#cli-convert) page.
+
+`get_token(sandbox: bool) -> Result<String, Error>`
+
+:   As described in the [CLI](cli.qmd) page, this gets the token from either the
+    keyring or from the env variables.
 
 `Metadata {...}`
 
@@ -131,6 +195,51 @@ flowchart TD
 `read_metadata(path: &Path) -> Result<Metadata, Error>`
 
 :   Reads the Zenodo TOML file, e.g. `.zenodo.toml`.
+
+<!-- TODO: Not sure if we want to keep the response here...? -->
+
+`Request {sandbox, token, header, url, zendo_id, deposit, response}`
+
+:   The struct that contains the information needed to connect and send requests
+    to Zenodo. This object is used by
+    [reqwest](https://docs.rs/reqwest/latest/reqwest/) to build and send the
+    request to the [Zenodo API](https://developers.zenodo.org/?shell#rest-api).
+    The fields `zendo_id`, `deposit`, and `response` are `Option` types.
+
+`Request::discard_deposit(self: &self) -> Result<Self, Error>`
+
+:   This `impl` method on `Request` sends a
+    [discard](https://developers.zenodo.org/?shell#discard) request to Zenodo.
+    If the `Request.deposit.metadata` field was modified locally in a previous
+    step, `discard_deposit` won't change it back. That's because we consider
+    running discard as one of the last steps in a sequence of actions. If the
+    current metadataon Zenodo needs to be retrieved, do `Request::new()` again
+    to start over.
+
+`Request::has_deposit(self: &self) -> Result<Self, Error>`
+
+:   A simple `impl` method on `Request` to check that the `Request` has a
+    `deposit` field. Used for CLI commands that require a `deposit` be present.
+
+<!-- TODO: Unsure if this should be a `Result` type instead... -->
+
+`Request::is_editable(self: &self) -> bool`
+
+:   Checks the
+    [`deposit.state`](https://developers.zenodo.org/?shell#representation) field
+    if it is "inprogress" and/or if the `deposit.submitted` field is false. Is
+    an `impl` method on `Request`.
+
+`Request::new(sandbox, token, zendo_id)`
+
+:   This constructs a new `Request` struct with details needed for reqwest to
+    correctly send a request to Zenodo. Based on the `sandbox` value, the `url`
+    field will point to either `sandbox.zenodo.org` or `zenodo.org` URLs. If the
+    `zendo_id` is given, a request will be sent to Zenodo for the deposit
+    connected to the ID, the response of which will be attached to the `deposit`
+    field to limit repeated requests. Importantly, the main purpose for getting
+    and assigning the `deposit` at this point is to get the Zenodo identifier in
+    [`deposit.id`](https://developers.zenodo.org/?shell#entities).
 
 `trait left_join(self, right: Option<Right>) -> self`
 
