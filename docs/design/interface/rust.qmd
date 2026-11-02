@@ -31,4 +31,3 @@ diagrams.
 
 The `init` CLI command isn't shown here as it is a very simple command to create
 an `.zenodo.toml` file with empty `Metadata` fields.
-
