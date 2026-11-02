@@ -273,13 +273,109 @@ deposits on a Zenodo account associated with the given token.
 flowchart TD
     sandbox[/"--sandbox"/]:::inputs
     token["get_token()"]
-    request[("Request::new()")]
+    session[("Session::new()")]
     list["list_deposits()"]
     output[/"Vec\< Deposit \><br>or nothing"/]
 
     sandbox & token -->
-      request -->
+      session -->
       list -->
+      output
+
+    classDef inputs fill:lightgray,stroke-width:3px
+```
+
+### {{< var wip >}} `publish()` {#cli-publish}
+
+The meaning of `--draft` compared to `--yes` has a slight difference and results
+in different outcomes. Making a draft with `--draft` means the user wants to
+view the deposit on Zenodo to confirm things before publishing. `--yes` is a
+flag that tells `update()` to publish without prompting for a confirmation,
+which doesn't mean anything when used with `--draft` (though nothing will happen
+if both are used together). This is mainly to ensure that a command wasn't ran
+accidentally.
+
+While `has_deposit()` outputs a `Result` type, rather than send to `stderr` in
+`publish()` we instead create a new deposit. Likewise, while `is_editable()` is
+a `bool`, in the `false` case we output an error to `stderr` since we don't want
+to modify a deposit that is in the editable state.
+
+```{mermaid}
+%%| label: fig-publish-cli
+%%| fig-cap: "The flow of input and output through the `publish()` CLI function."
+%%| fig-alt: >-
+%%|   Diagram showing the flow of input and output from input to output. There
+%%|   are various shapes for each box, which is described at the top of the
+%%|   document.
+
+flowchart TD
+    draft[/"--draft"/]:::inputs
+    yes[/"--yes"/]:::inputs
+    sandbox[/"--sandbox"/]:::inputs
+    metadata_file[/"[metadata-file]"/]:::inputs
+    files[/"--file"/]:::inputs
+
+    token["get_token()"]
+    session[("Session::new()")]
+    confirm_publish["confirm_publish()"]
+    read_metadata["read_metadata()"]
+    metadata[("Metadata {...}")]
+    session_without_files[("Session {...}<br>Without files")]
+    create_deposit["create_deposit()"]
+    has_deposit["has_deposit()"]
+    is_editable["is_editable()"]
+    as_new_version["as_new_version()"]
+    add_files["add_files()"]
+    delete_files["delete_files()"]
+    update_deposit["update_deposit()"]
+    publish["publish_deposit()"]
+    discard_deposit["discard_deposit()"]
+    output[/"Deposit<br>or nothing"/]
+
+    decision_new_deposit{"new deposit?"}
+    decision_publish{"publish?"}
+    decision_draft{"draft?"}
+    decision_editable{"editable?"}
+
+    sandbox & token -->
+      session
+
+    draft -->
+      decision_draft -->|true| output
+
+    files --> add_files
+
+    session -->
+      has_deposit -->
+      decision_new_deposit -->|Ok| is_editable -->
+      decision_editable -->|false| as_new_version
+
+    decision_new_deposit -->|Err| create_deposit
+    metadata -->
+      create_deposit -->
+      session_without_files
+
+    decision_editable --> |true| error[/Error/]
+
+    as_new_version & metadata -->
+      update_deposit -->
+      delete_files -->
+      request_without_files -->
+      add_files -->
+      decision_draft -->|false| decision_publish
+
+    decision_publish -->|true| publish -->
+      output
+
+    metadata_file -->
+      read_metadata -->
+      metadata
+
+    metadata -->|add ID| session
+
+    yes -->
+      confirm_publish -->
+      decision_publish -->|false| discard_deposit -->
       output
 
     classDef inputs fill:lightgray,stroke-width:3px
@@ -302,6 +398,12 @@ a function signature as well as some reasons their design (if needed).
 
 :   This newtype pattern is used to make sure downstream functions use an object
     that has been checked.
+
+`confirm_publish(yes: bool) -> bool`
+
+:   A simple helper function to print a message confirming whether the Zenodo
+    deposit should be published. The value of `yes` will also be the value of
+    the output.
 
 <!-- TODO: Confirm whether response contains the deposit, then it can be added to `Deposit` -->
 
@@ -368,6 +470,24 @@ a function signature as well as some reasons their design (if needed).
     synchronous connection. The fields `zendo_id`, `deposit`, and `response` are
     `Option` types.
 
+`Session::add_files(self: &self, files: NonEmptyVec<&Path>) -> Result<Self, Error>`
+
+:   As an `impl` method on `Session`, this adds files to a deposit. Must be in
+    the `"inprogress"` state or have `"submitted"` be false.
+
+`Session::as_new_version(self: &mut self) -> Result<Self, Error>`
+
+:   This `impl` method on `Session` converts an existing deposit into a ["new
+    version"](https://developers.zenodo.org/#new-version). It is similar to
+    converting a deposit to "editable" state, but is needed if new files are
+    going to be added to the deposit to make a new record.
+
+`Session::create_deposit(self: &mut self, metadata: &Metadata) -> Result<Self, Error>`
+
+:   This `impl` method on `Session` creates a new deposit from the `Metadata` in
+    the Zenodo TOML file. Will add the `deposit` details from the Zenodo API
+    response.
+
 `Session::discard_deposit(self: &self) -> Result<Self, Error>`
 
 :   This `impl` method on `Session` sends a
@@ -425,6 +545,18 @@ a function signature as well as some reasons their design (if needed).
     [`deposit.id`](https://developers.zenodo.org/?shell#entities). When using
     `new()`, the `reqwest::blocking::Client::new()` will be added to
     `connection` to reuse that object for each request sent to Zenodo.
+
+`Session::publish_deposit(self: &self) -> Result<Self, Error>`
+
+:   This `impl` method on `Session` sends a
+    [publish](https://developers.zenodo.org/?shell#publish) request to Zenodo on
+    the deposit.
+
+`Session::update_deposit(self: &mut self, metadata: &Metadata) -> Result<Self, Error>`
+
+:   As an `impl` method on `Session`, it takes the `Metadata` from the Zenodo
+    TOML file and updates the `Session.deposit.metadata` field. Since it
+    modifies the `Session` struct, it must be mutable.
 
 `trait left_join(self, right: Option<Self>) -> Self`
 
