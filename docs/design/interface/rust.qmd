@@ -3,7 +3,7 @@ title: "Rust library"
 ---
 
 This document describes the design of the Rust library and of the individual CLI
-commands, as well as tracking the implementation status. This document is split
+commands, as well as tracks the implementation status. This document is split
 into the functions for the CLI and the library implementing the CLI.
 
 {{< include /docs/includes/_design-status.qmd >}}
@@ -24,7 +24,7 @@ on the function name, but their struct type is always the function name with
 `Args` as the suffix (e.g. `ListArgs`). These structs are created when Rust
 parses the command when it is used on the CLI.
 
-Many functions or methods return a `Result` type. In those cases, the desigm
+Many functions or methods return a `Result` type. In those cases, the design
 diagrams assume that the error will contain the correct message and be send to
 `stderr`. So arrows and boxes are not included for errors to simplify the
 diagrams.
