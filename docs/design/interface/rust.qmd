@@ -142,7 +142,8 @@ flowchart TD
     the fields in the left hand side (`self`) are kept and any that are missing
     from the right hand side (`right`) are merged into it. This enables any
     values added to an existing file, e.g. `pyproject.toml`, to be kept when
-    joined over. If nothing exists on the right side,
+    joined over. If nothing exists on the right side, the left side is output
+    without any changes.
 
 `trait path(self) -> &Path`
 
