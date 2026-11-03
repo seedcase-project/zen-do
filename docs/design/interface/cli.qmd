@@ -129,16 +129,14 @@ published with `publish` before any content can be updated.
 ## {{< var planned >}} `discard` {#cli-discard}
 
 ```bash
-zen-do discard [METADATA-FILE] --sandbox --yes
+zen-do discard [METADATA-FILE] --sandbox
 ```
 
 The `discard` command cancels a deposit that is in the "editable" state. This
 happens when using the `--draft` argument in e.g. `update` or `publish`. This is
 useful if you make a mistake with starting a deposit and want to cancel while
 staying within the CLI. Like the other commands `--sandbox` will discard changes
-in the editable state for deposits on the Zenodo sandbox. The `--yes` flag, like
-in the `update` command, will bypass the confirmation prompt given when
-`discard` is used.
+in the editable state for deposits on the Zenodo sandbox.
 
 ## {{< var planned >}} `publish` {#cli-publish}
 
