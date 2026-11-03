@@ -68,17 +68,16 @@ scheme = ""
 ```
 
 Notice the `zendo_id` field in the newly created `.zenodo.toml` file. zen-do
-needs this field to keep track of projects. It is needed for all tasks,
-such as creating a new deposit or updating an existing
-one and publishing a record from the changes. The `zendo_id` key needs to
-be a value that is unique to the (future) deposit of all the deposits in your
-Zenodo account. As long as you use the pattern shown above
-(`"<github-username>:<repo-name>:<output-type>"`), it should be unique enough.
-We assume (and strongly recommend) you store your project as a Git repository
-and that you save it on GitHub, so you can use your username or organization
-name along with the repository name as the base of this `zendo_id`. Since in
-this guide we want to publish a report, we can use that as the `<output-type>`
-as `report`.
+needs this field to keep track of projects. It is needed for all tasks, such as
+creating a new deposit or updating an existing one and publishing a record from
+the changes. The `zendo_id` key needs to be a value that is unique to the
+(future) deposit of all the deposits in your Zenodo account. As long as you use
+the pattern shown above (`"<github-username>:<repo-name>:<output-type>"`), it
+should be unique enough. We assume (and strongly recommend) you store your
+project as a Git repository and that you save it on GitHub, so you can use your
+username or organization name along with the repository name as the base of this
+`zendo_id`. Since in this guide we want to publish a report, we can use that as
+the `<output-type>` as `report`.
 
 ::: callout-tip
 If you don't use GitHub, follow the naming scheme
@@ -144,9 +143,9 @@ zen-do publish \
 ```
 :::
 
-Next, open up the [Zenodo sandbox website](https://sandbox.zenodo.org/), go to your "dashboard", and open the newly
-created draft deposit. Does the content of the page match what is in your
-`.zenodo.toml` file? Great!
+Next, open up the [Zenodo sandbox website](https://sandbox.zenodo.org/), go to
+your "dashboard", and open the newly created draft deposit. Does the content of
+the page match what is in your `.zenodo.toml` file? Great!
 
 Because you made a draft, you could either manually click "publish" or you could
 try it with zen-do. Let's try publishing with zen-do! Because you created a
