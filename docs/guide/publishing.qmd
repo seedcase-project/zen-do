@@ -67,9 +67,10 @@ resource_type = ""
 scheme = ""
 ```
 
-There is one very important field here, `zendo_id`, in this file that zen-do
-needs to correctly create a new deposit and record and to update an existing
-deposit and create a new record from that deposit. The `zendo_id` key needs to
+Notice the `zendo_id` field in the newly created `.zenodo.toml` file. zen-do
+needs this field to keep track of projects. It is needed for all tasks,
+such as creating a new deposit or updating an existing
+one and publishing a record from the changes. The `zendo_id` key needs to
 be a value that is unique to the (future) deposit of all the deposits in your
 Zenodo account. As long as you use the pattern shown above
 (`"<github-username>:<repo-name>:<output-type>"`), it should be unique enough.
@@ -143,7 +144,7 @@ zen-do publish \
 ```
 :::
 
-Next, open up the Zenodo sandbox, go to your "dashboard", and open the newly
+Next, open up the [Zenodo sandbox website](https://sandbox.zenodo.org/), go to your "dashboard", and open the newly
 created draft deposit. Does the content of the page match what is in your
 `.zenodo.toml` file? Great!
 
