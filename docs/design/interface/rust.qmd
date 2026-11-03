@@ -267,7 +267,7 @@ flowchart TD
     If the `Request.deposit.metadata` field was modified locally in a previous
     step, `discard_deposit` won't change it back. That's because we consider
     running discard as one of the last steps in a sequence of actions. If the
-    current metadataon Zenodo needs to be retrieved, do `Request::new()` again
+    current metadata on Zenodo needs to be retrieved, do `Request::new()` again
     to start over.
 
 `Request::has_deposit(self: &self) -> Result<Self, Error>`
