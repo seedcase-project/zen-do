@@ -94,9 +94,14 @@ zendo_id = "seedcase-project:zen-do:report-pdf"
 ...
 ```
 
-Once you've filled it in, you can fill in the other values in the `.zenodo.toml`
-file. After you've filled in the `.zenodo.toml` file, it's time to create a
-deposit!
+All the fields available from the [Zenodo
+metadata](https://developers.zenodo.org/#representation) are available to be
+added and filled in, not only what are present in the default `.zenodo.toml`
+created from `init`. You can add any field you want from the list and fill them
+in. You should ideally fill as many fields in as make sense for your project
+*before* publishing. But thankfully, you can update the fields later with
+`update`, so it isn't strictly a requirement. Once you've filled in the
+`.zenodo.toml` file, it's time to create the deposit on Zenodo!
 
 ## Creating a (draft) deposit
 
