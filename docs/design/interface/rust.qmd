@@ -155,7 +155,7 @@ flowchart TD
     correct locations of the output format types. For example, with the enum
     `Format::CitationCff`, the path to this file should be `CITATION.cff`.
 
-`trait read(self) -> Result<Self::Output, Error>`
+`trait read() -> Result<Option<Self>, Error>`
 
 :   This trait for the `convert()` CLI function uses
     [generics](https://doc.rust-lang.org/book/ch20-02-advanced-traits.html) and
