@@ -34,11 +34,12 @@ case, there would be two `.zenodo.toml` files in the same folder, but with
 different prefixes (e.g. `.zenodo.toml` for the Git repository and
 `.pdf.zenodo.toml` for the PDF).
 
-For now, we'll keep it simple. We want to create a Zenodo deposit and eventual
+For now, keep it simple. Assume you want to create a Zenodo deposit and eventual
 record for a PDF output of a scientific analysis done in a Quarto document. In
-this guide, the PDF file we want to publish is called `analysis-report.pdf`.
+this guide, the PDF file you (hypothetically) want to publish is called
+`analysis-report.pdf`.
 
-We start by creating an empty `.zenodo.toml` file in the folder that has the
+You start by creating an empty `.zenodo.toml` file in the folder that has the
 Quarto document (note that they must be in the same folder).
 
 <!-- TODO: Convert into an executable code chunk -->
@@ -76,7 +77,7 @@ pattern `"<github-username>:<repo-name>:<output-type>"`, it should be unique
 enough. We assume (and strongly recommend) you store your project as a Git
 repository and that you save it on GitHub, so you can use your username or
 organization name along with the repository name as the base of the `zendo_id`.
-Since in this guide we want to publish a report, we can write `report-pdf` as
+Since in this guide you want to publish a report, you can write `report-pdf` as
 the `<output-type>`.
 
 ::: callout-tip
@@ -86,7 +87,7 @@ If you don't use GitHub, follow the naming scheme
 with that identifier already exists on your Zenodo account.
 :::
 
-In our case, we can update the value with:
+In our case, you can update the value with:
 
 ```toml {filename=".zenodo.toml"}
 ...
@@ -151,7 +152,10 @@ zen-do publish \
 
 Next, open up the [Zenodo sandbox website](https://sandbox.zenodo.org/), go to
 your "dashboard", and open the newly created draft deposit. Does the content of
-the page match what is in your `.zenodo.toml` file? Great!
+the page match what is in your `.zenodo.toml` file? Great! If it doesn't, check
+your TOML file again. Otherwise, you should [open an issue on
+zen-do](https://github.com/seedcase-project/zen-do/issues/new/choose) so we can
+try to fix it.
 
 Because you made a draft, you could either manually click "publish" or you could
 try it with zen-do. Let's try publishing with zen-do! Because you created a
