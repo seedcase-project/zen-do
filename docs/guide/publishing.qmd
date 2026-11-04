@@ -71,12 +71,12 @@ Notice the `zendo_id` field in the newly created `.zenodo.toml` file. zen-do
 needs this field to keep track of projects. It is needed for all tasks, such as
 creating a new deposit or updating an existing one and publishing a record from
 the changes. The value of the `zendo_id` key needs to be unique---it must not be
-identical to any deposit ID's in your Zenodo account. As long as you use
-the pattern `"<github-username>:<repo-name>:<output-type>"`, it
-should be unique enough. We assume (and strongly recommend) you store your
-project as a Git repository and that you save it on GitHub, so you can use your
-username or organization name along with the repository name as the base of the
-`zendo_id`. Since in this guide we want to publish a report, we can write `report-pdf` as
+identical to any deposit ID's in your Zenodo account. As long as you use the
+pattern `"<github-username>:<repo-name>:<output-type>"`, it should be unique
+enough. We assume (and strongly recommend) you store your project as a Git
+repository and that you save it on GitHub, so you can use your username or
+organization name along with the repository name as the base of the `zendo_id`.
+Since in this guide we want to publish a report, we can write `report-pdf` as
 the `<output-type>`.
 
 ::: callout-tip
@@ -109,36 +109,37 @@ You eventually want to make a published record based on your newly created
 `.zenodo.toml` file. But you don't yet have a deposit. A record can only be
 created from a deposit. If a `.zenodo.toml` file doesn't have an associated
 deposit on your Zenodo account, using `zen-do publish` will create that deposit
-on Zenodo for you. If you want to check whether a deposit already exists, you can use
-`zen-do get`:
+on Zenodo for you. If you want to check whether a deposit already exists, you
+can use `zen-do get`:
 
 ```bash {filename="Terminal"}
 zen-do get
 ```
 
 This command will read your `.zenodo.toml` file and check your Zenodo account
-for any deposit that has the value `zendo_id` in it. If a deposit with that ID exists on your account, it
-will print the deposit details to your terminal, otherwise, it will let you know
-it hasn't found anything.
+for any deposit that has the value `zendo_id` in it. If a deposit with that ID
+exists on your account, it will print the deposit details to your terminal,
+otherwise, it will let you know it hasn't found anything.
 
 By default, running `zen-do publish` will create a new deposit and immediately
 publish a new record from that deposit, though it will prompt you to confirm.
 When creating deposits for the first time, it's good practice to use the [Zenodo
-sandbox](https://sandbox.zenodo.org/) and make a draft deposit first. Then, to check the
-metadata in the newly created draft deposit to confirm. If it looks as you
-expect (the information you want is there), you can try creating
-a record in the sandbox. So, let's try making a draft in Zenodo's sandbox.
-zen-do's `publish` command needs the file to upload along with the
-`.zenodo.toml` file, which it looks for in the current directory by default.
-Using `publish` will always prompt you to confirm your actions, as some actions
-are irreversible (see note below).
+sandbox](https://sandbox.zenodo.org/) and make a draft deposit first. Then, to
+check the metadata in the newly created draft deposit to confirm. If it looks as
+you expect (the information you want is there), you can try creating a record in
+the sandbox. So, let's try making a draft in Zenodo's sandbox. zen-do's
+`publish` command needs the file to upload along with the `.zenodo.toml` file,
+which it looks for in the current directory by default. Using `publish` will
+always prompt you to confirm your actions, as some actions are irreversible (see
+note below).
 
 ```bash {filename="Terminal"}
 zen-do publish --file analysis-report.pdf --sandbox --draft
 ```
 
 ::: callout-tip
-If you want to add multiple files to your deposit, you can use `--file` multiple times:
+If you want to add multiple files to your deposit, you can use `--file` multiple
+times:
 
 ```bash {filename="Terminal"}
 zen-do publish \
@@ -196,7 +197,8 @@ zen-do get
 ::: callout-tip
 If you want to include zen-do in a GitHub workflow or some continuous delivery
 process, you can use the `--yes` argument to bypass the prompt. But be very
-careful with this, because this will create an official record with an associated DOI.
+careful with this, because this will create an official record with an
+associated DOI.
 
 ```bash {filename="Terminal"}
 zen-do publish --file analysis-report.pdf --yes
