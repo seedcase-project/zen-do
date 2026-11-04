@@ -1,0 +1,235 @@
+---
+title: "Publishing a record"
+description: |
+  Use the `publish` command to create a new deposit and publish it as a record.
+order: 1
+---
+
+The main purpose of zen-do is to simplify the process of publishing records on
+Zenodo. This page walks you through how to use zen-do to create and publish a
+record on Zenodo.
+
+{{< include /docs/includes/_deposit-vs-record.qmd >}}
+
+## Creating and filling in `.zenodo.toml`
+
+In order to publish on Zenodo, you need to create and fill out the metadata for
+your (future) published record in the `.zenodo.toml` file (or a similarly named
+TOML file). You can create an empty one with the `zen-do init` command.
+
+{{< include /docs/includes/_use-uv.qmd >}}
+
+The file or files that will be part of the published record must be in the same
+folder as the `.zenodo.toml` file or in a subfolder within that folder (see our
+[design docs](/docs/design/interface/inputs.qmd) for more details about this).
+This allows you to organise your files in different ways depending on what you
+want to publish. For example, you could have one Zenodo deposit for a Git
+repository or one deposit for a [Quarto](https://quarto.org) output file in a
+folder.
+
+However, a single folder could contain multiple deposits. For example, one
+deposit could contain the source files for creating a Quarto book (such as the
+entire Git repository) and one deposit could be the generated PDF book. In this
+case, there would be two `.zenodo.toml` files in the same folder, but with
+different prefixes (e.g. `.zenodo.toml` for the Git repository and
+`.pdf.zenodo.toml` for the PDF).
+
+For now, keep it simple. Assume you want to create a Zenodo deposit and eventual
+record for a PDF output of a scientific analysis done in a Quarto document. In
+this guide, the PDF file you (hypothetically) want to publish is called
+`analysis-report.pdf`.
+
+You start by creating an empty `.zenodo.toml` file in the folder that has the
+Quarto document (note that they must be in the same folder).
+
+<!-- TODO: Convert into an executable code chunk -->
+
+```bash {filename="Terminal"}
+zen-do init
+```
+
+This creates an empty `.zenodo.toml` file. If you open it, you should see
+something like below:
+
+```toml {filename=".zenodo.toml"}
+title = ""
+upload_type = ""
+zendo_id = "<github-username>:<repo-name>:<output-type>"
+
+[[creators]]
+name = ""
+affiliation = ""
+orcid = ""
+
+[[related_identifiers]]
+identifier = ""
+relation = ""
+resource_type = ""
+scheme = ""
+```
+
+Notice the `zendo_id` field in the newly created `.zenodo.toml` file. zen-do
+needs this field to keep track of projects. It is needed for all tasks, such as
+creating a new deposit or updating an existing one and publishing a record from
+the changes. The value of the `zendo_id` key needs to be unique---it must not be
+identical to any deposit ID's in your Zenodo account. As long as you use the
+pattern `"<github-username>:<repo-name>:<output-type>"`, it should be unique
+enough. We assume (and strongly recommend) you store your project as a Git
+repository and that you save it on GitHub, so you can use your username or
+organization name along with the repository name as the base of the `zendo_id`.
+Since in this guide you want to publish a report, you can write `report-pdf` as
+the `<output-type>`.
+
+::: callout-tip
+If you don't use GitHub, follow the naming scheme
+`your-name:project-name:output-type`. This helps to ensure that the URN will be
+(very likely) unique to this deposit and allow zen-do to identify if a deposit
+with that identifier already exists on your Zenodo account.
+:::
+
+In our case, you can update the value with:
+
+```toml {filename=".zenodo.toml"}
+...
+zendo_id = "seedcase-project:zen-do:report-pdf"
+...
+```
+
+All the fields available from the [Zenodo
+metadata](https://developers.zenodo.org/#representation) are available to be
+added and filled in, not only what are present in the default `.zenodo.toml`
+created from `init`. You can add any field you want from the list and fill them
+in. You should ideally fill out all fields that make sense for your project
+*before* publishing, but, thankfully, you can update the fields later with
+`update`, so it isn't strictly a requirement. Once you've filled in the
+`.zenodo.toml` file, it's time to create the deposit on Zenodo!
+
+## Creating a (draft) deposit
+
+You eventually want to make a published record based on your newly created
+`.zenodo.toml` file. But you don't yet have a deposit. A record can only be
+created from a deposit. If a `.zenodo.toml` file doesn't have an associated
+deposit on your Zenodo account, using `zen-do publish` will create that deposit
+on Zenodo for you. If you want to check whether a deposit already exists, you
+can use `zen-do get`:
+
+```bash {filename="Terminal"}
+zen-do get
+```
+
+This command will read your `.zenodo.toml` file and check your Zenodo account
+for any deposit that has the value `zendo_id` in it. If a deposit with that ID
+exists on your account, it will print the deposit details to your terminal,
+otherwise, it will let you know it hasn't found anything.
+
+By default, running `zen-do publish` will create a new deposit and immediately
+publish a new record from that deposit, though it will prompt you to confirm.
+When creating deposits for the first time, it's good practice to use the [Zenodo
+sandbox](https://sandbox.zenodo.org/) and make a draft deposit first. Then, to
+check the metadata in the newly created draft deposit to confirm. If it looks as
+you expect (the information you want is there), you can try creating a record in
+the sandbox. So, let's try making a draft in Zenodo's sandbox. zen-do's
+`publish` command needs the file to upload along with the `.zenodo.toml` file,
+which it looks for in the current directory by default. Using `publish` will
+always prompt you to confirm your actions, as some actions are irreversible (see
+note below).
+
+```bash {filename="Terminal"}
+zen-do publish --file analysis-report.pdf --sandbox --draft
+```
+
+::: callout-tip
+If you want to add multiple files to your deposit, you can use `--file` multiple
+times:
+
+```bash {filename="Terminal"}
+zen-do publish \
+  --file analysis-report.pdf \
+  --file supplemental-details.pdf \
+  --sandbox --draft
+```
+:::
+
+Next, open up the [Zenodo sandbox website](https://sandbox.zenodo.org/), go to
+your "dashboard", and open the newly created draft deposit. Does the content of
+the page match what is in your `.zenodo.toml` file? Great! If it doesn't, check
+your TOML file again. Otherwise, you should [open an issue on
+zen-do](https://github.com/seedcase-project/zen-do/issues/new/choose) so we can
+try to fix it.
+
+Because you made a draft, you could either manually click "publish" or you could
+try it with zen-do. Let's try publishing with zen-do! Because you created a
+draft you need to discard it first. That's what the `discard` command is for:
+
+```bash {filename="Terminal"}
+zen-do discard --sandbox
+```
+
+You can try re-running the command to publish as a record in the sandbox:
+
+```bash {filename="Terminal"}
+zen-do publish --file analysis-report.pdf --sandbox
+```
+
+Now when you go to your Zenodo sandbox account, you should see a new record for
+the deposit.
+
+## Publishing your first record
+
+If you're satisfied with how `publish` works with `--sandbox`, it's time to
+officially publish the report on Zenodo! It's as easy as removing the
+`--sandbox` argument.
+
+::: callout-important
+Be **very** careful and certain about what you officially publish on Zenodo (not
+the sandbox). Once something has been published and a record with a DOI has been
+created, it **cannot** be deleted fully!
+:::
+
+```bash {filename="Terminal"}
+zen-do publish --file analysis-report.pdf
+```
+
+This command prompts you to confirm. Saying yes will now create an official
+record and associated DOI for your analysis! You can check it from your terminal
+by using `get`:
+
+```bash {filename="Terminal"}
+zen-do get
+```
+
+::: callout-tip
+If you want to include zen-do in a GitHub workflow or some continuous delivery
+process, you can use the `--yes` argument to bypass the prompt. But be very
+careful with this, because this will create an official record with an
+associated DOI.
+
+```bash {filename="Terminal"}
+zen-do publish --file analysis-report.pdf --yes
+```
+:::
+
+## Publishing another record
+
+For some outputs, like a scientific paper, you may only ever need to create one
+record. However, for some types of output, especially ones with versions or with
+frequent changes, such as a book or course material, you'll probably want to
+create a new record for those new changes to the file or files. Publishing a new
+record of an existing deposit is as easy as using the same command as above!
+
+```bash {filename="Terminal"}
+zen-do publish --file analysis-report.pdf
+```
+
+::: callout-important
+To update a deposit with a new file and create a new record including that file,
+zen-do **requires** the `zendo_id` value in the `.zenodo.toml` file. This ID
+ensures that a new record is correctly created in the existing deposit on your
+account.
+:::
+
+::: callout-tip
+If you only want to update the metadata, *but not change the file*, use the
+`zen-do update` command. This command doesn't create a new record and only edits
+the metadata of an existing deposit or record.
+:::
