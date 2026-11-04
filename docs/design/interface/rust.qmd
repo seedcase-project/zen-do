@@ -56,8 +56,8 @@ flowchart TD
 
     read_metadata["read_metadata()"]
     metadata[("Metadata {...}")]
-    formats[("Formats<br>enum")]
-    into_format["into_format()"]
+    formats[("Format\< T \><br>generic enum")]
+    into_format["into()<br>trait"]
 
     subgraph new_format
       %% Fix positions with hidden arrows
@@ -77,20 +77,17 @@ flowchart TD
     left_join["left_join()<br>trait"]
     read["read()<br>trait"]
     write["write()<br>trait"]
-    path["path()<br>trait"]
 
     metadata_file -->
       read_metadata -->
       metadata -->
       into_format
 
-    to -->
-      formats -->
-      into_format -->
+    to -->|match to<br>correct T| formats
+    formats -->|assign output<br>to correct T| into_format -->
       new_format
 
     new_format -->
-      path -->
       read -->
       old_format -->
       right
@@ -109,10 +106,13 @@ flowchart TD
 
 ## Library code
 
-`enum Formats`
+`enum Format<T>`
 
-:   This `enum` contains all the different formats we convert to, as listed in
-    the [CLI](cli.qmd#cli-convert) page.
+:   This [generic
+    `enum`](https://doc.rust-lang.org/book/ch10-01-syntax.html#in-enum-definitions)
+    contains all the different formats we convert to, as listed in the
+    [CLI](cli.qmd#cli-convert) page. The `<T>` is the generic type that will
+    represent the output format structs, e.g. `Format<CitationCff>`.
 
 `Metadata {...}`
 
@@ -120,17 +120,17 @@ flowchart TD
     Will eventually form the deposit's
     [`metadata`](https://developers.zenodo.org/?shell#depositions) field.
 
-`Metadata::into_format(self: Self, to: Formats) -> T`
-
-:   This `impl` [generic
-    method](https://doc.rust-lang.org/rust-by-example/generics/impl.html) on
-    `Metadata` converts the `Metadata` struct into the selected `to` format
-    using the `Formats` enum. The `T` type is any of the output structs, like
-    `CitationCff`, `ZenodoJson`, or `PyprojectToml`.
-
 `read_metadata(path: &Path) -> Result<Metadata, Error>`
 
 :   Reads the Zenodo TOML file, e.g. `.zenodo.toml`.
+
+`trait into<Format<T>>(self: Self) -> Format<T>`
+
+:   This uses the built-in `into()` trait to add `impl` [generic
+    methods](https://doc.rust-lang.org/rust-by-example/generics/impl.html) on
+    `Metadata` to convert into the different output format structs. The
+    `Format<T>` uses the generic enum with `T` type to wrap the different output
+    structs, like `CitationCff`, `ZenodoJson`, or `PyprojectToml`.
 
 `trait left_join(self, right: Option<Right>) -> self`
 
@@ -143,24 +143,31 @@ flowchart TD
     from the right hand side (`right`) are merged into it. This enables any
     values added to an existing file, e.g. `pyproject.toml`, to be kept when
     joined over. If nothing exists on the right side, the left side is output
-    without any changes.
+    without any changes. `Right` is a type alias in the generic trait and method
+    to inform Rust that, even though the left and right sides are the same type,
+    they are treated as different types.
 
-`trait path(self) -> &Path`
+`trait const PATH: &Path`
 
-:   This `convert()` CLI function trait takes an input format type and outputs
-    associated path. For example, with the enum `Formats::CitationCff`, the path
-    to this file should be `CITATION.cff`. This trait is used internally in the
-    `read()` and `write()` traits.
+:   This [associated
+    constant](https://doc.rust-lang.org/reference/items/associated-items.html)
+    as a trait is used internally in `read()` and `write()` to point to the
+    correct locations of the output format types. For example, with the enum
+    `Format::CitationCff`, the path to this file should be `CITATION.cff`.
 
-`trait read(self) -> Option<Self::Output>`
+`trait read(self) -> Result<Self::Output, Error>`
 
 :   This trait for the `convert()` CLI function uses
     [generics](https://doc.rust-lang.org/book/ch20-02-advanced-traits.html) and
     takes the format type (e.g. `CitationCff{...}`) and reads any existing file
     that is present. If no file is present, it will output `None`. Uses the
-    `path()` trait to read the right path location.
+    `path()` trait to read the right path location. The `Self::Output` is a type
+    alias to the same input type as the trait `path()` to inform Rust that they
+    are internally different. The `Self::Output` type ensures that even though
+    the input type and output type are the same, Rust can track them as
+    different internally.
 
-`trait write(self) -> Result<Self::Output, Error>`
+`trait write(self) -> Result<(), Error>`
 
 :   This trait for the `convert()` CLI function uses
     [generics](https://doc.rust-lang.org/book/ch20-02-advanced-traits.html) and
