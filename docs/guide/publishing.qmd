@@ -36,9 +36,9 @@ different prefixes (e.g. `.zenodo.toml` for the Git repository and
 
 For now, we'll keep it simple. We want to create a Zenodo deposit and eventual
 record for a PDF output of a scientific analysis done in a Quarto document. In
-this guide, the PDF file will be called `analysis-report.pdf`.
+this guide, the PDF file we want to publish is called `analysis-report.pdf`.
 
-We start with creating an empty `.zenodo.toml` file in the folder that has the
+We start by creating an empty `.zenodo.toml` file in the folder that has the
 Quarto document (note that they must be in the same folder).
 
 <!-- TODO: Convert into an executable code chunk -->
@@ -70,19 +70,19 @@ scheme = ""
 Notice the `zendo_id` field in the newly created `.zenodo.toml` file. zen-do
 needs this field to keep track of projects. It is needed for all tasks, such as
 creating a new deposit or updating an existing one and publishing a record from
-the changes. The `zendo_id` key needs to be a value that is unique to the
-(future) deposit of all the deposits in your Zenodo account. As long as you use
-the pattern shown above (`"<github-username>:<repo-name>:<output-type>"`), it
+the changes. The value of the `zendo_id` key needs to be unique---it must not be
+identical to any deposit ID's in your Zenodo account. As long as you use
+the pattern `"<github-username>:<repo-name>:<output-type>"`, it
 should be unique enough. We assume (and strongly recommend) you store your
 project as a Git repository and that you save it on GitHub, so you can use your
-username or organization name along with the repository name as the base of this
-`zendo_id`. Since in this guide we want to publish a report, we can use that as
-the `<output-type>` as `report`.
+username or organization name along with the repository name as the base of the
+`zendo_id`. Since in this guide we want to publish a report, we can write `report-pdf` as
+the `<output-type>`.
 
 ::: callout-tip
 If you don't use GitHub, follow the naming scheme
 `your-name:project-name:output-type`. This helps to ensure that the URN will be
-(very likely) unique to your deposit and allow zen-do to identify if any deposit
+(very likely) unique to this deposit and allow zen-do to identify if a deposit
 with that identifier already exists on your Zenodo account.
 :::
 
@@ -98,8 +98,8 @@ All the fields available from the [Zenodo
 metadata](https://developers.zenodo.org/#representation) are available to be
 added and filled in, not only what are present in the default `.zenodo.toml`
 created from `init`. You can add any field you want from the list and fill them
-in. You should ideally fill as many fields in as make sense for your project
-*before* publishing. But thankfully, you can update the fields later with
+in. You should ideally fill out all fields that make sense for your project
+*before* publishing, but, thankfully, you can update the fields later with
 `update`, so it isn't strictly a requirement. Once you've filled in the
 `.zenodo.toml` file, it's time to create the deposit on Zenodo!
 
@@ -109,7 +109,7 @@ You eventually want to make a published record based on your newly created
 `.zenodo.toml` file. But you don't yet have a deposit. A record can only be
 created from a deposit. If a `.zenodo.toml` file doesn't have an associated
 deposit on your Zenodo account, using `zen-do publish` will create that deposit
-for you. If you want to check whether a deposit already exists, you can use
+on Zenodo for you. If you want to check whether a deposit already exists, you can use
 `zen-do get`:
 
 ```bash {filename="Terminal"}
@@ -117,16 +117,16 @@ zen-do get
 ```
 
 This command will read your `.zenodo.toml` file and check your Zenodo account
-for any deposit that has the value `zendo_id` in it. If it finds something, it
+for any deposit that has the value `zendo_id` in it. If a deposit with that ID exists on your account, it
 will print the deposit details to your terminal, otherwise, it will let you know
 it hasn't found anything.
 
 By default, running `zen-do publish` will create a new deposit and immediately
 publish a new record from that deposit, though it will prompt you to confirm.
 When creating deposits for the first time, it's good practice to use the [Zenodo
-sandbox](https://sandbox.zenodo.org/) and make a draft first. Then to check the
+sandbox](https://sandbox.zenodo.org/) and make a draft deposit first. Then, to check the
 metadata in the newly created draft deposit to confirm. If it looks as you
-expect (the information is there that you want there), you can then try creating
+expect (the information you want is there), you can try creating
 a record in the sandbox. So, let's try making a draft in Zenodo's sandbox.
 zen-do's `publish` command needs the file to upload along with the
 `.zenodo.toml` file, which it looks for in the current directory by default.
@@ -138,7 +138,7 @@ zen-do publish --file analysis-report.pdf --sandbox --draft
 ```
 
 ::: callout-tip
-If you wanted to add multiple files, you can use `--file` multiple times:
+If you want to add multiple files to your deposit, you can use `--file` multiple times:
 
 ```bash {filename="Terminal"}
 zen-do publish \
@@ -196,7 +196,7 @@ zen-do get
 ::: callout-tip
 If you want to include zen-do in a GitHub workflow or some continuous delivery
 process, you can use the `--yes` argument to bypass the prompt. But be very
-careful with this.
+careful with this, because this will create an official record with an associated DOI.
 
 ```bash {filename="Terminal"}
 zen-do publish --file analysis-report.pdf --yes
