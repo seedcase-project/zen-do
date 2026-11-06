@@ -155,7 +155,75 @@ flowchart TD
     classDef inputs fill:lightgray,stroke-width:3px
 ```
 
+### {{< var wip >}} `get()` {#cli-get}
+
+The internals of this function are used in several other CLI functions. That is
+why the subgraph `get_deposit()` library function is shown in this diagram, to
+highlight that it will be reused.
+
+```{mermaid}
+%%| label: fig-get-cli
+%%| fig-cap: "The flow of input and output through the `get()` CLI function."
+%%| fig-alt: >-
+%%|   Diagram showing the flow of input and output through the CLI function.
+%%|   Details about the shapes and what they mean are described at the top of
+%%|   the document.
+
+flowchart TD
+    sandbox[/"--sandbox"/]:::inputs
+    metadata_file[/"[metadata-file]"/]:::inputs
+    token["get_token()"]
+    request[("Request::new()")]
+    read_metadata["read_metadata()"]
+    metadata[("Metadata {...}")]
+    output[/"Deposit<br>or nothing"/]
+
+    subgraph get_deposit ["get_deposit()"]
+      list["list_deposits()"]
+      deposits[("Vec\< Deposits \>")]
+      check_ids["check_ids()"]
+      checked_deposits[("CheckedDeposits")]
+      keep_matching_id["keep_matching_id()"]
+    end
+
+    metadata_file -->
+      read_metadata -->
+      metadata --> |add ID| request
+
+    sandbox & token -->
+      request -->
+      list -->
+      deposits -->
+      check_ids -->
+      checked_deposits -->
+      keep_matching_id
+
+    request -->|add ID| keep_matching_id -->
+      output
+
+    get_deposit:::outer_function
+    classDef outer_function fill:none
+    classDef inputs fill:lightgray,stroke-width:3px
+```
+
 ## Library code
+
+This section describes the non-CLI library interface, which the CLI functions
+use internally use. They are a higher-level description, mainly here to provide
+a function signature as well as some reasons their design (if needed).
+
+`check_ids(deposits: Vec<Deposit>) -> Result<CheckedDeposits, Error>`
+
+:   Checks a list of deposits for any duplicate `zendo_id` identifiers contained
+    within the `related_identifier` Zenodo field. Outputs a `CheckedDeposits`
+    newtype that contains `Vec<Deposit>`.
+
+`CheckedDeposits(Vec<Deposit>)`
+
+:   This newtype pattern is used to make sure downstream functions use an object
+    that has been checked.
+
+<!-- TODO: Confirm whether response contains the deposit, then it can be added to `deposit` -->
 
 `Deposit {...}`
 
@@ -177,6 +245,11 @@ flowchart TD
 
 :   As described in the [CLI](cli.qmd) page, this gets the token from either the
     keyring or from the env variables.
+
+`keep_matching_id(checked_deposits: CheckedDeposits, zendo_id: &ZendoId) -> Option<Deposit>`
+
+:   Takes the `CheckedDeposits` newtype pattern to ensure the internal
+    `Vec<Deposit>` has only deposits that don't have any duplicate `ZendoId`.
 
 `Metadata {...}`
 
@@ -223,6 +296,16 @@ flowchart TD
     current metadata on Zenodo needs to be retrieved, do `Request::new()` again
     to start over.
 
+`Request::get_deposit(self: &mut self, id: &ZendoId) -> Result<Self, Error>`
+
+:   Sends a [`get` REST API request](https://developers.zenodo.org/#list) to
+    Zenodo using the reqwest. Deserialises the Zenodo JSON response into our
+    `Deposit` struct. Also needs a `try_from()` to convert the Zenodo JSON
+    `related_identifier` into our `zendo_id`, if it exists in the JSON (but
+    won't fail if it can't convert anything in the deposit). If no deposit is
+    found, the `Request.deposit` field will be kept as `None`. Is a `impl`
+    method on `Request`.
+
 `Request::has_deposit(self: &self) -> Result<Self, Error>`
 
 :   A simple `impl` method on `Request` to check that the `Request` has a
@@ -236,6 +319,16 @@ flowchart TD
     [`deposit.state`](https://developers.zenodo.org/?shell#representation) field
     if it is "inprogress" and/or if the `deposit.submitted` field is false. Is
     an `impl` method on `Request`.
+
+`Request::list_deposits(self: &self) -> Result<Vec<Deposit>, Error>`
+
+:   Sends a [`get` REST API request](https://developers.zenodo.org/#list) to
+    Zenodo using the reqwest. Deserialises the Zenodo JSON response into our
+    `Deposit` struct. Also needs a `try_from()` to convert the Zenodo JSON
+    `related_identifier` into our `zendo_id`, if it exists in the JSON (but
+    won't fail if it can't convert anything in the deposit). Implemented as an
+    `impl` method on `Request`. Can output an empty `Vec` if no deposit is
+    found.
 
 `Request::new(sandbox, token, zendo_id)`
 
