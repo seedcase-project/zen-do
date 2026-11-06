@@ -252,13 +252,20 @@ flowchart TD
 
 <!-- TODO: Not sure if we want to keep the response here...? -->
 
-`Request {sandbox, token, header, url, zendo_id, deposit, response}`
+`Request {sandbox, token, header, url, connection, zendo_id, deposit, response}`
 
-:   The struct that contains the information needed to connect and send requests
-    to Zenodo. This object is used by
+:   The struct acts as a container to hold everything necessary for all the
+    various functions that it is used by. It contains the information needed to
+    connect to Zenodo, to send a request, as well as the details from the
+    request. This object is used by
     [reqwest](https://docs.rs/reqwest/latest/reqwest/) to build and send the
     request to the [Zenodo API](https://developers.zenodo.org/?shell#rest-api).
-    The fields `zendo_id`, `deposit`, and `response` are `Option` types.
+    Since we aren't sending many requests to Zenodo and because they are fairly
+    simple, these requests are done synchronously. That way we don't need to set
+    up any `async` structures. The `connection` field will hold the
+    `reqwest::blocking::Client::new()` object, where `blocking` is what sets the
+    synchronous connection. The fields `zendo_id`, `deposit`, and `response` are
+    `Option` types.
 
 `Request::discard_deposit(self: &self) -> Result<Self, Error>`
 
@@ -293,7 +300,9 @@ flowchart TD
     connected to the ID, the response of which will be attached to the `deposit`
     field to limit repeated requests. Importantly, the main purpose for getting
     and assigning the `deposit` at this point is to get the Zenodo identifier in
-    [`deposit.id`](https://developers.zenodo.org/?shell#entities).
+    [`deposit.id`](https://developers.zenodo.org/?shell#entities). When using
+    `new()`, the `reqwest::blocking::Client::new()` will be added to
+    `connection` to reuse that object for each request sent to Zenodo.
 
 `trait left_join(self, right: Option<Self>) -> Self`
 
