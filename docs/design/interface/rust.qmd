@@ -31,3 +31,154 @@ diagrams.
 
 The `init` CLI command isn't shown here as it is a very simple command to create
 an `.zenodo.toml` file with empty `Metadata` fields.
+
+### {{< var wip >}} `convert()` {#cli-convert}
+
+Because of the wide variety of potential output formats, the internals of this
+function need to be flexible to adding new formats. It makes heavy use of traits
+and generics in `impl` methods in Rust to keep a simple flow. Methods of the
+traits are applied to each of the formats structs, e.g. for `CitationCff` or
+`ZenodoJson`.
+
+```{mermaid}
+%%| label: fig-convert-cli
+%%| fig-cap: >-
+%%|   The flow of input and output through the `convert()` CLI function. 'New'
+%%|   metadata synced to a format is joined with the 'old' metadata in that
+%%|   format.
+%%| fig-alt: >-
+%%|   Diagram showing the flow of input and output from input to output. There
+%%|   are various shapes for each box, which is described at the top of the
+%%|   document.
+
+flowchart TD
+    metadata_file[/"[metadata-file]"/]:::inputs
+    to[/"--to"/]:::inputs
+
+    read_metadata["read_metadata()"]
+    metadata[("Metadata {...}")]
+    formats[("ToFormats<br>enum")]
+    from["from()<br>trait"]
+
+    subgraph new_format ["Format()<br>struct, new"]
+      %% Fix positions with hidden arrows
+      citation_cff[("CitationCff {...}")] ~~~
+        pyproject_toml[("PyprojectToml {...}")]
+      zenodo_json[("ZenodoJson {...}")] ~~~
+        codemeta_json[("CodemetaJson {...}")]
+      quarto_yml[("QuartoYml {...}")] ~~~
+        description_r[("DescriptionR {...}")]
+    end
+
+    old_format[("Format()<br>struct, old")]
+
+    left{"left?"}
+    right{"right?"}
+
+    left_join["left_join()<br>trait"]
+    read["read()<br>trait"]
+    write["write()<br>trait"]
+
+    metadata_file -->
+      read_metadata -->
+      metadata -->
+      from
+
+    to -->
+      formats -->|match to<br>assign correct<br>format struct| from -->
+      new_format
+
+    new_format -->
+      read -->
+      old_format -->
+      right
+
+    new_format -->
+      left
+
+    left & right -->
+      left_join -->
+      write
+
+    new_format:::inner
+    classDef inner fill:none
+    classDef inputs fill:lightgray,stroke-width:3px
+```
+
+## Library code
+
+`enum ToFormats`
+
+:   This `enum` contains a listing of all the different the different formats we
+    convert to as received from the `--to` arg, as listed in the
+    [CLI](cli.qmd#cli-convert) page.
+
+`struct Format<T>(T)`
+
+:   This struct uses the [newtype
+    pattern](https://www.howtocodeit.com/guides/ultimate-guide-rust-newtypes#newtype-essentials)
+    as a container for the different format structs, e.g. `CitationCff` as
+    `Format(CitationCff)`. This allows traits to be applied to the `Format`
+    struct while also ensuring types match when e.g. using `match`.
+
+`trait from<T>(metadata: &Metadata) -> Self`
+
+:   This uses the built-in `From` trait to build
+    [`from()`](https://doc.rust-lang.org/std/convert/trait.From.html) `impl`
+    methods on the different format structs. For example, for `CitationCff` it
+    could be `impl From<&Metadata> for CitationCff`.
+
+`Metadata {...}`
+
+:   This contains the metadata from the Zenodo TOML file, e.g. `.zenodo.toml`.
+    Will eventually form the deposit's
+    [`metadata`](https://developers.zenodo.org/?shell#depositions) field.
+
+`read_metadata(path: &Path) -> Result<Metadata, Error>`
+
+:   Reads the Zenodo TOML file, e.g. `.zenodo.toml`.
+
+`trait left_join<T>(self, right: Self) -> Self`
+
+:   This trait will be used to create methods on all of the different format
+    structs. This allows a variety of formats (e.g. `CitationCff`) to be used
+    without writing new code for each of those formats. Left join means that all
+    the fields in the left hand side (`self`) are kept and any that are missing
+    from the right hand side (`right`) are merged into it. This enables any
+    values added to an existing file, e.g. `CITATION.cff`, to be kept when
+    joined over. If nothing exists on the right side, the left side is output
+    without any changes. For `Format` it could be an [associated
+    function/generic
+    implementation](https://doc.rust-lang.org/reference/items/implementations.html#generic-implementations)
+    `impl<T> LeftJoin for Format<T>` and internally might apply `left_join()` on
+    the internal struct to then output it wrapped in `Format()` again.
+
+`trait const PATH: &Path`
+
+:   This [associated
+    constant](https://doc.rust-lang.org/reference/items/associated-items.html)
+    as a trait applied to the different format structs is used internally in
+    `read()` and `write()` to point to the correct locations of the output
+    format types. For example, with the enum `ToFormat::CitationCff`, the path
+    to this file should be `CITATION.cff`.
+
+`trait read<T>() -> Result<Option<Self>, Error>`
+
+:   Like `left_join()` above, this trait as an `impl` method on the format
+    structs takes the format type (e.g. `CitationCff{...}`) and reads any
+    existing file that is present. If no file is present, it will output `None`.
+    Uses the `PATH` const to read the right path location. For the newtype
+    `Format()`, it can pass `read()` to the inner type and output `Format()`
+    again.
+
+`trait write<T>(self) -> Result<(), Error>`
+
+:   Like `left_join()` and `read()` above, this trait as an `impl` method on the
+    format structs writes the format to any file. It uses the `PATH` const. It
+    will overwrite the contents of the file, though with `left_join()` will
+    maintain any details not found in the `Metadata`.
+
+`ZendoId`
+
+:   This type contains the `zendo_id` value from the Zenodo TOML file, e.g.
+    `.zenodo.toml`.
