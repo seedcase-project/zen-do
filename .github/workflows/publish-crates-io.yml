@@ -1,0 +1,41 @@
+name: Publish to crates.io
+
+on:
+  # Defining workflow_call means that this workflow can be called from
+  # your main workflow job (`release` from dist)
+  workflow_call:
+    # dist exposes the plan from the plan step, as a JSON string,
+    # to your job if it needs it.
+    inputs:
+      plan:
+        required: true
+        type: string
+
+jobs:
+  publish-crates-io:
+    name: "Publish to crates.io"
+    runs-on: ubuntu-latest
+    permissions:
+      # Required for authentication to crates.io via trusted publishing.
+      id-token: write
+    environment:
+      name: "crates-io"
+    steps:
+      # This is a useful security step to check for unexpected outbound calls from the runner,
+      # which could indicate a compromised token or runner.
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Authenticate with crates.io
+        id: auth
+        uses: rust-lang/crates-io-auth-action@3268eb413133e2960fa4ae0e963ca76380c54cd9 # v1.0.6
+
+      - name: Publish to crates.io
+        run: cargo publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
