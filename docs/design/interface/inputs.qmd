@@ -74,6 +74,10 @@ decided on using an ID that looks like:
 zendo_id = "<github-username>:<repo-name>:<output-type>"
 ```
 
+::: callout-note
+You can also use a GitHub organisation as the username, e.g. `<github-org>`.
+:::
+
 The `zendo_id` field has two requirements:
 
 1. It must consist of at least two words sperarated by `:`.
