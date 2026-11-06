@@ -10,7 +10,13 @@ ci = "github"
 # The installers to generate for each app
 installers = ["shell"]
 # Target platforms to build apps for (Rust target-triple syntax)
-targets = ["aarch64-apple-darwin", "aarch64-unknown-linux-gnu", "x86_64-apple-darwin", "x86_64-unknown-linux-gnu", "x86_64-pc-windows-msvc"]
+targets = [
+  "aarch64-apple-darwin",
+  "aarch64-unknown-linux-gnu",
+  "x86_64-apple-darwin",
+  "x86_64-unknown-linux-gnu",
+  "x86_64-pc-windows-msvc",
+]
 # Path that installers should place binaries in
 install-path = ["$XDG_BIN_HOME/", "$XDG_DATA_HOME/../bin", "~/.local/bin"]
 # Whether to install an updater program
@@ -18,12 +24,13 @@ install-updater = false
 # Whether dist should create a Github Release or use an existing draft
 create-release = false
 # Publish jobs to run in CI
-publish-jobs = ["./publish-crates-io"]
+publish-jobs = ["./publish-crates-io", "./publish-pypi"]
 # Post-announce jobs to run in CI
 post-announce-jobs = ["./build-website"]
 
-# [[dist.github-custom-job-permissions]]
-# "build-website" = { contents = "read" }
+[dist.github-custom-job-permissions]
+# Permissions to sign and upload the release artifacts, and to make the attestation
+"publish-pypi" = { contents = "write", attestations = "write" }
 
 # Set commit hashes rather than version numbers for better security
 [dist.github-action-commits]

@@ -105,6 +105,10 @@ build-website:
 build-package:
     cargo build
 
+# Build the PyPI wheel
+build-wheel:
+  maturin build
+
 # Preview the website with automatic reload on changes
 preview-website:
     quarto preview
