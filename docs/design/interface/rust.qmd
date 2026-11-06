@@ -331,6 +331,76 @@ flowchart TD
     classDef inputs fill:lightgray,stroke-width:3px
 ```
 
+### {{< var wip >}} `update()` {#cli-update}
+
+Like with [`publish()`](#cli-publish), `--draft` and `--yes` mean slightly
+different things.
+
+```{mermaid}
+%%| label: fig-update-cli
+%%| fig-cap: "The flow of input and output through the `update()` CLI function."
+%%| fig-alt: >-
+%%|   Diagram showing the flow of input and output from input to output. There
+%%|   are various shapes for each box, which is described at the top of the
+%%|   document.
+
+flowchart TD
+    draft[/"--draft"/]:::inputs
+    yes[/"--yes"/]:::inputs
+    sandbox[/"--sandbox"/]:::inputs
+    metadata_file[/"[metadata-file]"/]:::inputs
+
+    token["get_token()"]
+    request[("Request::new()")]
+    has_deposit["has_deposit()"]
+    confirm_publish["confirm_publish()"]
+    read_metadata["read_metadata()"]
+    metadata[("Metadata {...}")]
+    is_editable["is_editable()"]
+    as_editable["as_editable()"]
+    update_deposit["update_deposit()"]
+    publish["publish_deposit()"]
+    discard_deposit["discard_deposit()"]
+    output[/"Deposit<br>or nothing"/]
+
+    decision_publish{"publish?"}
+    decision_draft{"draft?"}
+    decision_editable{"editable?"}
+
+    sandbox & token -->
+      request
+
+    draft -->
+      decision_draft -->|true| output
+
+    request -->
+      has_deposit -->
+      is_editable -->
+      decision_editable -->|false| as_editable
+
+    decision_editable --> |true| update_deposit
+
+    as_editable & metadata -->
+      update_deposit -->
+      decision_draft -->|false| decision_publish
+
+    decision_publish -->|true| publish -->
+      output
+
+    metadata_file -->
+      read_metadata -->
+      metadata
+
+    metadata -->|add ID| request
+
+    yes -->
+      confirm_publish -->
+      decision_publish -->|false| discard_deposit -->
+      output
+
+    classDef inputs fill:lightgray,stroke-width:3px
+```
+
 ## Library code
 
 This section describes the non-CLI library interface, which the CLI functions
@@ -428,6 +498,12 @@ a function signature as well as some reasons their design (if needed).
     version"](https://developers.zenodo.org/#new-version). It is similar to
     converting a deposit to "editable" state, but is needed if new files are
     going to be added to the deposit to make a new record.
+
+`Request::as_editable(self: &mut self) -> Result<Self, Error>`
+
+:   This converts the deposit into an [editable
+    state](https://developers.zenodo.org/?shell#edit). Is an `impl` method on
+    `Request`.
 
 `Request::create_deposit(self: &mut self, metadata: &Metadata) -> Result<Self, Error>`
 
