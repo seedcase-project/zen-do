@@ -110,21 +110,21 @@ zen-do update [METADATA-FILE] --sandbox --draft --yes
 
 The `update` command takes a `.zenodo.toml` metadata file and updates the
 contents with the Zenodo deposit, which also updates the record. It doesn't lead
-to a new DOI, as it doesn't change the files in the deposit. This command is
+to a new DOI, as it doesn't change the files in the deposit---only updated metadata. This command is
 useful if you have a typo in one of the fields or forgot to add some
 information, but you don't want to re-upload the same file and create a new DOI.
 
-It has one required argument, `[METADATA-FILE]` that by default looks for the
-`.zenodo.toml` file in the working directory. The optional argument `--sandbox`
-is to update a deposit in the sandbox environment. The second optional argument
-`--draft` will update the deposit without publishing to the record, to enable
-checking the deposit before publishing. Lastly, normally the `update` command
-will prompt for confirmation before continuing. With the `--yes` flag, this
-bypasses that confirmation, which can be useful in continuous delivery
+`update` has one required argument, `[METADATA-FILE]` which is the path to the `.zenodo.toml` file. By default, it looks for the
+ file in the working directory. The optional argument `--sandbox`
+tells the command to update a deposit in the sandbox environment instead of updating it in Zenodo's main environment. The second optional argument
+`--draft` updates the deposit without publishing to the record, making it possible to
+check the deposit before publishing. Lastly, `update`
+prompts for confirmation before actually updating, but with the `--yes` flag,
+that confirmation is bypassed, which is useful for continuous delivery
 workflows.
 
 If no deposit exists then `update` will fail. A deposit needs to first be
-published with `publish` before any content can be updated.
+published as a record (e.g., with `publish`) before any content can be updated.
 
 ## {{< var planned >}} `discard` {#cli-discard}
 
@@ -152,7 +152,7 @@ will be deleted and the new files will be uploaded instead. If `--draft` is
 used, the deposit doesn't get formally published as a new record, otherwise it
 will immediately be created into a record with a corresponding DOI. If
 `--sandbox` is used, the deposit and record will be created in the sandbox
-environment on Zenodo. The `--yes` flag, like the other commands, is used to
+environment on Zenodo. The `--yes` flag, like for the other commands, is used to
 bypass the confirmation prompt.
 
 Unlike the `update` command, this *requires* files to upload and will also
