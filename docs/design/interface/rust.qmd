@@ -126,11 +126,7 @@ flowchart TD
 :   This uses the built-in `From` trait to build
     [`from()`](https://doc.rust-lang.org/std/convert/trait.From.html) `impl`
     methods on the different format structs. For example, for `CitationCff` it
-    could be `impl From<&Metadata> for CitationCff`. For `Format` it could be an
-    [associated function/generic
-    implementation](https://doc.rust-lang.org/reference/items/implementations.html#generic-implementations)
-    `impl<T> From for Format<T>` and internally might apply `from()` on the
-    internal struct to then output it wrapped in `Format()` again.
+    could be `impl From<&Metadata> for CitationCff`.
 
 `Metadata {...}`
 
@@ -151,7 +147,11 @@ flowchart TD
     from the right hand side (`right`) are merged into it. This enables any
     values added to an existing file, e.g. `CITATION.cff`, to be kept when
     joined over. If nothing exists on the right side, the left side is output
-    without any changes.
+    without any changes. For `Format` it could be an [associated
+    function/generic
+    implementation](https://doc.rust-lang.org/reference/items/implementations.html#generic-implementations)
+    `impl<T> LeftJoin for Format<T>` and internally might apply `left_join()` on
+    the internal struct to then output it wrapped in `Format()` again.
 
 `trait const PATH: &Path`
 
@@ -164,15 +164,16 @@ flowchart TD
 
 `trait read<T>() -> Result<Option<Self>, Error>`
 
-:   Like `from()` above, this trait as an `impl` method on the format structs
-    takes the format type (e.g. `CitationCff{...}`) and reads any existing file
-    that is present. If no file is present, it will output `None`. Uses the
-    `PATH` const to read the right path location. For the newtype `Format()`, it
-    can pass `read()` to the inner type and output `Format()` again.
+:   Like `left_join()` above, this trait as an `impl` method on the format
+    structs takes the format type (e.g. `CitationCff{...}`) and reads any
+    existing file that is present. If no file is present, it will output `None`.
+    Uses the `PATH` const to read the right path location. For the newtype
+    `Format()`, it can pass `read()` to the inner type and output `Format()`
+    again.
 
 `trait write<T>(self) -> Result<(), Error>`
 
-:   Like `from()` and `read()` above, this trait as an `impl` method on the
+:   Like `left_join()` and `read()` above, this trait as an `impl` method on the
     format structs writes the format to any file. It uses the `PATH` const. It
     will overwrite the contents of the file, though with `left_join()` will
     maintain any details not found in the `Metadata`.
