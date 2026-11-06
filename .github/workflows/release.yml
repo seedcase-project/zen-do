@@ -97,9 +97,11 @@ jobs:
           version=$(cog get-version)
           # Remove logging from git-cliff.
           RUST_LOG='none' uvx git-cliff --latest --output RELEASE_NOTES.md --strip all
+          # Set to draft so `cargo-dist` can upload artifacts
           gh release create "${version}" \
             --title "Release ${version}" \
-            --notes-file RELEASE_NOTES.md
+            --notes-file RELEASE_NOTES.md \
+            --draft
 
   publish-crates-io:
     name: "Publish to crates.io"
