@@ -101,4 +101,3 @@ jobs:
             --title "Release ${version}" \
             --notes-file RELEASE_NOTES.md \
             --draft
-
