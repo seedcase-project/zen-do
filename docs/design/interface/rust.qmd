@@ -225,7 +225,7 @@ flowchart TD
     token["get_token()"]
     request[("Request::new()")]
     list["list_deposits()"]
-    output[/"Vec\< Deposits \><br>or nothing"/]
+    output[/"Vec\< Deposit \><br>or nothing"/]
 
     sandbox & token -->
       request -->
