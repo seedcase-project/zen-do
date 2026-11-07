@@ -5,6 +5,7 @@ use std::convert::TryFrom;
 use std::error::Error;
 use std::fs;
 use std::path::Path;
+use toml_comment::TomlComment;
 
 pub const EXAMPLE_METADATA: &str = r#"
 title = "Random"
@@ -65,7 +66,7 @@ impl TryFrom<String> for ZendoId {
 }
 
 /// Type representing Zenodo metadata.
-#[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Default, TomlComment)]
 pub struct Metadata {
     /// The title of the deposit.
     pub title: String,
@@ -76,6 +77,7 @@ pub struct Metadata {
 
     /// The zen-do identifier that identifies whether a deposit can be tracked
     /// by zen-do.
+    #[toml_comment(inline)]
     pub zendo_id: ZendoId,
 
     // TODO: Don't allow empty vec, NonEmptyVec?
@@ -112,7 +114,7 @@ impl Metadata {
 }
 
 /// The type containing the details of the creator/author of a Zenodo deposit.
-#[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Default, TomlComment)]
 pub struct Creator {
     /// The full name of the creator/author.
     pub name: String,
@@ -125,7 +127,7 @@ pub struct Creator {
 }
 
 /// Model representing an identifier related to a Zenodo deposit.
-#[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Default, TomlComment)]
 #[serde(try_from = "RelatedIdentifierCheck")]
 pub struct RelatedIdentifier {
     /// The value of the identifier (meaning, the identifier itself).
@@ -215,7 +217,7 @@ pub fn read_metadata(path: &Path) -> Result<Metadata, Box<dyn Error>> {
 /// Errors when writing to file, such as if there is a problem with the file
 /// itself or where it will be saved.
 pub fn write_metadata(metadata: &Metadata, path: &Path) -> Result<(), Box<dyn Error>> {
-    let toml_str: String = toml::to_string_pretty(metadata)?;
+    let toml_str: String = metadata.to_commented_toml();
     fs::write(path, toml_str)?;
     Ok(())
 }
