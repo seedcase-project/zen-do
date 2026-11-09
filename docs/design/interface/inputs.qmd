@@ -75,8 +75,8 @@ zendo_id = "<github-username>:<repo-name>:<output-type>"
 ```
 
 ::: callout-note
-You can also use a GitHub organisation as the username like so: `"<github-username>:<repo-name>:<output-type>"`.
-
+You can also use a GitHub organisation as the username like so:
+`"<github-username>:<repo-name>:<output-type>"`.
 :::
 
 The `zendo_id` field has two requirements:
