@@ -79,7 +79,7 @@ flowchart TD
     convert to as received from the `--to` arg, as listed in the
     [CLI](cli.qmd#cli-convert) page.
 
-`trait from<T>(metadata: &Metadata) -> Self`
+`trait from(metadata: &Metadata) -> Self`
 
 :   This uses the built-in `From` trait to build
     [`from()`](https://doc.rust-lang.org/std/convert/trait.From.html) `impl`
@@ -161,7 +161,7 @@ flowchart TD
     classDef inner fill:none
 ```
 
-`trait left_join<T>(self, right: Self) -> Self`
+`trait left_join(self, right: Self) -> Self`
 
 :   This trait will be used to create methods on all of the different format
     structs. This allows a variety of formats (e.g. `CitationCff`) to be used
@@ -181,14 +181,14 @@ flowchart TD
     format types. For example, with the enum `ToFormat::CitationCff`, the path
     to this file should be `CITATION.cff`.
 
-`trait read<T>() -> Result<Option<Self>, Error>`
+`trait read() -> Result<Option<Self>, Error>`
 
 :   Like `left_join()` above, this trait as an `impl` method on the format
     structs takes the format type (e.g. `CitationCff{...}`) and reads any
     existing file that is present. If no file is present, it will output `None`.
     Uses the `PATH` const to read the right path location.
 
-`trait write<T>(self) -> Result<(), Error>`
+`trait write(self) -> Result<(), Error>`
 
 :   Like `left_join()` and `read()` above, this trait as an `impl` method on the
     format structs writes the format to any file. It uses the `PATH` const. It
