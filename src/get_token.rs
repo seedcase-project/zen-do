@@ -40,9 +40,9 @@ pub fn get_token(sandbox: bool) -> Result<String, Box<dyn std::error::Error>> {
 fn get_keyring_token(token_name: &str) -> Result<String, Box<dyn std::error::Error>> {
     // Set up the platform's keyring on first use.
     let _ = keyring::Entry::store_status();
-    // Use `keyring_core` for new entry, bc `keyring` don't create entries when the
-    // platform's keyring isn't available (as in the CI), even if another store is
-    // set.
+    // Use `keyring_core` for new entry, bc `keyring` don't create entries when
+    // the platform's keyring isn't available (as in the CI), even if another
+    // store is set.
     let token = keyring_core::Entry::new(SERVICE_NAME, token_name)?.get_password()?;
     non_empty(token)
 }
@@ -77,8 +77,8 @@ mod tests {
     }
 
     fn use_failing_keyring() {
-        // Initialise the real store first, so it isn't set up again in get_token()
-        // after being removed.
+        // Initialise the real store first, so it isn't set up again in
+        // get_token() after being removed.
         let _ = keyring::Entry::store_status();
         keyring_core::unset_default_store();
     }

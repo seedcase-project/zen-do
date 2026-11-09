@@ -107,7 +107,7 @@ build-package:
 
 # Build the PyPI wheel
 build-wheel:
-  maturin build
+    maturin build
 
 # Preview the website with automatic reload on changes
 preview-website:
@@ -123,4 +123,4 @@ reset-from-template:
 
 # Re-generate the `release.yml` file from cargo-dist
 update-release:
-  dist init --yes
+    dist init --yes
