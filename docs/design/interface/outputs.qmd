@@ -27,9 +27,11 @@ While the `.zenodo.toml` file is the main input, there are many other formats
 that provide some of the information that Zenodo needs. Or, like the
 `.zenodo.json` file, that contain the exact same information but in a different
 format. Even though Zenodo uses a JSON file in its official documentation, JSON
-is not pleasant to manually edit and use, while TOML is. So if a user has a
-`.zenodo.json` file already, being able to convert to the TOML version is
-useful.
+is not pleasant to manually edit and use, while TOML is. So being able to
+convert from the `.zenodo.toml` "source of truth" to the `.zenodo.json` file
+format when connecting to Zenodo via their [GitHub
+integration](https://help.zenodo.org/docs/github/) would help simplify setting
+up that integration.
 
 Likewise, there are so many different formats for storing project metadata (e.g.
 [`CITATION.cff`](https://citation-file-format.github.io/),

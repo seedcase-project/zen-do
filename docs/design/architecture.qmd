@@ -81,7 +81,6 @@ flowchart TB
     user -->|edit| metadata
     user -->|provide| token
     metadata -->|read| zen_do
-    metadata <-.->|convert| metadata_formats
     token --> zen_do
     zen_do -->|convert| metadata_formats
     file -->|add| zen_do
