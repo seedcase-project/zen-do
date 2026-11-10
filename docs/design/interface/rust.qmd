@@ -265,8 +265,9 @@ a function signature as well as some reasons their design (if needed).
 `check_ids(deposits: Vec<Deposit>) -> Result<CheckedDeposits, Error>`
 
 :   Checks a list of deposits for any duplicate `zendo_id` identifiers contained
-    within the `related_identifier` Zenodo field. Outputs a `CheckedDeposits`
-    newtype that contains `Vec<Deposit>`.
+    within the `related_identifier` Zenodo field. Outputs a `Result` type with
+    `CheckedDeposits` newtype that contains `Vec<Deposit>` in the `Ok()` arm and
+    an `Error` if the check failed, i.e. if found any duplicates.
 
 `CheckedDeposits(Vec<Deposit>)`
 
