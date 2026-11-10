@@ -104,7 +104,7 @@ is a thin wrapper around `from()`, `read()`, `left_join()`, and `write()`. The
 signature is:
 
 ```rust
-impl sync_format(metadata: &Metadata) -> Result<(), Error>;
+fn sync_format<T>(metadata: &Metadata) -> Result<(), Error>;
 ```
 
 ```{mermaid}
@@ -184,7 +184,7 @@ flowchart TD
 `trait read() -> Result<Option<Self>, Error>`
 
 :   Like `left_join()` above, this trait as an `impl` method on the format
-    structs takes the format type (e.g. `CitationCff{...}`) and reads any
+    structs reads any
     existing file that is present. If no file is present, it will output `None`.
     Uses the `PATH` const to read the right path location.
 
