@@ -137,10 +137,9 @@ struct ConvertArgs {
     metadata_file: MetadataFileArg,
 
     // TODO: Convert `to` into an enum?
-    /// The formats to convert the metadata file to. Can be a single format or
-    /// an array of formats.
+    /// The format to convert the metadata file to.
     #[arg(short, long, required = true)]
-    to: Vec<String>,
+    to: String,
 }
 
 /// Create a `.zenodo.toml` file with all deposit metadata fields
