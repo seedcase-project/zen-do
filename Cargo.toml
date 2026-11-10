@@ -1,6 +1,6 @@
 [package]
 name = "zen-do"
-version = "0.14.0"
+version = "0.14.1"
 edition = "2024"
 authors = [
   "Signe Kirk Brødbæk <signekb@clin.au.dk>",
@@ -40,3 +40,8 @@ tempfile = "3.27.0"
 # Needs to have priority set to indicate the order. `-1` means first.
 pedantic = { priority = -1, level = "warn" }
 unwrap_used = "deny"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"

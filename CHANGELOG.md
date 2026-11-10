@@ -19,6 +19,79 @@ releases we've made so far, along with what was changed within each release.
 Commits from bots, like `dependabot` or `pre-commit-ci`, are not included in the
 changelog.
 
+## [0.14.1](https://github.com/seedcase-project/zen-do/compare/0.14.0..0.14.1) - 2026-11-10
+
+### ♻️ Refactor
+
+- Rename `convert` to `sync`
+  [#282](https://github.com/seedcase-project/zen-do/pull/282) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([372c9fe](https://github.com/seedcase-project/zen-do/commit/372c9fe1f2d20450b543bfbbd1b8d749dcccd951))
+
+### 📝 Documentation
+
+- Add header refs to CLI commands to link to
+  [#253](https://github.com/seedcase-project/zen-do/pull/253) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([75dd914](https://github.com/seedcase-project/zen-do/commit/75dd914d9b4327879002823b562d37c7ff5dafcc))
+- Add intro section to Rust library interface
+  [#244](https://github.com/seedcase-project/zen-do/pull/244) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([3091307](https://github.com/seedcase-project/zen-do/commit/3091307c0d7d979d890135089953ebfc9ebc46c0))
+- Add guide on publishing
+  [#180](https://github.com/seedcase-project/zen-do/pull/180) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([6948ba7](https://github.com/seedcase-project/zen-do/commit/6948ba70247e9449206a89f4297ef846523c2f38))
+- Clarify meaning of (draft) deposit in design docs
+  [#233](https://github.com/seedcase-project/zen-do/pull/233) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([20980ae](https://github.com/seedcase-project/zen-do/commit/20980aed70b0036b06860cd6993e365a391f295b))
+- Add `--yes` flag to CLI design
+  [#254](https://github.com/seedcase-project/zen-do/pull/254) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([1e9fbd4](https://github.com/seedcase-project/zen-do/commit/1e9fbd4909c7d2768934365788b5af980c349bd7))
+- Fix links and reformat LICENSE file
+  [#284](https://github.com/seedcase-project/zen-do/pull/284) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([d57e92e](https://github.com/seedcase-project/zen-do/commit/d57e92ea5ad9659ee7dd246ec5fccabdd904292f))
+
+### 💄 Styling
+
+- Reformat various files
+  [#283](https://github.com/seedcase-project/zen-do/pull/283) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([8fbef11](https://github.com/seedcase-project/zen-do/commit/8fbef11220ecc89cfb06412151ba5d2b4b2efeee))
+
+### 👷 CI/CD
+
+- Setup binary distributions on release workflow
+  [#279](https://github.com/seedcase-project/zen-do/pull/279) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([49400fd](https://github.com/seedcase-project/zen-do/commit/49400fd3fead2cd3bfe49b95ff3fb9422029cc87))
+- Add missing publish to crates workflow
+  [#280](https://github.com/seedcase-project/zen-do/pull/280) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([8b440bd](https://github.com/seedcase-project/zen-do/commit/8b440bda7b0bf39bd81b749d16214f0f430e15ff))
+- Add publish to PyPI workflow
+  [#281](https://github.com/seedcase-project/zen-do/pull/281) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([6999825](https://github.com/seedcase-project/zen-do/commit/6999825af8647a2bdc22922a5fee9fbf8e58904c))
+
+### 👩‍💻 Miscellaneous
+
+- Fix `CHANGELOG` link in `_quarto.yml`, should be `md`
+  [#232](https://github.com/seedcase-project/zen-do/pull/232) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([16abb71](https://github.com/seedcase-project/zen-do/commit/16abb71cedadb5370d9d89e9e28032e243d6d305))
+- Upgrade pre-commit version
+  [#257](https://github.com/seedcase-project/zen-do/pull/257) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([049a27d](https://github.com/seedcase-project/zen-do/commit/049a27d25def330ebcd8ada17fe65576d3c5df84))
+- Remove no longer relevant Python files
+  [#252](https://github.com/seedcase-project/zen-do/pull/252) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([393d246](https://github.com/seedcase-project/zen-do/commit/393d2465ce018c8e99bc897e79cd993e9f71d474))
+
 ## [0.14.0](https://github.com/seedcase-project/zen-do/compare/0.13.1..0.14.0) - 2026-10-30
 
 ### ✨ Features

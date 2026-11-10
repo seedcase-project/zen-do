@@ -1,0 +1,38 @@
+[project]
+# Dynamic will populate the metadata from `Cargo.toml`
+dynamic = [
+  "version",
+  "description",
+  "readme",
+  "urls",
+  "authors",
+  "license",
+  "keywords",
+]
+name = "zen-do"
+requires-python = ">=3.12"
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+
+  # How mature is this project? Common values are
+  #   3 - Alpha
+  #   4 - Beta
+  #   5 - Production/Stable
+  "Development Status :: 4 - Beta",
+
+  # Indicate who your project is intended for
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+
+  # Built in Rust
+  "Programming Language :: Rust",
+]
+
+[build-system]
+requires = ["maturin>=1.16,<2.0"]
+build-backend = "maturin"
+
+# Only create a binary Python package (not library)
+[tool.maturin]
+bindings = "bin"
+exclude = ["**/__pycache__", "**/*.pyc", "**/*.pyo"]

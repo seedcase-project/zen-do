@@ -37,8 +37,8 @@ simplifies specific tasks related to disseminating different scientific output.
 
 Publishing to Zenodo should not require learning another web interface or
 managing the same information in several places. zen-do provides a command-line
-interface (CLI) for preparing, managing, converting, and publishing Zenodo
-deposits from a metadata file and your existing research files.
+interface (CLI) for preparing, managing, and publishing Zenodo deposits from a
+metadata file and your existing research files.
 
 Publishing research outputs to Zenodo with zen-do makes it an easy part of your
 normal research workflow. It provides a simple way to keep the information about

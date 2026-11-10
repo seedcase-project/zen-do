@@ -105,6 +105,10 @@ build-website:
 build-package:
     cargo build
 
+# Build the PyPI wheel
+build-wheel:
+    maturin build
+
 # Preview the website with automatic reload on changes
 preview-website:
     quarto preview
@@ -116,3 +120,7 @@ update-from-template:
 # Reset repo changes to match the template
 reset-from-template:
     uvx copier recopy --defaults
+
+# Re-generate the `release.yml` file from cargo-dist
+update-release:
+    dist init --yes
