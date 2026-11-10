@@ -32,7 +32,7 @@ diagrams.
 The `init` CLI command isn't shown here as it is a very simple command to create
 an `.zenodo.toml` file with empty `Metadata` fields.
 
-### {{< var wip >}} `convert()` {#cli-convert}
+### {{< var wip >}} `sync()` {#cli-sync}
 
 Because of the wide variety of potential output formats, the internals of this
 function need to be flexible to adding new formats. It makes heavy use of traits
@@ -41,9 +41,9 @@ traits are applied to each of the formats structs, e.g. for `CitationCff` or
 `ZenodoJson`.
 
 ```{mermaid}
-%%| label: fig-convert-cli
+%%| label: fig-sync-cli
 %%| fig-cap: >-
-%%|   The flow of input and output through the `convert()` CLI function. 'New'
+%%|   The flow of input and output through the `sync()` CLI function. 'New'
 %%|   metadata synced to a format is joined with the 'old' metadata in that
 %%|   format.
 %%| fig-alt: >-
@@ -76,8 +76,8 @@ flowchart TD
 `enum ToFormats`
 
 :   This `enum` contains a listing of all the different the different formats we
-    convert to as received from the `--to` arg, as listed in the
-    [CLI](cli.qmd#cli-convert) page.
+    sync to as received from the `--to` arg, as listed in the
+    [CLI](cli.qmd#cli-sync) page.
 
 `trait from(metadata: &Metadata) -> Self`
 
