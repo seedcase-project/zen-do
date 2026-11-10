@@ -218,8 +218,6 @@ highlight that it will be reused.
 %%| fig-cap: "The flow of input and output through the `get()` CLI function."
 %%| fig-alt: >-
 %%|   Diagram showing the flow of input and output through the CLI function.
-%%|   Details about the shapes and what they mean are described at the top of
-%%|   the document.
 
 flowchart TD
     sandbox[/"--sandbox"/]:::inputs
@@ -232,7 +230,7 @@ flowchart TD
 
     subgraph get_deposit ["get_deposit()"]
       list["list_deposits()"]
-      deposits[("Vec\< Deposits \>")]
+      deposits[("Vec\< Deposit \>")]
       check_ids["check_ids()"]
       checked_deposits[("CheckedDeposits")]
       keep_matching_id["keep_matching_id()"]
@@ -275,7 +273,7 @@ a function signature as well as some reasons their design (if needed).
 :   This newtype pattern is used to make sure downstream functions use an object
     that has been checked.
 
-<!-- TODO: Confirm whether response contains the deposit, then it can be added to `deposit` -->
+<!-- TODO: Confirm whether response contains the deposit, then it can be added to `Deposit` -->
 
 `Deposit {...}`
 
@@ -302,6 +300,8 @@ a function signature as well as some reasons their design (if needed).
 
 :   Takes the `CheckedDeposits` newtype pattern to ensure the internal
     `Vec<Deposit>` has only deposits that don't have any duplicate `ZendoId`.
+    Compares the ID from the metadata file and outputs the deposit from
+    `CheckedDeposits` with the matching ID (if any).
 
 `Metadata {...}`
 
@@ -351,12 +351,13 @@ a function signature as well as some reasons their design (if needed).
 `Session::get_deposit(self: &mut self, id: &ZendoId) -> Result<Self, Error>`
 
 :   Sends a [`get` REST API request](https://developers.zenodo.org/#list) to
-    Zenodo using the reqwest. Deserialises the Zenodo JSON response into our
-    `Deposit` struct. Also needs a `try_from()` to convert the Zenodo JSON
-    `related_identifier` into our `zendo_id`, if it exists in the JSON (but
-    won't fail if it can't convert anything in the deposit). If no deposit is
-    found, the `Session.deposit` field will be kept as `None`. Is a `impl`
-    method on `Session`.
+    Zenodo using [reqwest](https://docs.rs/reqwest/latest/reqwest/).
+    Deserialises the Zenodo JSON response into our `Deposit` struct. Also
+    includes a `try_from()` to convert the Zenodo JSON `related_identifier` into
+    our `zendo_id`, if it exists in the JSON (but won't fail if it can't convert
+    any `related_identifier`s in the deposit). If no deposit is found, the
+    `Session.deposit` field will be kept as `None`. Is a `impl` method on
+    `Session`.
 
 `Session::require_deposit(self: &self) -> Result<Self, Error>`
 
@@ -375,9 +376,9 @@ a function signature as well as some reasons their design (if needed).
 `Session::list_deposits(self: &self) -> Result<Vec<Deposit>, Error>`
 
 :   Sends a [`get` REST API request](https://developers.zenodo.org/#list) to
-    Zenodo using the reqwest. Deserialises the Zenodo JSON response into our
-    `Deposit` struct. Also needs a `try_from()` to convert the Zenodo JSON
-    `related_identifier` into our `zendo_id`, if it exists in the JSON (but
+    Zenodo using the `reqwest` package. Deserialises the Zenodo JSON response
+    into our `Deposit` struct. Also needs a `try_from()` to convert the Zenodo
+    JSON `related_identifier` into our `zendo_id`, if it exists in the JSON (but
     won't fail if it can't convert anything in the deposit). Implemented as an
     `impl` method on `Session`. Can output an empty `Vec` if no deposit is
     found.
