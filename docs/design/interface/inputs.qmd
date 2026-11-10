@@ -20,7 +20,7 @@ zen-do when interacting with the Zenodo API will use this file and overwrite
 anything in the Zenodo deposit.
 
 ::: callout-note
-The `.zenodo.toml` file can be synced to and from other formats, such as
+The metadata in the `.zenodo.toml` file can be synced to other formats, such as
 `.zenodo.json`, `_quarto.yml`, `pyproject.toml`, and `CITATION.cff` (filling in
 the relevant fields in those other formats) using the `sync` command. This
 command is the only command that takes other formats as input.
