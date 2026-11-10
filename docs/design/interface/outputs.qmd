@@ -28,8 +28,7 @@ that provide some of the information that Zenodo needs. Or, like the
 `.zenodo.json` file, that contain the exact same information but in a different
 format. Even though Zenodo uses a JSON file in its official documentation, JSON
 is not pleasant to manually edit and use, while TOML is. So if a user has a
-`.zenodo.json` file already, being able to convert to the TOML version is
-useful.
+`.zenodo.json` file already, being able to sync to the TOML version is useful.
 
 Likewise, there are so many different formats for storing project metadata (e.g.
 [`CITATION.cff`](https://citation-file-format.github.io/),
