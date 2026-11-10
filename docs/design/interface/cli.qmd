@@ -98,8 +98,9 @@ to keep synchronized with the `.zenodo.toml` file, including:
   `pyproject.toml`, it contains similar metadata fields to the `.zenodo.toml`
   file, such as the package name, description, authors, and license.
 
-The `--to` argument can be a single format or an array of formats, allowing
-users to sync to multiple formats in one command.
+The `--to` argument takes a single format only, so `sync` must be used multiple
+times to sync to multiple formats---one time for each format. This matches
+similar "converter" packages, e.g. [pandoc](https://pandoc.org).
 
 ## {{< var planned >}} `update` {#cli-update}
 
