@@ -184,9 +184,8 @@ flowchart TD
 `trait read() -> Result<Option<Self>, Error>`
 
 :   Like `left_join()` above, this trait as an `impl` method on the format
-    structs reads any
-    existing file that is present. If no file is present, it will output `None`.
-    Uses the `PATH` const to read the right path location.
+    structs reads any existing file that is present. If no file is present, it
+    will output `None`. Uses the `PATH` const to read the right path location.
 
 `trait write(self) -> Result<(), Error>`
 
