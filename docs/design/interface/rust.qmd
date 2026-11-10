@@ -267,9 +267,7 @@ deposits on a Zenodo account associated with the given token.
 %%|   The flow of input and output through the `list()` CLI function. Bolded and
 %%|   gray box is the input arguments to `list()`.
 %%| fig-alt: >-
-%%|   Diagram showing the flow of input and output through the CLI function.
-%%|   Details about the shapes and what they mean are described at the top of
-%%|   the document.
+%%|   Diagram showing the flow of input and output through the CLI list function.
 
 flowchart TD
     sandbox[/"--sandbox"/]:::inputs
