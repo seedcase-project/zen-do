@@ -98,10 +98,10 @@ flowchart TD
 
 ### `sync_format()`
 
-This `impl` method on the various format structs, e.g. `CitationCff` is a simple
-convenience method for use in the `match` arms of the `sync()` CLI command. It
-is a thin wrapper around `from()`, `read()`, `left_join()`, and `write()`. The
-signature is:
+This generic function operates on the various format structs, e.g.
+`CitationCff`. It is a simple convenience method for use in the `match` arms of
+the `sync()` CLI command. It is a thin wrapper around `from()`, `read()`,
+`left_join()`, and `write()`. The signature is:
 
 ```rust
 fn sync_format<T>(metadata: &Metadata) -> Result<(), Error>;
@@ -161,7 +161,7 @@ flowchart TD
     classDef inner fill:none
 ```
 
-`trait left_join(self, right: Self) -> Self`
+`trait left_join(self, right: Option<Self>) -> Self`
 
 :   This trait will be used to create methods on all of the different format
     structs. This allows a variety of formats (e.g. `CitationCff`) to be used
@@ -179,7 +179,8 @@ flowchart TD
     as a trait applied to the different format structs is used internally in
     `read()` and `write()` to point to the correct locations of the output
     format types. For example, with the enum `ToFormat::CitationCff`, the path
-    to this file should be `CITATION.cff`.
+    to this file should be `CITATION.cff`, in the same folder as where the
+    `metadata-file` is found.
 
 `trait read() -> Result<Option<Self>, Error>`
 
