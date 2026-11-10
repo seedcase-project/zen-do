@@ -27,15 +27,15 @@ package.
 
   : Objects used in zen-do.
 
-  | Action    | Description                                                                                                                                         |
-  | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-  | init      | Create an empty metadata file to be filled in.                                                                                                      |
-  | list      | List all Zenodo deposits in an account.                                                                                                             |
-  | get       | Get a Zenodo deposit in an account from a metadata file.                                                                                            |
+  | Action    | Description                                                                                                                                                                 |
+  | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------                         |
+  | init      | Create an empty metadata file to be filled in.                                                                                                                              |
+  | list      | List all Zenodo deposits in an account.                                                                                                                                     |
+  | get       | Get a Zenodo deposit in an account from a metadata file.                                                                                                                    |
   | sync      | Sync the metadata from `zenodo.toml` to other metadata formats.                                                                                                             |
-  | update    | Updates an existing Zenodo deposit's metadata only (not file) based on the contents of a metadata file.                                             |
-  | publish   | Publish a new Zenodo record from an existing or new Zenodo deposit based on the metadata file and, if given, updating the file(s) in the deposit.   |
-  | discard   | Discard a draft of or update to a Zenodo deposit (but not record).                                                                                  |
+  | update    | Updates an existing Zenodo deposit's metadata only (not file) based on the contents of a metadata file.                                                                     |
+  | publish   | Publish a new Zenodo record from an existing or new Zenodo deposit based on the metadata file and, if given, updating the file(s) in the deposit.                           |
+  | discard   | Discard a draft of or update to a Zenodo deposit (but not record).                                                                                                          |
 
   : Actions used in zen-do.
 
