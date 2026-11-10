@@ -167,15 +167,13 @@ This relatively simple function, like [`get()`](#cli-get), has an internal
 `discard_deposit()` method that is used in other CLI functions. However, unlike
 `get_deposit()` that requires a bit more steps, the [discard Zenodo
 API](https://developers.zenodo.org/#discard) request used in `discard_deposit()`
-is a (mostly) simple `POST` to the `discard` endpoint.
+is a (mostly) simple `POST` request to the `discard` endpoint.
 
 ```{mermaid}
 %%| label: fig-discard-cli
 %%| fig-cap: "The flow of input and output through the `discard()` CLI function."
 %%| fig-alt: >-
 %%|   Diagram showing the flow of input and output through the CLI function.
-%%|   Details about the shapes and what they mean are described at the top of
-%%|   the document.
 
 flowchart TD
     sandbox[/"--sandbox"/]:::inputs
@@ -215,7 +213,7 @@ flowchart TD
 
 :   A struct that represents the JSON response received from Zenodo. Mainly
     needed for updating the `deposit.metadata` object and for the `deposit.id`
-    fields. The list of fields in the deposit are shown on
+    fields. The Zenodo deposit fields are listed on
     [Zenodo](https://developers.zenodo.org/?shell#entities). Some fields are not
     converted from the Zenodo JSON representation to our `Deposit` struct as
     they aren't needed by zen-do nor needed during communication with the Zenodo
@@ -234,8 +232,8 @@ flowchart TD
 
 `Metadata {...}`
 
-:   This contains the metadata from the Zenodo TOML file, e.g. `.zenodo.toml`.
-    Will eventually form the deposit's
+:   This contains the metadata from the Zenodo TOML file, i.e., `.zenodo.toml`.
+    It will eventually form the deposit's
     [`metadata`](https://developers.zenodo.org/?shell#depositions) field.
 
 `Metadata::into_format(self: Self, to: Formats) -> T`
