@@ -19,6 +19,29 @@ releases we've made so far, along with what was changed within each release.
 Commits from bots, like `dependabot` or `pre-commit-ci`, are not included in the
 changelog.
 
+## [0.14.2](https://github.com/seedcase-project/zen-do/compare/0.14.1..0.14.2) - 2026-11-10
+
+### ♻️ Refactor
+
+- Revise so `--to` in `sync` only takes one arg
+  [#289](https://github.com/seedcase-project/zen-do/pull/289) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([74af730](https://github.com/seedcase-project/zen-do/commit/74af730e08f2bf538b0c2fb9518f3770dd161c4e))
+
+### 📝 Documentation
+
+- Clarify the purpose of `sync` to be one-way
+  [#285](https://github.com/seedcase-project/zen-do/pull/285) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([ba9bc92](https://github.com/seedcase-project/zen-do/commit/ba9bc9249b7cea55a101522316a07ba42db86e69))
+
+### 👩‍💻 Miscellaneous
+
+- Allow CI to be triggered on GitHub release
+  [#290](https://github.com/seedcase-project/zen-do/pull/290) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([29f0905](https://github.com/seedcase-project/zen-do/commit/29f09054e7c85c2c2c21588ee02701827b446214))
+
 ## [0.14.1](https://github.com/seedcase-project/zen-do/compare/0.14.0..0.14.1) - 2026-11-10
 
 ### ♻️ Refactor
