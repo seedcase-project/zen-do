@@ -28,9 +28,9 @@ that provide some of the information that Zenodo needs. Or, like the
 `.zenodo.json` file, that contain the exact same information but in a different
 format. Even though Zenodo uses a JSON file in its official documentation, JSON
 is not pleasant to manually edit and use, while TOML is. So being able to
-convert from the `.zenodo.toml` "source of truth" to the `.zenodo.json` file
+sync the metadata in `.zenodo.toml` as a source of truth to the `.zenodo.json` file
 format when connecting to Zenodo via their [GitHub
-integration](https://help.zenodo.org/docs/github/) would help simplify setting
+integration](https://help.zenodo.org/docs/github/) helps to simplify setting
 up that integration.
 
 Likewise, there are so many different formats for storing project metadata (e.g.

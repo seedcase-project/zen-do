@@ -34,7 +34,7 @@ Specifically, zen-do must:
   deposit.
 - Simplify keeping different project metadata formats (e.g. `.zenodo.json`,
   `CITATION.cff`, `pyproject.toml`, `.zenodo.toml`, or `_quarto.yml`)
-  synchronized.
+  synchronized by having a single source of truth in `zenodo.toml`.
 - List all deposits for a given account.
 - Allow a GitHub repository to be linked to one or more Zenodo deposits.
 - Installable via crates.io or with uv.
