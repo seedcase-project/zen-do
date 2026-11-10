@@ -50,7 +50,6 @@ content of the metadata file using the `zendo_id`.
 ## {{< var wip >}} `sync` {#cli-sync}
 
 ```bash {filename="Terminal"}
-zen-do convert [METADATA-FILE] --to [FORMAT]
 zen-do sync [METADATA-FILE] --to [FORMAT]
 ```
 
