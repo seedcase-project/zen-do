@@ -47,29 +47,29 @@ updating or publishing it. Internally uses the Rust functions within `list()` to
 get the list of deposits and uses that to find the deposit that matches the
 content of the metadata file using the `zendo_id`.
 
-## {{< var wip >}} `convert` {#cli-convert}
+## {{< var wip >}} `sync` {#cli-sync}
 
 ```bash {filename="Terminal"}
-zen-do convert [METADATA_FILE] --to [FORMAT]
+zen-do sync [METADATA_FILE] --to [FORMAT]
 ```
 
 There are many different file formats and standards that contain similar or even
-identical metadata, but that are structured slightly differently. The `convert`
+identical metadata, but that are structured slightly differently. The `sync`
 command helps to keep one "source of truth" between these different formats for
 those cases where a repository might need different formats for different
 purposes. For example, GitHub will look for a `CITATION.cff` file to display the
 citation information for a repository, but doesn't recognize other formats (like
 `.zenodo.toml`). Rather than manually keeping these different files in sync, the
-`convert` command can simplify this syncing task.
+`sync` command can simplify this syncing task.
 
-We decided to only convert from `.zenodo.toml` to other formats, rather than
-allow any format to be converted to any other format because we want the
-`.zenodo.toml` file to be the "single source of truth" for a project's metadata.
-This means that any changes to the metadata must be done in the `.zenodo.toml`
-file and `convert` can update the other formats. This also simplifies the
-implementation and testing of the `convert` command, as we only need to
-implement the logic for converting from `.zenodo.toml` to other formats, rather
-than having to handle conversions between all possible pairs of formats.
+We decided to only sync from `.zenodo.toml` to other formats, rather than allow
+any format to be synced to any other format because we want the `.zenodo.toml`
+file to be the "single source of truth" for a project's metadata. This means
+that any changes to the metadata must be done in the `.zenodo.toml` file and
+`sync` can update the other formats. This also simplifies the implementation and
+testing of the `sync` command, as we only need to implement the logic for
+syncing from `.zenodo.toml` to other formats, rather than having to handle
+syncing between all possible pairs of formats.
 
 There are several different formats that we've encountered that would be useful
 to keep synchronized with the `.zenodo.toml` file, including:
