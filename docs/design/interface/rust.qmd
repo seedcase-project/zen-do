@@ -256,6 +256,35 @@ flowchart TD
     classDef inputs fill:lightgray,stroke-width:3px
 ```
 
+### {{< var wip >}} `list()` {#cli-list}
+
+This function only has one argument, `--sandbox`. Otherwise, it simply lists all
+deposits on a Zenodo account associated with the given token.
+
+```{mermaid}
+%%| label: fig-list-cli
+%%| fig-cap: >-
+%%|   The flow of input and output through the `list()` CLI function. Bolded and
+%%|   gray box is the input arguments to `list()`.
+%%| fig-alt: >-
+%%|   Diagram showing the flow of input and output through the CLI list
+%%|   function.
+
+flowchart TD
+    sandbox[/"--sandbox"/]:::inputs
+    token["get_token()"]
+    request[("Request::new()")]
+    list["list_deposits()"]
+    output[/"Vec\< Deposit \><br>or nothing"/]
+
+    sandbox & token -->
+      request -->
+      list -->
+      output
+
+    classDef inputs fill:lightgray,stroke-width:3px
+```
+
 ## Library code
 
 This section describes the non-CLI library interface, which the CLI functions
