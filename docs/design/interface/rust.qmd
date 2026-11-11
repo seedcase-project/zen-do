@@ -179,30 +179,30 @@ flowchart TD
     sandbox[/"--sandbox"/]:::inputs
     metadata_file[/"[metadata-file]"/]:::inputs
     token["get_token()"]
-    request[("Request::new()")]
+    session[("Session::new()")]
     read_metadata["read_metadata()"]
     metadata[("Metadata {...}")]
     has_deposit["has_deposit()"]
-    is_editable["is_editable()"]
+    is_draft["is_draft()"]
     discard_deposit["discard_deposit()"]
     output[/"Response<br>or nothing"/]
 
-    decision_editable{"editable?"}
+    decision_draft{"draft?"}
 
     metadata_file -->
       read_metadata -->
-      metadata -->|add ID| request
+      metadata -->|add ID| session
 
-    request --> discard_deposit
+    session --> discard_deposit
 
     sandbox & token -->
-      request -->
+      session -->
       has_deposit -->
-      is_editable --> decision_editable
-      decision_editable -->|true| discard_deposit -->
+      is_draft --> decision_draft
+      decision_draft -->|true| discard_deposit -->
       output
 
-    decision_editable -->|false| output
+    decision_draft -->|false| output
 
     classDef inputs fill:lightgray,stroke-width:3px
 ```
@@ -250,7 +250,7 @@ flowchart TD
 
 <!-- TODO: Not sure if we want to keep the response here...? -->
 
-`Request {sandbox, token, header, url, connection, zendo_id, deposit, response}`
+`Session {sandbox, token, header, url, connection, zendo_id, deposit, response}`
 
 :   The struct acts as a container to hold everything necessary for all the
     various functions that it is used by. It contains the information needed to
@@ -258,40 +258,40 @@ flowchart TD
     request. This object is used with
     [reqwest](https://docs.rs/reqwest/latest/reqwest/) to build and send the
     request to the [Zenodo API](https://developers.zenodo.org/?shell#rest-api).
-    Since `zen-do` doesn't send many requests to Zenodo and because the requests are fairly
-    simple, they are sent synchronously. That way we don't need to set
-    up any `async` structures. The `connection` field will hold the
+    Since `zen-do` doesn't send many requests to Zenodo and because the requests
+    are fairly simple, they are sent synchronously. That way we don't need to
+    set up any `async` structures. The `connection` field will hold the
     `reqwest::blocking::Client::new()` object, where `blocking` is what sets the
     synchronous connection. The fields `zendo_id`, `deposit`, and `response` are
     `Option` types.
 
-`Request::discard_deposit(self: &self) -> Result<Self, Error>`
+`Session::discard_deposit(self: &self) -> Result<Self, Error>`
 
-:   This `impl` method on `Request` sends a
+:   This `impl` method on `Session` sends a
     [discard](https://developers.zenodo.org/?shell#discard) request to Zenodo.
-    If the `Request.deposit.metadata` field was modified locally in a previous
+    If the `Session.deposit.metadata` field was modified locally in a previous
     step, `discard_deposit` won't change it back. That's because we consider
     running discard as one of the last steps in a sequence of actions. If the
-    current metadata on Zenodo needs to be retrieved, do `Request::new()` again
+    current metadata on Zenodo needs to be retrieved, do `Session::new()` again
     to start over.
 
-`Request::has_deposit(self: &self) -> Result<Self, Error>`
+`Session::has_deposit(self: &self) -> Result<Self, Error>`
 
-:   A simple `impl` method on `Request` to check that the `Request` has a
+:   A simple `impl` method on `Session` to check that the `Session` has a
     `deposit` field. Used for CLI commands that require a `deposit` be present.
 
 <!-- TODO: Unsure if this should be a `Result` type instead... -->
 
-`Request::is_editable(self: &self) -> bool`
+`Session::is_draft(self: &self) -> bool`
 
 :   Checks the
     [`deposit.state`](https://developers.zenodo.org/?shell#representation) field
-    if it is "inprogress" or if the `deposit.submitted` field is false. Is
-    an `impl` method on `Request`.
+    if it is "inprogress" or if the `deposit.submitted` field is false. Is an
+    `impl` method on `Session`.
 
-`Request::new(sandbox, token, zendo_id)`
+`Session::new(sandbox, token, zendo_id)`
 
-:   This constructs a new `Request` struct with details needed for reqwest to
+:   This constructs a new `Session` struct with details needed for reqwest to
     correctly send a request to Zenodo. Based on the `sandbox` value, the `url`
     field will point to either `sandbox.zenodo.org` or `zenodo.org` URLs. If the
     `zendo_id` is given, a request will be sent to Zenodo for the deposit
