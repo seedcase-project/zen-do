@@ -161,6 +161,147 @@ flowchart TD
     classDef inner fill:none
 ```
 
+### {{< var wip >}} `discard()` {#cli-discard}
+
+This relatively simple function, like [`get()`](#cli-get), has an internal
+`discard_deposit()` method that is used in other CLI functions. However, unlike
+`get_deposit()` that requires a bit more steps, the [discard Zenodo
+API](https://developers.zenodo.org/#discard) request used in `discard_deposit()`
+is a (mostly) simple `POST` request to the `discard` endpoint.
+
+```{mermaid}
+%%| label: fig-discard-cli
+%%| fig-cap: "The flow of input and output through the `discard()` CLI function."
+%%| fig-alt: >-
+%%|   Diagram showing the flow of input and output through the CLI function.
+
+flowchart TD
+    sandbox[/"--sandbox"/]:::inputs
+    metadata_file[/"[metadata-file]"/]:::inputs
+    token["get_token()"]
+    session[("Session::new()")]
+    read_metadata["read_metadata()"]
+    metadata[("Metadata {...}")]
+    require_deposit["require_deposit()"]
+    is_draft["is_draft()"]
+    discard_deposit["discard_deposit()"]
+    output[/"Message<br>or nothing<br>(stdout)"/]
+
+    decision_draft{"draft?"}
+
+    metadata_file -->
+      read_metadata -->
+      metadata -->|add ID| session
+
+    session --> discard_deposit
+
+    sandbox & token -->
+      session -->
+      require_deposit -->
+      is_draft --> decision_draft
+      decision_draft -->|true| discard_deposit -->
+      output
+
+    decision_draft -->|false| output
+
+    classDef inputs fill:lightgray,stroke-width:3px
+```
+
+## Library code
+
+`Deposit {...}`
+
+:   A struct that represents the JSON response received from Zenodo. Mainly
+    needed for updating the `deposit.metadata` object and for the `deposit.id`
+    fields. The Zenodo deposit fields are listed on
+    [Zenodo](https://developers.zenodo.org/?shell#entities). Some fields are not
+    converted from the Zenodo JSON representation to our `Deposit` struct as
+    they aren't needed by zen-do nor needed during communication with the Zenodo
+    API. Specifically `doi_url`, `created`, `modified`, and `title` are not
+    kept.
+
+`enum Formats`
+
+:   This `enum` contains all the different formats we convert to, as listed in
+    the [CLI](cli.qmd#cli-convert) page.
+
+`get_token(sandbox: bool) -> Result<String, Error>`
+
+:   As described in the [CLI](cli.qmd) page, this gets the token from either the
+    keyring or from the env variables.
+
+`Metadata {...}`
+
+:   This contains the metadata from the Zenodo TOML file, i.e., `.zenodo.toml`.
+    It will eventually form the deposit's
+    [`metadata`](https://developers.zenodo.org/?shell#depositions) field.
+
+`Metadata::into_format(self: Self, to: Formats) -> T`
+
+:   This `impl` [generic
+    method](https://doc.rust-lang.org/rust-by-example/generics/impl.html) on
+    `Metadata` converts the `Metadata` struct into the selected `to` format
+    using the `Formats` enum. The `T` type is any of the output structs, like
+    `CitationCff`, `ZenodoJson`, or `PyprojectToml`.
+
+`read_metadata(path: &Path) -> Result<Metadata, Error>`
+
+:   Reads the Zenodo TOML file, e.g. `.zenodo.toml`.
+
+<!-- TODO: Not sure if we want to keep the response here...? -->
+
+`Session {sandbox, token, header, url, connection, zendo_id, deposit, response}`
+
+:   The struct acts as a container to hold everything necessary for all the
+    various functions that it is used by. It contains the information needed to
+    connect to Zenodo, to send a request, as well as the details from the
+    request. This object is used with
+    [reqwest](https://docs.rs/reqwest/latest/reqwest/) to build and send the
+    request to the [Zenodo API](https://developers.zenodo.org/?shell#rest-api).
+    Since `zen-do` doesn't send many requests to Zenodo and because the requests
+    are fairly simple, they are sent synchronously. That way we don't need to
+    set up any `async` structures. The `connection` field will hold the
+    `reqwest::blocking::Client::new()` object, where `blocking` is what sets the
+    synchronous connection. The fields `zendo_id`, `deposit`, and `response` are
+    `Option` types.
+
+`Session::discard_deposit(self: &self) -> Result<Self, Error>`
+
+:   This `impl` method on `Session` sends a
+    [discard](https://developers.zenodo.org/?shell#discard) request to Zenodo.
+    If the `Session.deposit.metadata` field was modified locally in a previous
+    step, `discard_deposit` won't change it back. That's because we consider
+    running discard as one of the last steps in a sequence of actions. If the
+    current metadata on Zenodo needs to be retrieved, do `Session::new()` again
+    to start over.
+
+`Session::require_deposit(self: &self) -> Result<Self, Error>`
+
+:   A simple `impl` method on `Session` to check that the `Session` has a
+    `deposit` field. Used for CLI commands that require a `deposit` be present.
+
+<!-- TODO: Unsure if this should be a `Result` type instead... -->
+
+`Session::is_draft(self: &self) -> bool`
+
+:   Checks the
+    [`deposit.state`](https://developers.zenodo.org/?shell#representation) field
+    if it is "inprogress" or if the `deposit.submitted` field is false. Is an
+    `impl` method on `Session`.
+
+`Session::new(sandbox, token, zendo_id)`
+
+:   This constructs a new `Session` struct with details needed for reqwest to
+    correctly send a request to Zenodo. Based on the `sandbox` value, the `url`
+    field will point to either `sandbox.zenodo.org` or `zenodo.org` URLs. If the
+    `zendo_id` is given, a request will be sent to Zenodo for the deposit
+    connected to the ID, the response of which will be attached to the `deposit`
+    field to limit repeated requests. Importantly, the main purpose for getting
+    and assigning the `deposit` at this point is to get the Zenodo identifier in
+    [`deposit.id`](https://developers.zenodo.org/?shell#entities). When using
+    `new()`, the `reqwest::blocking::Client::new()` will be added to
+    `connection` to reuse that object for each request sent to Zenodo.
+
 `trait left_join(self, right: Option<Self>) -> Self`
 
 :   This trait will be used to create methods on all of the different format
