@@ -182,7 +182,7 @@ flowchart TD
     session[("Session::new()")]
     read_metadata["read_metadata()"]
     metadata[("Metadata {...}")]
-    has_deposit["has_deposit()"]
+    require_deposit["require_deposit()"]
     is_draft["is_draft()"]
     discard_deposit["discard_deposit()"]
     output[/"Response<br>or nothing"/]
@@ -197,7 +197,7 @@ flowchart TD
 
     sandbox & token -->
       session -->
-      has_deposit -->
+      require_deposit -->
       is_draft --> decision_draft
       decision_draft -->|true| discard_deposit -->
       output
@@ -275,7 +275,7 @@ flowchart TD
     current metadata on Zenodo needs to be retrieved, do `Session::new()` again
     to start over.
 
-`Session::has_deposit(self: &self) -> Result<Self, Error>`
+`Session::require_deposit(self: &self) -> Result<Self, Error>`
 
 :   A simple `impl` method on `Session` to check that the `Session` has a
     `deposit` field. Used for CLI commands that require a `deposit` be present.
