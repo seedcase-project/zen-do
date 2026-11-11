@@ -71,7 +71,8 @@ repository, e.g., one for the source code and one for the documentation. We
 decided on using an ID that looks like:
 
 zendo_id = "<github-username>:<repo-name>:<output-type>"
-```
+
+````
 
 ::: callout-note
 You can also use a GitHub organisation as the username like so:
@@ -92,7 +93,7 @@ repository, we recommend:
 
 ```text
 zendo_id = "<github-username>:<repo-name>:<output-type>"
-```
+````
 
 So if we made a metadata file for the zen-do repository to upload the
 documentation as a PDF as a deposit, it might look like
