@@ -255,11 +255,11 @@ flowchart TD
 :   The struct acts as a container to hold everything necessary for all the
     various functions that it is used by. It contains the information needed to
     connect to Zenodo, to send a request, as well as the details from the
-    request. This object is used by
+    request. This object is used with
     [reqwest](https://docs.rs/reqwest/latest/reqwest/) to build and send the
     request to the [Zenodo API](https://developers.zenodo.org/?shell#rest-api).
-    Since we aren't sending many requests to Zenodo and because they are fairly
-    simple, these requests are done synchronously. That way we don't need to set
+    Since `zen-do` doesn't send many requests to Zenodo and because the requests are fairly
+    simple, they are sent synchronously. That way we don't need to set
     up any `async` structures. The `connection` field will hold the
     `reqwest::blocking::Client::new()` object, where `blocking` is what sets the
     synchronous connection. The fields `zendo_id`, `deposit`, and `response` are
@@ -286,7 +286,7 @@ flowchart TD
 
 :   Checks the
     [`deposit.state`](https://developers.zenodo.org/?shell#representation) field
-    if it is "inprogress" and/or if the `deposit.submitted` field is false. Is
+    if it is "inprogress" or if the `deposit.submitted` field is false. Is
     an `impl` method on `Request`.
 
 `Request::new(sandbox, token, zendo_id)`
