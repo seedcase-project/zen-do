@@ -185,7 +185,7 @@ flowchart TD
     require_deposit["require_deposit()"]
     is_draft["is_draft()"]
     discard_deposit["discard_deposit()"]
-    output[/"Response<br>or nothing"/]
+    output[/"Message<br>or nothing<br>(stdout)"/]
 
     decision_draft{"draft?"}
 
