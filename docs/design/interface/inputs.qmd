@@ -70,7 +70,6 @@ as the ID because we want to be able to create multiple deposits for the same
 repository, e.g., one for the source code and one for the documentation. We
 decided on using an ID that looks like:
 
-zendo_id = "<github-username>:<repo-name>:<output-type>"
 
 ````
 
@@ -91,7 +90,6 @@ If the user wants to have multiple deposits for the same project (e.g.,
 distinguish between those outputs. If the metadata file is hosted on a GitHub
 repository, we recommend:
 
-```text
 zendo_id = "<github-username>:<repo-name>:<output-type>"
 ````
 
