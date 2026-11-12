@@ -82,9 +82,10 @@ to keep synchronized with the `.zenodo.toml` file, including:
   citation](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-citation-files)
   information for a repository when it is in the root of the repository. This
   contains only a subset of the metadata found in the `.zenodo.toml` file.
-- {{< var wip >}} `pyproject.toml`: While this file is almost entirely used only
-  for Python projects, it contains similar metadata fields to the `.zenodo.toml`
-  file, such as the project name, description, authors, and license.
+- {{< var planned >}} `pyproject.toml`: While this file is almost entirely used
+  only for Python projects, it contains similar metadata fields to the
+  `.zenodo.toml` file, such as the project name, description, authors, and
+  license.
 - {{< var planned >}} `codemeta.json`: This file is used to describe software
   metadata in a machine-readable format, following the
   [CodeMeta](https://codemeta.github.io/) standard. It contains similar metadata
