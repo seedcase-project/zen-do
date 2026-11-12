@@ -273,12 +273,12 @@ deposits on a Zenodo account associated with the given token.
 flowchart TD
     sandbox[/"--sandbox"/]:::inputs
     token["get_token()"]
-    request[("Request::new()")]
+    session[("Session::new()")]
     list["list_deposits()"]
     output[/"Vec\< Deposit \><br>or nothing"/]
 
     sandbox & token -->
-      request -->
+      session -->
       list -->
       output
 
@@ -381,7 +381,7 @@ a function signature as well as some reasons their design (if needed).
 `Session::get_deposit(self: &mut self, id: &ZendoId) -> Result<Self, Error>`
 
 :   Sends a [`get` REST API request](https://developers.zenodo.org/#list) to
-    Zenodo using [reqwest](https://docs.rs/reqwest/latest/reqwest/).
+    Zenodo using [`reqwest`](https://docs.rs/reqwest/latest/reqwest/).
     Deserialises the Zenodo JSON response into our `Deposit` struct. Also
     includes a `try_from()` to convert the Zenodo JSON `related_identifier` into
     our `zendo_id`, if it exists in the JSON (but won't fail if it can't convert
