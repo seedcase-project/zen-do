@@ -83,9 +83,9 @@ flowchart TD
 
 ### {{< var wip >}} `get()` {#cli-get}
 
-The internals of this function are used in several other CLI functions. That is
-why the subgraph `get_deposit()` library function is shown in this diagram, to
-highlight that it will be reused.
+The internals of this function are used in several other CLI functions,
+specifically the `Session::new()`. See [`get_deposit()`](#lib-get-deposit)
+below.
 
 ```{mermaid}
 %%| label: fig-get-cli
@@ -94,21 +94,14 @@ highlight that it will be reused.
 %%|   Diagram showing the flow of input and output through the CLI function.
 
 flowchart TD
-    sandbox[/"--sandbox"/]:::inputs
-    metadata_file[/"[metadata-file]"/]:::inputs
+    sandbox[/"--sandbox"/]
+    metadata_file[/"[metadata-file]"/]
     token["get_token()"]
     session[("Session::new()")]
     read_metadata["read_metadata()"]
     metadata[("Metadata {...}")]
+    get_deposit["get_deposit()"]
     output[/"Deposit<br>or nothing"/]
-
-    subgraph get_deposit ["get_deposit()"]
-      list["list_deposits()"]
-      deposits[("Vec\< Deposit \>")]
-      check_ids["check_ids()"]
-      checked_deposits[("CheckedDeposits")]
-      keep_matching_id["keep_matching_id()"]
-    end
 
     metadata_file -->
       read_metadata -->
@@ -116,18 +109,8 @@ flowchart TD
 
     sandbox & token -->
       session -->
-      list -->
-      deposits -->
-      check_ids -->
-      checked_deposits -->
-      keep_matching_id
-
-    session -->|add ID| keep_matching_id -->
+      get_deposit -->
       output
-
-    get_deposit:::outer_function
-    classDef outer_function fill:none
-    classDef inputs fill:lightgray,stroke-width:3px
 ```
 
 ### {{< var wip >}} `sync()` {#cli-sync}
@@ -170,6 +153,10 @@ flowchart TD
 ```
 
 ## Library code
+
+This section describes the non-CLI library interface, which the CLI functions
+use internally use. They are a higher-level description, mainly here to provide
+a function signature as well as some reasons their design (if needed).
 
 `enum ToFormats`
 
@@ -265,18 +252,6 @@ This section describes the non-CLI library interface, which the CLI functions
 use internally use. They are a higher-level description, mainly here to provide
 a function signature as well as some reasons their design (if needed).
 
-`check_ids(deposits: Vec<Deposit>) -> Result<CheckedDeposits, Error>`
-
-:   Checks a list of deposits for any duplicate `zendo_id` identifiers contained
-    within the `related_identifier` Zenodo field. Outputs a `Result` type with
-    `CheckedDeposits` newtype that contains `Vec<Deposit>` in the `Ok()` arm and
-    an `Error` if the check failed, i.e. if found any duplicates.
-
-`CheckedDeposits(Vec<Deposit>)`
-
-:   This newtype pattern is used to make sure downstream functions use an object
-    that has been checked.
-
 <!-- TODO: Confirm whether response contains the deposit, then it can be added to `Deposit` -->
 
 `Deposit {...}`
@@ -295,26 +270,23 @@ a function signature as well as some reasons their design (if needed).
 :   As described in the [CLI](cli.qmd) page, this gets the token from either the
     keyring or from the env variables.
 
-`keep_matching_id(checked_deposits: CheckedDeposits, zendo_id: &ZendoId) -> Option<Deposit>`
+### `find_deposit()` {#lib-find-deposit}
 
-:   Takes the `CheckedDeposits` newtype pattern to ensure the internal
-    `Vec<Deposit>` has only deposits that don't have any duplicate `ZendoId`.
-    Compares the ID from the metadata file and outputs the deposit from
-    `CheckedDeposits` with the matching ID (if any).
+The signature is:
+
+```rust
+find_deposit(deposits: Vec<Deposit>, zendo_id: &ZendoId) -> Result<Option<Deposit>, Error>
+```
+
+Uses the `ZendoId` to find the matching deposit within the `related_identifier`
+Zenodo field. If it doesn't find one, it outputs `None`. If there are duplicate
+`ZendoId` (more than on `Deposit`), than fail.
 
 `Metadata {...}`
 
 :   This contains the metadata from the Zenodo TOML file, i.e., `.zenodo.toml`.
     It will eventually form the deposit's
     [`metadata`](https://developers.zenodo.org/?shell#depositions) field.
-
-`Metadata::into_format(self: Self, to: Formats) -> T`
-
-:   This `impl` [generic
-    method](https://doc.rust-lang.org/rust-by-example/generics/impl.html) on
-    `Metadata` converts the `Metadata` struct into the selected `to` format
-    using the `Formats` enum. The `T` type is any of the output structs, like
-    `CitationCff`, `ZenodoJson`, or `PyprojectToml`.
 
 `read_metadata(path: &Path) -> Result<Metadata, Error>`
 
@@ -343,16 +315,53 @@ a function signature as well as some reasons their design (if needed).
     the current deposit on Zenodo needs to be retrieved, do `Session::new()`
     again to start over.
 
-`Session::get_deposit(self: &mut self, id: &ZendoId) -> Result<Self, Error>`
+### `Session::get_deposit()` {#lib-get-deposit}
 
-:   Sends a [`get` REST API request](https://developers.zenodo.org/#list) to
-    Zenodo using [reqwest](https://docs.rs/reqwest/latest/reqwest/).
-    Deserialises the Zenodo JSON response into our `Deposit` struct. Also
-    includes a `try_from()` to convert the Zenodo JSON `related_identifier` into
-    our `zendo_id`, if it exists in the JSON (but won't fail if it can't convert
-    any `related_identifier`s in the deposit). If no deposit is found, the
-    `Session.deposit` field will be kept as `None`. Is a `impl` method on
-    `Session`.
+The signature is:
+
+```rust
+impl Session {
+    fn get_deposit(self: &mut self, id: &ZendoId) -> Result<Self, Error> {}
+}
+```
+
+Sends a [`get` REST API request](https://developers.zenodo.org/#list) to Zenodo
+using [reqwest](https://docs.rs/reqwest/latest/reqwest/). Deserialises the
+Zenodo JSON response into our `Deposit` struct. Also includes a `try_from()` to
+convert the Zenodo JSON `related_identifier` into our `zendo_id`, if it exists
+in the JSON (but won't fail if it can't convert any `related_identifier`s in the
+deposit). If no deposit is found, the `Session.deposit` field will be kept as
+`None`. Is a `impl` method on `Session`.
+
+This is used internally in `Session::new()`.
+
+```{mermaid}
+%%| label: fig-lib-get-deposit
+%%| fig-cap: >-
+%%|   The flow of input and output through the `Session::get_deposit()` CLI
+%%|   function.
+%%| fig-alt: >-
+%%|   Diagram showing the flow of input and output through the CLI function.
+
+flowchart TD
+    session[/"Session {...}"/]
+    zendo_id[/"ZendoId"/]
+    output[/"Result\< Session, Error \>"/]
+
+    list["list_deposits()"]
+    deposits[("Vec\< Deposit \>")]
+    find_deposit["find_deposit()"]
+
+    session -->
+      list -->
+      deposits -->
+      find_deposit
+
+    session -->
+      zendo_id -->
+      find_deposit -->
+      output
+```
 
 <!-- TODO: Unsure if this should be a `Result` type instead... -->
 
@@ -363,15 +372,22 @@ a function signature as well as some reasons their design (if needed).
     if it is "inprogress", or if the `state` is not "error" and the
     `deposit.submitted` field is false. Is an `impl` method on `Session`.
 
-`Session::list_deposits(self: &self) -> Result<Vec<Deposit>, Error>`
+### `Session::list_deposits()` {#lib-list-deposit}
 
-:   Sends a [`get` REST API request](https://developers.zenodo.org/#list) to
-    Zenodo using the `reqwest` package. Deserialises the Zenodo JSON response
-    into our `Deposit` struct. Also needs a `try_from()` to convert the Zenodo
-    JSON `related_identifier` into our `zendo_id`, if it exists in the JSON (but
-    won't fail if it can't convert anything in the deposit). Implemented as an
-    `impl` method on `Session`. Can output an empty `Vec` if no deposit is
-    found.
+The signature is:
+
+```rust
+impl Session {
+    list_deposits(self: &self) -> Result<Vec<Deposit>, Error>
+}
+```
+
+Sends a [`get` REST API request](https://developers.zenodo.org/#list) to Zenodo
+using the `reqwest` package. Deserialises the Zenodo JSON response into our
+`Deposit` struct. Also needs a `try_from()` to convert the Zenodo JSON
+`related_identifier` into our `zendo_id`, if it exists in the JSON (but won't
+fail if it can't convert anything in the deposit). Implemented as an `impl`
+method on `Session`. Can output an empty `Vec` if no deposit is found.
 
 `Session::new(sandbox, token, zendo_id)`
 
@@ -379,9 +395,10 @@ a function signature as well as some reasons their design (if needed).
     correctly send a request to Zenodo. Based on the `sandbox` value, the `url`
     field will point to either `sandbox.zenodo.org` or `zenodo.org` URLs. If the
     `zendo_id` is given, a request will be sent to Zenodo for the deposit
-    connected to the ID, the response of which will be attached to the `deposit`
-    field to limit repeated requests. Importantly, the main purpose for getting
-    and assigning the `deposit` at this point is to get the Zenodo identifier in
+    connected to the ID using [`Session::get_deposit()`](#lib-get-deposit), the
+    response of which will be attached to the `deposit` field to limit repeated
+    requests. Importantly, the main purpose for getting and assigning the
+    `deposit` at this point is to get the Zenodo identifier in
     [`deposit.id`](https://developers.zenodo.org/?shell#entities). When using
     `new()`, the `reqwest::blocking::Client::new()` will be added to
     `connection` to reuse that object for each request sent to Zenodo. The
