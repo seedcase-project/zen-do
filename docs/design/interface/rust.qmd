@@ -32,6 +32,52 @@ diagrams.
 The `init` CLI command isn't shown here as it is a very simple command to create
 an `.zenodo.toml` file with empty `Metadata` fields.
 
+### {{< var wip >}} `discard()` {#cli-discard}
+
+This relatively simple function, like [`get()`](#cli-get), has an internal
+`discard_deposit()` method that is used in other CLI functions. However, unlike
+`get_deposit()` that requires a bit more steps, the [discard Zenodo
+API](https://developers.zenodo.org/#discard) request used in `discard_deposit()`
+is a (mostly) simple `POST` request to the `discard` endpoint.
+
+```{mermaid}
+%%| label: fig-discard-cli
+%%| fig-cap: "The flow of input and output through the `discard()` CLI function."
+%%| fig-alt: >-
+%%|   Diagram showing the flow of input and output through the CLI function.
+
+flowchart TD
+    sandbox[/"--sandbox"/]:::inputs
+    metadata_file[/"[metadata-file]"/]:::inputs
+    token["get_token()"]
+    session[("Session::new()")]
+    read_metadata["read_metadata()"]
+    metadata[("Metadata {...}")]
+    require_deposit["require_deposit()"]
+    is_draft["is_draft()"]
+    discard_deposit["discard_deposit()"]
+    output[/"Message<br>or nothing<br>(stdout)"/]
+
+    decision_draft{"draft?"}
+
+    metadata_file -->
+      read_metadata -->
+      metadata -->|add ID| session
+
+    session --> discard_deposit
+
+    sandbox & token -->
+      session -->
+      require_deposit -->
+      is_draft --> decision_draft
+      decision_draft -->|true| discard_deposit -->
+      output
+
+    decision_draft -->|false| output
+
+    classDef inputs fill:lightgray,stroke-width:3px
+```
+
 ### {{< var wip >}} `sync()` {#cli-sync}
 
 Because of the wide variety of potential output formats, the internals of this
@@ -161,54 +207,6 @@ flowchart TD
     classDef inner fill:none
 ```
 
-### {{< var wip >}} `discard()` {#cli-discard}
-
-This relatively simple function, like [`get()`](#cli-get), has an internal
-`discard_deposit()` method that is used in other CLI functions. However, unlike
-`get_deposit()` that requires a bit more steps, the [discard Zenodo
-API](https://developers.zenodo.org/#discard) request used in `discard_deposit()`
-is a (mostly) simple `POST` request to the `discard` endpoint.
-
-```{mermaid}
-%%| label: fig-discard-cli
-%%| fig-cap: "The flow of input and output through the `discard()` CLI function."
-%%| fig-alt: >-
-%%|   Diagram showing the flow of input and output through the CLI function.
-
-flowchart TD
-    sandbox[/"--sandbox"/]:::inputs
-    metadata_file[/"[metadata-file]"/]:::inputs
-    token["get_token()"]
-    session[("Session::new()")]
-    read_metadata["read_metadata()"]
-    metadata[("Metadata {...}")]
-    require_deposit["require_deposit()"]
-    is_draft["is_draft()"]
-    discard_deposit["discard_deposit()"]
-    output[/"Message<br>or nothing<br>(stdout)"/]
-
-    decision_draft{"draft?"}
-
-    metadata_file -->
-      read_metadata -->
-      metadata -->|add ID| session
-
-    session --> discard_deposit
-
-    sandbox & token -->
-      session -->
-      require_deposit -->
-      is_draft --> decision_draft
-      decision_draft -->|true| discard_deposit -->
-      output
-
-    decision_draft -->|false| output
-
-    classDef inputs fill:lightgray,stroke-width:3px
-```
-
-## Library code
-
 `Deposit {...}`
 
 :   A struct that represents the JSON response received from Zenodo. Mainly
@@ -248,9 +246,7 @@ flowchart TD
 
 :   Reads the Zenodo TOML file, e.g. `.zenodo.toml`.
 
-<!-- TODO: Not sure if we want to keep the response here...? -->
-
-`Session {sandbox, token, header, url, connection, zendo_id, deposit, response}`
+`Session {sandbox, token, header, url, connection, zendo_id, deposit}`
 
 :   The struct acts as a container to hold everything necessary for all the
     various functions that it is used by. It contains the information needed to
@@ -262,18 +258,18 @@ flowchart TD
     are fairly simple, they are sent synchronously. That way we don't need to
     set up any `async` structures. The `connection` field will hold the
     `reqwest::blocking::Client::new()` object, where `blocking` is what sets the
-    synchronous connection. The fields `zendo_id`, `deposit`, and `response` are
-    `Option` types.
+    synchronous connection. The fields `zendo_id` and `deposit` are `Option`
+    types.
 
-`Session::discard_deposit(self: &self) -> Result<Self, Error>`
+`Session::discard_deposit(self: &mut self) -> Result<Self, Error>`
 
 :   This `impl` method on `Session` sends a
     [discard](https://developers.zenodo.org/?shell#discard) request to Zenodo.
     If the `Session.deposit.metadata` field was modified locally in a previous
-    step, `discard_deposit` won't change it back. That's because we consider
-    running discard as one of the last steps in a sequence of actions. If the
-    current metadata on Zenodo needs to be retrieved, do `Session::new()` again
-    to start over.
+    step, `discard_deposit` will remove it and set as `None`. That's because we
+    consider running discard as one of the last steps in a sequence of actions.
+    If the current metadata on Zenodo needs to be retrieved, do `Session::new()`
+    again to start over.
 
 `Session::require_deposit(self: &self) -> Result<Self, Error>`
 
@@ -286,8 +282,8 @@ flowchart TD
 
 :   Checks the
     [`deposit.state`](https://developers.zenodo.org/?shell#representation) field
-    if it is "inprogress" or if the `deposit.submitted` field is false. Is an
-    `impl` method on `Session`.
+    if it is "inprogress" or error state, or if the `deposit.submitted` field is
+    false. Is an `impl` method on `Session`.
 
 `Session::new(sandbox, token, zendo_id)`
 
