@@ -218,33 +218,10 @@ flowchart TD
     API. Specifically `doi_url`, `created`, `modified`, and `title` are not
     kept.
 
-`enum Formats`
-
-:   This `enum` contains all the different formats we sync to, as listed in the
-    [CLI](cli.qmd#cli-convert) page.
-
 `get_token(sandbox: bool) -> Result<String, Error>`
 
 :   As described in the [CLI](cli.qmd) page, this gets the token from either the
     keyring or from the env variables.
-
-`Metadata {...}`
-
-:   This contains the metadata from the Zenodo TOML file, i.e., `.zenodo.toml`.
-    It will eventually form the deposit's
-    [`metadata`](https://developers.zenodo.org/?shell#depositions) field.
-
-`Metadata::into_format(self: Self, to: Formats) -> T`
-
-:   This `impl` [generic
-    method](https://doc.rust-lang.org/rust-by-example/generics/impl.html) on
-    `Metadata` converts the `Metadata` struct into the selected `to` format
-    using the `Formats` enum. The `T` type is any of the output structs, like
-    `CitationCff`, `ZenodoJson`, or `PyprojectToml`.
-
-`read_metadata(path: &Path) -> Result<Metadata, Error>`
-
-:   Reads the Zenodo TOML file, e.g. `.zenodo.toml`.
 
 `Session {header, url, connection, zendo_id, deposit}`
 
