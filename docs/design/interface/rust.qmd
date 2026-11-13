@@ -246,7 +246,7 @@ flowchart TD
 
 :   Reads the Zenodo TOML file, e.g. `.zenodo.toml`.
 
-`Session {sandbox, token, header, url, connection, zendo_id, deposit}`
+`Session {header, url, connection, zendo_id, deposit}`
 
 :   The struct acts as a container to hold everything necessary for all the
     various functions that it is used by. It contains the information needed to
@@ -294,7 +294,9 @@ flowchart TD
     and assigning the `deposit` at this point is to get the Zenodo identifier in
     [`deposit.id`](https://developers.zenodo.org/?shell#entities). When using
     `new()`, the `reqwest::blocking::Client::new()` will be added to
-    `connection` to reuse that object for each request sent to Zenodo.
+    `connection` to reuse that object for each request sent to Zenodo. The
+    `token` will be added to the header, which will be added to the `reqwest`
+    connection field.
 
 `trait left_join(self, right: Option<Self>) -> Self`
 
