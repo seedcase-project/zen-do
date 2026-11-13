@@ -220,7 +220,7 @@ flowchart TD
 
 `enum Formats`
 
-:   This `enum` contains all the different formats we convert to, as listed in
+:   This `enum` contains all the different formats we sync to, as listed in
     the [CLI](cli.qmd#cli-convert) page.
 
 `get_token(sandbox: bool) -> Result<String, Error>`
@@ -261,19 +261,17 @@ flowchart TD
     synchronous connection. The fields `zendo_id` and `deposit` are `Option`
     types.
 
-`Session::discard_deposit(self: &mut self) -> Result<Self, Error>`
+`Session::discard_deposit(self: mut self) -> Result<Self, Error>`
 
 :   This `impl` method on `Session` sends a
     [discard](https://developers.zenodo.org/?shell#discard) request to Zenodo.
-    If the `Session.deposit.metadata` field was modified locally in a previous
-    step, `discard_deposit` will remove it and set as `None`. That's because we
-    consider running discard as one of the last steps in a sequence of actions.
-    If the current metadata on Zenodo needs to be retrieved, do `Session::new()`
+    If the request succeeds, the `Session.deposit` field is set to `None`.
+    If the current deposit on Zenodo needs to be retrieved, do `Session::new()`
     again to start over.
 
 `Session::require_deposit(self: &self) -> Result<Self, Error>`
 
-:   A simple `impl` method on `Session` to check that the `Session` has a
+:   A simple `impl` method on `Session` to ensure that the `Session` has a
     `deposit` field. Used for CLI commands that require a `deposit` be present.
 
 <!-- TODO: Unsure if this should be a `Result` type instead... -->
@@ -282,7 +280,7 @@ flowchart TD
 
 :   Checks the
     [`deposit.state`](https://developers.zenodo.org/?shell#representation) field
-    if it is "inprogress" or error state, or if the `deposit.submitted` field is
+    if it is "inprogress", or if the `state` is not "error" and the `deposit.submitted` field is
     false. Is an `impl` method on `Session`.
 
 `Session::new(sandbox, token, zendo_id)`
