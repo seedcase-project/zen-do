@@ -5,6 +5,7 @@ use std::convert::TryFrom;
 use std::error::Error;
 use std::fs;
 use std::path::Path;
+use toml_example::TomlExample;
 
 pub const EXAMPLE_METADATA: &str = r#"
 title = "Random"
@@ -46,7 +47,7 @@ impl TryFrom<String> for ZendoId {
 
         if components
             .iter()
-            .any(|part| matches!(*part, "<github-org>" | "<output-type>"))
+            .any(|part| matches!(*part, "<github-org>" | "<project-name>" | "<output-type>"))
         {
             return Err("The field `zendo_id` in the Zenodo TOML file cannot contain placeholder values (e.g., `<github-org>`). Please fill them in with actual values.".into());
         }
@@ -64,8 +65,7 @@ impl TryFrom<String> for ZendoId {
     }
 }
 
-/// Type representing Zenodo metadata.
-#[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Default, TomlExample)]
 pub struct Metadata {
     /// The title of the deposit.
     pub title: String,
@@ -74,24 +74,21 @@ pub struct Metadata {
     /// The type of the deposit.
     pub upload_type: String,
 
-    /// The zen-do identifier that identifies whether a deposit can be tracked
-    /// by zen-do.
+    /// This is a required ID for zen-do
+    #[toml_example(default = "<github-org>:<project-name>:<output-type>")]
     pub zendo_id: ZendoId,
 
     // TODO: Don't allow empty vec, NonEmptyVec?
     /// The creators of the deposit.
+    #[toml_example(default = creators, nesting)]
     pub creators: Vec<Creator>,
 
     /// Identifiers related to the deposit.
+    #[toml_example(default = related_identifiers, nesting)]
     pub related_identifiers: Vec<RelatedIdentifier>,
 }
 
 impl ZendoId {
-    // Only used for writing with init - compiler will not read a placeholder
-    #[must_use]
-    pub fn placeholder(project_name: &str) -> Self {
-        Self(format!("<github-org>:{project_name}:<output-type>"))
-    }
     // Method that returns a reference to the inner string without copying it.
     #[must_use]
     pub fn as_str(&self) -> &str {
@@ -99,22 +96,11 @@ impl ZendoId {
     }
 }
 
-impl Metadata {
-    #[must_use]
-    pub fn new(project_name: &str) -> Self {
-        Self {
-            zendo_id: ZendoId::placeholder(project_name),
-            creators: vec![Creator::default()],
-            related_identifiers: vec![RelatedIdentifier::default()],
-            ..Default::default()
-        }
-    }
-}
-
 /// The type containing the details of the creator/author of a Zenodo deposit.
-#[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Default, TomlExample)]
 pub struct Creator {
     /// The full name of the creator/author.
+    #[toml_example(default = "your-name-here")]
     pub name: String,
 
     /// The (primary) affiliation of the creator/author.
@@ -125,7 +111,7 @@ pub struct Creator {
 }
 
 /// Model representing an identifier related to a Zenodo deposit.
-#[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Default, TomlExample)]
 #[serde(try_from = "RelatedIdentifierCheck")]
 pub struct RelatedIdentifier {
     /// The value of the identifier (meaning, the identifier itself).
@@ -152,6 +138,7 @@ struct RelatedIdentifierCheck {
     pub scheme: Option<String>,
 }
 
+// Users cannot manually set an "urn:zendo:..." identifiers
 impl TryFrom<RelatedIdentifierCheck> for RelatedIdentifier {
     type Error = String;
 
@@ -216,6 +203,13 @@ pub fn read_metadata(path: &Path) -> Result<Metadata, Box<dyn Error>> {
 /// itself or where it will be saved.
 pub fn write_metadata(metadata: &Metadata, path: &Path) -> Result<(), Box<dyn Error>> {
     let toml_str: String = toml::to_string_pretty(metadata)?;
+    fs::write(path, toml_str)?;
+    Ok(())
+}
+
+// Only used for the `init` command.
+pub fn write_init(path: &Path) -> Result<(), Box<dyn Error>> {
+    let toml_str = Metadata::toml_example();
     fs::write(path, toml_str)?;
     Ok(())
 }
