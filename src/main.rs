@@ -1,6 +1,6 @@
 // The `main.rs` file is the binary entry-point, e.g. for CLIs
 
-use ::zen_do::metadata::{write_init};
+use ::zen_do::metadata::write_init;
 use clap::{Args, Parser, Subcommand};
 use std::error::Error;
 use std::path::PathBuf;
@@ -163,8 +163,7 @@ pub fn init(args: &InitArgs) -> Result<(), Box<dyn Error>> {
 
     // Rust cannot display a PathBuf, so we need to convert it to a str. A str
     // is restricted to utf-8.
-    path
-        .file_name()
+    path.file_name()
         .and_then(|name| name.to_str())
         .ok_or("Current directory contains unsupported characters")?;
 
