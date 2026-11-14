@@ -32,9 +32,9 @@ Specifically, zen-do must:
 - Upload and/or replace files in a Zenodo deposit.
 - Publish a Zenodo record (that contains the DOI) from a new or existing
   deposit.
-- Simplify conversion between and loading from different metadata formats (e.g.
-  `.zenodo.json`, `CITATION.cff`, `pyproject.toml`, `.zenodo.toml`, or
-  `_quarto.yml`).
+- Simplify keeping different project metadata formats (e.g. `.zenodo.json`,
+  `CITATION.cff`, `pyproject.toml`, `.zenodo.toml`, or `_quarto.yml`)
+  synchronized by having a single source of truth in `zenodo.toml`.
 - List all deposits for a given account.
 - Allow a GitHub repository to be linked to one or more Zenodo deposits.
 - Installable via crates.io or with uv.

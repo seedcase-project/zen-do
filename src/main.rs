@@ -25,9 +25,8 @@ enum Commands {
     /// Get the JSON of the deposit described by `.zenodo.toml`.
     Get(GetArgs),
 
-    /// Convert `.zenodo.toml` into other formats (e.g.
-    /// `CITATION.cff`).
-    Convert(ConvertArgs),
+    /// Sync `.zenodo.toml` into other formats (e.g. `CITATION.cff`).
+    Sync(SyncArgs),
 
     /// Discards deposit draft changes.
     ///
@@ -132,15 +131,14 @@ struct PublishArgs {
 }
 
 #[derive(Args, Debug)]
-struct ConvertArgs {
+struct SyncArgs {
     #[command(flatten)]
     metadata_file: MetadataFileArg,
 
     // TODO: Convert `to` into an enum?
-    /// The formats to convert the metadata file to. Can be a single format or
-    /// an array of formats.
+    /// The format to sync the metadata file to.
     #[arg(short, long, required = true)]
-    to: Vec<String>,
+    to: String,
 }
 
 /// Create a `.zenodo.toml` file with all deposit metadata fields
@@ -197,7 +195,7 @@ fn main() {
 
         // TODO: Remove once implemented
         #[allow(unused_variables)]
-        Commands::Convert(args) => todo!("Not started yet"),
+        Commands::Sync(args) => todo!("Not started yet"),
 
         // TODO: Remove once implemented
         #[allow(unused_variables)]
