@@ -84,7 +84,7 @@ flowchart TD
 ### {{< var wip >}} `get()` {#cli-get}
 
 The internals of this function are used in several other CLI functions,
-specifically the `Session::new()`. Interally, `Session::new()` uses
+specifically the `Session::new()`. Internally, `Session::new()` uses
 [`get_deposit()`](#lib-get-deposit) to get the deposit if it exists.
 
 ```{mermaid}
