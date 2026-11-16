@@ -1,9 +1,11 @@
 // The `main.rs` file is the binary entry-point, e.g. for CLIs
 
-use ::zen_do::metadata::{Metadata, write_metadata};
 use clap::{Args, Parser, Subcommand};
+use serde::Serialize;
 use std::error::Error;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
+use zen_do::metadata::{Metadata, read_metadata, write_metadata};
+use zen_do::sync::{ZenodoJson, sync_format};
 
 // TODO: Include `verbose` flag everywhere with `clap-verbosity-flag`?
 /// Common publishing tasks with Zenodo from the terminal.
@@ -130,15 +132,20 @@ struct PublishArgs {
     draft: DraftArg,
 }
 
+#[derive(clap::ValueEnum, Clone, Debug, Serialize)]
+#[serde(rename_all = "kebab-case")]
+enum ToFormats {
+    ZenodoJson,
+}
+
 #[derive(Args, Debug)]
 struct SyncArgs {
     #[command(flatten)]
     metadata_file: MetadataFileArg,
 
-    // TODO: Convert `to` into an enum?
     /// The format to sync the metadata file to.
     #[arg(short, long, required = true)]
-    to: String,
+    to: ToFormats,
 }
 
 /// Create a `.zenodo.toml` file with all deposit metadata fields
@@ -175,6 +182,16 @@ pub fn init(args: &InitArgs) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+fn sync(args: &SyncArgs) -> Result<(), Box<dyn Error>> {
+    let metadata_file = &args.metadata_file.metadata_file;
+    let metadata = read_metadata(metadata_file)?;
+    let parent = metadata_file.parent().unwrap_or(Path::new("."));
+
+    match args.to {
+        ToFormats::ZenodoJson => sync_format::<ZenodoJson>(&metadata, parent),
+    }
+}
+
 fn main() {
     let args = Cli::parse();
 
@@ -197,7 +214,14 @@ fn main() {
 
         // TODO: Remove once implemented
         #[allow(unused_variables)]
-        Commands::Sync(args) => todo!("Not started yet"),
+        Commands::Sync(args) => match sync(args) {
+            Ok(()) => {
+                print!("Synced metadata.");
+            }
+            Err(err) => {
+                eprint!("Error: {err}");
+            }
+        },
 
         // TODO: Remove once implemented
         #[allow(unused_variables)]
