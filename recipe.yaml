@@ -25,5 +25,5 @@ about:
   license_file:
     - LICENSE.md
     - THIRDPARTY.yml
-  description: "A utility for managing cargo dependencies from the command line."
-  summary: "A utility for managing cargo dependencies from the command line."
+  description: "Zenodo tasks from the command-line"
+  summary: "Zenodo tasks from the command-line"
