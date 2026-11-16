@@ -287,7 +287,7 @@ flowchart TD
 
 ### {{< var wip >}} `publish()` {#cli-publish}
 
-The meaning of `--draft` compared to `--yes` has a slight difference and results
+The meaning of `--draft` compared to `--yes` has a difference and results
 in different outcomes. Making a draft with `--draft` means the user wants to
 view the deposit on Zenodo to confirm things before publishing. `--yes` is a
 flag that tells `update()` to publish without prompting for a confirmation,
@@ -297,7 +297,7 @@ accidentally.
 
 While `has_deposit()` outputs a `Result` type, rather than send to `stderr` in
 `publish()` we instead create a new deposit. Likewise, while `is_editable()` is
-a `bool`, in the `false` case we output an error to `stderr` since we don't want
+a `bool`, in the `true` case we output an error to `stderr` since we don't want
 to modify a deposit that is in the editable state.
 
 ```{mermaid}
