@@ -2,7 +2,7 @@ use crate::metadata::{Creator, Metadata, RelatedIdentifier};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, error::Error, fs, path::Path};
 
-trait FormatFileName {
+pub trait FormatFileName {
     const FILE_NAME: &str;
 }
 
@@ -33,12 +33,32 @@ pub trait Write {
     fn write(self, parent: &Path) -> Result<(), Box<dyn Error>>;
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-struct JsonRelatedIdentifier {
-    identifier: String,
-    relation: String,
-    resource_type: String,
-    scheme: Option<String>,
+#[derive(Debug, Default, PartialEq, Deserialize, Serialize)]
+#[serde(default)]
+pub struct JsonCreator {
+    pub name: String,
+    pub affiliation: String,
+    pub orcid: String,
+}
+
+impl From<&Creator> for JsonCreator {
+    fn from(creator: &Creator) -> Self {
+        Self {
+            name: creator.name.clone(),
+            affiliation: creator.affiliation.clone(),
+            orcid: creator.orcid.clone(),
+        }
+    }
+}
+
+#[derive(Debug, Default, PartialEq, Deserialize, Serialize)]
+#[serde(default)]
+pub struct JsonRelatedIdentifier {
+    pub identifier: String,
+    pub relation: String,
+    pub resource_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub scheme: Option<String>,
 }
 
 impl From<&RelatedIdentifier> for JsonRelatedIdentifier {
@@ -53,16 +73,17 @@ impl From<&RelatedIdentifier> for JsonRelatedIdentifier {
 }
 
 /// Represents the `.zenodo.json` file format.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
 pub struct ZenodoJson {
-    title: String,
-    upload_type: String,
-    creators: Vec<Creator>,
-    related_identifiers: Vec<JsonRelatedIdentifier>,
+    pub title: String,
+    pub upload_type: String,
+    pub creators: Vec<JsonCreator>,
+    pub related_identifiers: Vec<JsonRelatedIdentifier>,
 
     // Any other fields in .zenodo.json
     #[serde(flatten)]
-    extra: HashMap<String, serde_json::Value>,
+    pub extra: HashMap<String, serde_json::Value>,
 }
 
 impl From<&Metadata> for ZenodoJson {
@@ -82,7 +103,7 @@ impl From<&Metadata> for ZenodoJson {
         Self {
             title: metadata.title.clone(),
             upload_type: metadata.upload_type.clone(),
-            creators: metadata.creators.clone(),
+            creators: metadata.creators.iter().map(JsonCreator::from).collect(),
             related_identifiers,
             extra: HashMap::new(),
         }
