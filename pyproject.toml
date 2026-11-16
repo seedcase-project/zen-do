@@ -12,8 +12,6 @@ dynamic = [
 name = "zen-do"
 requires-python = ">=3.12"
 classifiers = [
-  "License :: OSI Approved :: MIT License",
-
   # How mature is this project? Common values are
   #   3 - Alpha
   #   4 - Beta
