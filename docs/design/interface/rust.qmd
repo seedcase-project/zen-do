@@ -53,12 +53,12 @@ flowchart TD
     session[("Session::new()")]
     read_metadata["read_metadata()"]
     metadata[("Metadata {...}")]
-    require_deposit["require_deposit()"]
     is_draft["is_draft()"]
     discard_deposit["discard_deposit()"]
     output[/"Message<br>or nothing<br>(stdout)"/]
 
     decision_draft{"draft?"}
+    has_deposit{"has deposit?"}
 
     metadata_file -->
       read_metadata -->
@@ -68,9 +68,12 @@ flowchart TD
 
     sandbox & token -->
       session -->
-      require_deposit -->
-      is_draft --> decision_draft
-      decision_draft -->|true| discard_deposit -->
+      has_deposit -->|true| is_draft -->
+      decision_draft
+
+    has_deposit -->|false| output
+
+    decision_draft -->|true| discard_deposit -->
       output
 
     decision_draft -->|false| output
@@ -245,11 +248,6 @@ flowchart TD
     If the request succeeds, the `Session.deposit` field is set to `None`. If
     the current deposit on Zenodo needs to be retrieved, do `Session::new()`
     again to start over.
-
-`Session::require_deposit(self: &self) -> Result<Self, Error>`
-
-:   A simple `impl` method on `Session` to ensure that the `Session` has a
-    `deposit` field. Used for CLI commands that require a `deposit` be present.
 
 <!-- TODO: Unsure if this should be a `Result` type instead... -->
 
