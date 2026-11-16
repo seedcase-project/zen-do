@@ -84,8 +84,8 @@ flowchart TD
 ### {{< var wip >}} `get()` {#cli-get}
 
 The internals of this function are used in several other CLI functions,
-specifically the `Session::new()`. See [`get_deposit()`](#lib-get-deposit)
-below.
+specifically the `Session::new()`. Interally, `Session::new()` uses
+[`get_deposit()`](#lib-get-deposit) to get the deposit if it exists.
 
 ```{mermaid}
 %%| label: fig-get-cli
@@ -100,7 +100,6 @@ flowchart TD
     session[("Session::new()")]
     read_metadata["read_metadata()"]
     metadata[("Metadata {...}")]
-    get_deposit["get_deposit()"]
     output[/"Deposit<br>or nothing"/]
 
     metadata_file -->
@@ -109,7 +108,6 @@ flowchart TD
 
     sandbox & token -->
       session -->
-      get_deposit -->
       output
 ```
 
@@ -321,7 +319,7 @@ The signature is:
 
 ```rust
 impl Session {
-    fn get_deposit(self: &mut self, id: &ZendoId) -> Result<Self, Error> {}
+    fn get_deposit(self: mut self, id: &ZendoId) -> Result<mut self, Error> {}
 }
 ```
 
