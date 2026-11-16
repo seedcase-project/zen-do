@@ -244,12 +244,6 @@ flowchart TD
     classDef inner fill:none
 ```
 
-## Library code
-
-This section describes the non-CLI library interface, which the CLI functions
-use internally use. They are a higher-level description, mainly here to provide
-a function signature as well as some reasons their design (if needed).
-
 <!-- TODO: Confirm whether response contains the deposit, then it can be added to `Deposit` -->
 
 `Deposit {...}`
@@ -279,16 +273,6 @@ find_deposit(deposits: Vec<Deposit>, zendo_id: &ZendoId) -> Result<Option<Deposi
 Uses the `ZendoId` to find the matching deposit within the `related_identifier`
 Zenodo field. If it doesn't find one, it outputs `None`. If there are duplicate
 `ZendoId` (more than on `Deposit`), than fail.
-
-`Metadata {...}`
-
-:   This contains the metadata from the Zenodo TOML file, i.e., `.zenodo.toml`.
-    It will eventually form the deposit's
-    [`metadata`](https://developers.zenodo.org/?shell#depositions) field.
-
-`read_metadata(path: &Path) -> Result<Metadata, Error>`
-
-:   Reads the Zenodo TOML file, e.g. `.zenodo.toml`.
 
 `Session {header, url, connection, zendo_id, deposit}`
 
