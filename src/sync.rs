@@ -124,7 +124,9 @@ impl LeftJoin for ZenodoJson {
 impl Write for ZenodoJson {
     fn write(self, parent: &Path) -> Result<(), Box<dyn Error>> {
         let path = parent.join(Self::FILE_NAME);
-        fs::write(path, serde_json::to_string(&self)?)?;
+        let mut contents = serde_json::to_string_pretty(&self)?;
+        contents.push('\n');
+        fs::write(path, contents)?;
         Ok(())
     }
 }
