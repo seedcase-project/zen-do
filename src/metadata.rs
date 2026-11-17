@@ -47,9 +47,9 @@ impl TryFrom<String> for ZendoId {
 
         if components
             .iter()
-            .any(|part| matches!(*part, "<github-org>" | "<project-name>" | "<output-type>"))
+            .any(|part| matches!(*part, "<github-user>" | "<repo-name>" | "<output-type>"))
         {
-            return Err("The field `zendo_id` in the Zenodo TOML file cannot contain placeholder values (e.g., `<github-org>`). Please fill them in with actual values.".into());
+            return Err("The field `zendo_id` in the Zenodo TOML file cannot contain placeholder values (e.g., `<github-user>`). Please fill them in with actual values.".into());
         }
 
         let correct_characters = components.iter().all(|part| {
@@ -74,8 +74,8 @@ pub struct Metadata {
     /// The type of the deposit.
     pub upload_type: String,
 
-    /// This is a required ID for zen-do
-    #[toml_example(default = "<github-org>:<project-name>:<output-type>")]
+    /// This is a required ID for zen-do.
+    #[toml_example(default = "<github-user>:<repo-name>:<output-type>")]
     pub zendo_id: ZendoId,
 
     // TODO: Don't allow empty vec, NonEmptyVec?

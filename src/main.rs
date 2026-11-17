@@ -236,8 +236,8 @@ mod tests {
         // Remove placeholder:
         let contents = std::fs::read_to_string(&metadata_file).unwrap();
         let contents = contents
-            .replace("<github-org>", "my-org")
-            .replace("<project-name>", "zen-do")
+            .replace("<github-user>", "my-org")
+            .replace("<repo-name>", "zen-do")
             .replace("<output-type>", "docs");
         std::fs::write(&metadata_file, contents).unwrap();
 
