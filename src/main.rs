@@ -210,8 +210,6 @@ fn main() {
         #[allow(unused_variables)]
         Commands::Get(args) => todo!("Not started yet"),
 
-        // TODO: Remove once implemented
-        #[allow(unused_variables)]
         Commands::Sync(args) => match sync(args) {
             Ok(()) => {
                 print!("Synced metadata.");
