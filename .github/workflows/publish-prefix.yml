@@ -1,0 +1,61 @@
+# From https://github.com/prefix-dev/rattler-build-action
+name: Publish to Prefix
+
+on:
+  # Defining workflow_call means that this workflow can be called from
+  # your main workflow job (`release` from dist)
+  workflow_call:
+    # dist exposes the plan from the plan step, as a JSON string,
+    # to your job if it needs it.
+    inputs:
+      plan:
+        required: true
+        type: string
+
+jobs:
+  publish-prefix:
+    name: Build package
+    environment:
+      name: "prefix"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target-platform: linux-64
+          - os: ubuntu-24.04-arm
+            target-platform: linux-aarch64
+          - os: windows-latest
+            target-platform: win-64
+          - os: macos-13
+            target-platform: osx-64
+          - os: macos-latest
+            target-platform: osx-arm64
+    steps:
+      # This is a useful security step to check for unexpected outbound calls from the runner,
+      # which could indicate a compromised token or runner.
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Build conda package
+        uses: prefix-dev/rattler-build-action@1ca5f45832f419a46d1326ccc5861d7e14d67c44 # v0.2.39
+        with:
+          # needs to be unique for each matrix entry
+          artifact-name: package-${{ matrix.target-platform }}
+          build-args: --target-platform ${{ matrix.target-platform }}${{ matrix.target-platform == 'linux-aarch64' && ' --no-test' || '' }}
+
+      - name: Publish to prefix.dev
+        shell: bash
+        run: |
+          shopt -s nullglob
+          EXIT_CODE=0
+          for pkg in $(find output -type f \( -name "*.conda" -o -name "*.tar.bz2" \) ); do
+            if ! rattler-build upload prefix -c seedcase/seedcase "${pkg}"; then
+              EXIT_CODE=1
+            fi
+          done
+          exit $EXIT_CODE

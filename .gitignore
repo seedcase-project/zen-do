@@ -43,3 +43,6 @@ docs/.quarto/
 *.ipynb
 *.quarto_ipynb
 **/*.quarto_ipynb
+
+# Build conda packages
+output/
