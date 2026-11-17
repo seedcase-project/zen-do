@@ -63,13 +63,13 @@ check-cargo:
 
 # Checks formatting with rustfmt
 check-fmt:
-    cargo +nightly fmt --check -- --config-path .config/rustfmt.toml
+    cargo fmt --check -- --config-path .config/rustfmt.toml
 
 # Format the code and fix issues
 format-rust:
     cargo fix --allow-dirty
     cargo clippy --fix --allow-dirty
-    cargo +nightly fmt -- --config-path .config/rustfmt.toml
+    cargo fmt -- --config-path .config/rustfmt.toml
 
 # Format Markdown files
 format-md:

@@ -9,7 +9,8 @@
 License](https://img.shields.io/github/license/seedcase-project/zen-do.svg)](https://github.com/seedcase-project/zen-do/blob/main/LICENSE.md)
 [![GitHub
 Release](https://img.shields.io/github/v/release/seedcase-project/zen-do.svg)](https://github.com/seedcase-project/zen-do/releases/latest)
-<!-- [![Crates.io Version](https://img.shields.io/crates/v/zen-do.svg)](https://crates.io/crates/zen-do) -->
+[![Crates.io
+Version](https://img.shields.io/crates/v/zen-do.svg)](https://crates.io/crates/zen-do)
 [![Build
 documentation](https://github.com/seedcase-project/zen-do/actions/workflows/build-website.yml/badge.svg)](https://github.com/seedcase-project/zen-do/actions/workflows/build-website.yml)
 [![Checks](https://github.com/seedcase-project/zen-do/actions/workflows/checks.yml/badge.svg)](https://github.com/seedcase-project/zen-do/actions/workflows/checks.yml)
