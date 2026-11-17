@@ -31,6 +31,8 @@ directory by default:
 - **macOS or Linux:** `$HOME/.cargo/bin`
 - **Windows:** `%USERPROFILE%\.cargo\bin`
 
+To upgrade zen-do with cargo, you can rerun the installation command.
+
 ## uv
 
 ::::: callout-tip
@@ -55,6 +57,8 @@ To confirm that zen-do was installed correctly, run:
 ```bash {filename="Terminal"}
 zen-do --version
 ```
+
+If the `zen-do` command cannot be found, try restarting your terminal.
 
 To upgrade zen-do with uv, you can run:
 
