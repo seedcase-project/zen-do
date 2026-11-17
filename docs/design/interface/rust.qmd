@@ -270,8 +270,8 @@ The signature is:
 find_deposit(deposits: Vec<Deposit>, zendo_id: &ZendoId) -> Result<Option<Deposit>, Error>
 ```
 
-Uses the `ZendoId` to find the matching deposit within the `related_identifier`
-Zenodo field. If it doesn't find one, it outputs `None`. If there are duplicate
+Uses the `ZendoId` to find the matching deposit.
+If it doesn't find one, it outputs `None`. If there are duplicate
 `ZendoId` (more than on `Deposit`), than fail.
 
 `Session {header, url, connection, zendo_id, deposit}`
