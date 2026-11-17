@@ -3,7 +3,7 @@ title: "Command line"
 ---
 
 This documents the command-line interface (CLI) and its Rust counterparts,
-including some function signatures and explanation of the choices we've made.
+including some function signatures and explanations of the choices we've made.
 This document is primarily to help us (the developers) stay focused on the
 package's scope.
 
@@ -43,9 +43,9 @@ The `get` command will get the Zenodo deposit JSON based on the metadata file
 provided. If the deposit doesn't exist, it will output a message about not
 finding a match. This is useful for checking if a deposit already exists for a
 given set of metadata, and if so, getting the deposit information to use for
-updating or publishing it. Internally uses the Rust functions within `list()` to
-get the list of deposits and uses that to find the deposit that matches the
-content of the metadata file using the `zendo_id`.
+updating or publishing it. Internally, it uses the Rust functions within
+`list()` to get the list of deposits and uses that to find the deposit that
+matches the content of the metadata file using the `zendo_id`.
 
 ## {{< var wip >}} `sync` {#cli-sync}
 
