@@ -244,8 +244,6 @@ flowchart TD
     classDef inner fill:none
 ```
 
-<!-- TODO: Confirm whether response contains the deposit, then it can be added to `Deposit` -->
-
 `Deposit {...}`
 
 :   A struct that represents the JSON response received from Zenodo. Mainly
@@ -255,7 +253,8 @@ flowchart TD
     converted from the Zenodo JSON representation to our `Deposit` struct as
     they aren't needed by zen-do nor needed during communication with the Zenodo
     API. Specifically `doi_url`, `created`, `modified`, and `title` are not
-    kept.
+    kept. Will also contain `zendo_id` if there is one in the
+    `related_identifier` field.
 
 `get_token(sandbox: bool) -> Result<String, Error>`
 
@@ -270,9 +269,9 @@ The signature is:
 find_deposit(deposits: Vec<Deposit>, zendo_id: &ZendoId) -> Result<Option<Deposit>, Error>
 ```
 
-Uses the `ZendoId` to find the matching deposit.
-If it doesn't find one, it outputs `None`. If there are duplicate
-`ZendoId` (more than on `Deposit`), than fail.
+Uses the `ZendoId` to find the matching deposit. If it doesn't find one, it
+outputs `None`. If there are duplicate `ZendoId` (more than on `Deposit`), than
+fail.
 
 `Session {header, url, connection, zendo_id, deposit}`
 
@@ -289,7 +288,7 @@ If it doesn't find one, it outputs `None`. If there are duplicate
     synchronous connection. The fields `zendo_id` and `deposit` are `Option`
     types.
 
-`Session::discard_deposit(self: mut self) -> Result<Self, Error>`
+`Session::discard_deposit(self: mut self) -> Result<mut self, Error>`
 
 :   This `impl` method on `Session` sends a
     [discard](https://developers.zenodo.org/?shell#discard) request to Zenodo.
