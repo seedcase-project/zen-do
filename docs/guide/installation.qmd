@@ -8,7 +8,6 @@ Select your preferred package manager to view installation instructions for
 zen-do.
 
 ::: {.panel-tabset}
-
 ## Cargo
 
 First, install [Rust](https://rust-lang.org/tools/install/) and Cargo. Then
@@ -34,7 +33,7 @@ directory by default:
 
 ## uv
 
-:::: callout-tip
+::::: callout-tip
 If you prefer to not install zen-do as a standalone command, you can use `uvx`
 to install and run it in one step instead. To use `uvx` with zen-do, prefix the
 command invocation with `uvx` each time you type out a zen do command:
@@ -42,8 +41,7 @@ command invocation with `uvx` each time you type out a zen do command:
 ```bash {filename="Terminal"}
 uvx zen-do --version
 ```
-
-::::
+:::::
 
 First, install [uv](https://docs.astral.sh/uv). Then install zen-do from PyPI
 with
@@ -63,7 +61,6 @@ To upgrade zen-do with uv, you can run:
 ```bash {filename="Terminal"}
 uv tool upgrade --all
 ```
-
 :::
 
 <!-- TODO: uncomment when we have auto-completions
