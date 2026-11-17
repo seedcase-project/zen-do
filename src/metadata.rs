@@ -118,7 +118,7 @@ impl Metadata {
 }
 
 /// The type containing the details of the creator/author of a Zenodo deposit.
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Default)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
 pub struct Creator {
     /// The full name of the creator/author.
     pub name: String,

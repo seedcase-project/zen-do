@@ -1,7 +1,6 @@
 // The `main.rs` file is the binary entry-point, e.g. for CLIs
 
 use clap::{Args, Parser, Subcommand};
-use serde::Serialize;
 use std::error::Error;
 use std::path::{Path, PathBuf};
 use zen_do::metadata::{Metadata, read_metadata, write_metadata};
@@ -132,8 +131,7 @@ struct PublishArgs {
     draft: DraftArg,
 }
 
-#[derive(clap::ValueEnum, Clone, Debug, Serialize)]
-#[serde(rename_all = "kebab-case")]
+#[derive(clap::ValueEnum, Clone, Debug)]
 enum ToFormats {
     ZenodoJson,
 }
