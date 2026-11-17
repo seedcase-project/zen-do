@@ -2,10 +2,13 @@ use crate::metadata::{Creator, Metadata, RelatedIdentifier};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, error::Error, fs, path::Path};
 
+/// Provides the filename used to store the format.
 pub trait FormatFileName {
+    /// The filename used to store the format.
     const FILE_NAME: &str;
 }
 
+/// Provides functionality for reading a format from disk.
 pub trait Read: Sized {
     /// Reads the format from disk.
     ///
@@ -17,13 +20,17 @@ pub trait Read: Sized {
     fn read(parent: &Path) -> Result<Option<Self>, Box<dyn Error>>;
 }
 
+/// Provides functionality for merging two instances of a format.
 pub trait LeftJoin: Sized {
     /// Merges two instances of a format, keeping the values from `self`
-    /// and filling in additional fields from `right`, if present.
+    /// and filling in additional fields from `right`, if present. Arrays and
+    /// nested objects in `self` are retained completely rather than being
+    /// merged with their corresponding fields in `right`.
     #[must_use]
     fn left_join(self, right: Option<Self>) -> Self;
 }
 
+/// Provides functionality for writing a format to disk.
 pub trait Write {
     /// Writes the format to disk.
     ///
@@ -33,6 +40,7 @@ pub trait Write {
     fn write(self, parent: &Path) -> Result<(), Box<dyn Error>>;
 }
 
+/// Represents a creator in the `.zenodo.json` file format.
 #[derive(Debug, Default, PartialEq, Deserialize, Serialize)]
 #[serde(default)]
 pub struct JsonCreator {
@@ -51,6 +59,7 @@ impl From<&Creator> for JsonCreator {
     }
 }
 
+/// Represents a related identifier in the `.zenodo.json` file format.
 #[derive(Debug, Default, PartialEq, Deserialize, Serialize)]
 #[serde(default)]
 pub struct JsonRelatedIdentifier {
