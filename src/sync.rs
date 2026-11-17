@@ -176,9 +176,9 @@ pub fn sync_format<T>(metadata: &Metadata, parent: &Path) -> Result<(), Box<dyn 
 where
     T: for<'a> From<&'a Metadata> + Read + LeftJoin + Write,
 {
-    let new_format = T::from(metadata);
-    let old_format = T::read(parent)?;
-    let synced_format = new_format.left_join(old_format);
-    synced_format.write(parent)?;
+    let new_metadata = T::from(metadata);
+    let old_metadata = T::read(parent)?;
+    let synced_metadata = new_metadata.left_join(old_metadata);
+    synced_metadata.write(parent)?;
     Ok(())
 }
