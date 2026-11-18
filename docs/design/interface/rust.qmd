@@ -253,7 +253,7 @@ flowchart TD
     converted from the Zenodo JSON representation to our `Deposit` struct as
     they aren't needed by zen-do nor needed during communication with the Zenodo
     API. Specifically `doi_url`, `created`, `modified`, and `title` are not
-    kept. Will also contain `zendo_id` if there is one in the
+    kept. The struct also contains `zendo_id`, if there is one in the
     `related_identifier` field.
 
 `get_token(sandbox: bool) -> Result<String, Error>`
@@ -270,8 +270,8 @@ find_deposit(deposits: Vec<Deposit>, zendo_id: &ZendoId) -> Result<Option<Deposi
 ```
 
 Uses the `ZendoId` to find the matching deposit. If it doesn't find one, it
-outputs `None`. If there are duplicate `ZendoId` (more than on `Deposit`), than
-fail.
+outputs `None`. If there are found more than one `Deposit` with the  `ZendoId`, this function
+returns an error.
 
 `Session {header, url, connection, zendo_id, deposit}`
 
@@ -302,7 +302,7 @@ The signature is:
 
 ```rust
 impl Session {
-    fn get_deposit(self: mut self, id: &ZendoId) -> Result<mut self, Error> {}
+    fn get_deposit(mut self, id: &ZendoId) -> Result<Self, Error> {}
 }
 ```
 
@@ -364,11 +364,11 @@ impl Session {
 ```
 
 Sends a [`get` REST API request](https://developers.zenodo.org/#list) to Zenodo
-using the `reqwest` package. Deserialises the Zenodo JSON response into our
+using the `reqwest` package. Deserialises the Zenodo JSON response into a vector with our
 `Deposit` struct. Also needs a `try_from()` to convert the Zenodo JSON
 `related_identifier` into our `zendo_id`, if it exists in the JSON (but won't
 fail if it can't convert anything in the deposit). Implemented as an `impl`
-method on `Session`. Can output an empty `Vec` if no deposit is found.
+method on `Session`. Outputs an empty `Vec` if no deposit is found.
 
 `Session::new(sandbox, token, zendo_id)`
 
