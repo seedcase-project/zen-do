@@ -478,9 +478,8 @@ a function signature as well as some reasons their design (if needed).
 `Session::create_new_version(self: &mut self) -> Result<Self, Error>`
 
 :   This `impl` method on `Session` converts an existing deposit into a ["new
-    version"](https://developers.zenodo.org/#new-version). It is similar to
-    converting a deposit to "editable" state, but is needed if new files are
-    going to be added to the deposit to make a new record.
+    version"](https://developers.zenodo.org/#new-version). It is needed if new files are
+    going to be added to the deposit.
 
 `Session::create_deposit(self: &mut self, metadata: &Metadata) -> Result<Self, Error>`
 
