@@ -81,6 +81,36 @@ flowchart TD
     classDef inputs fill:lightgray,stroke-width:3px
 ```
 
+### {{< var wip >}} `get()` {#cli-get}
+
+The internals of this function are used in several other CLI functions,
+specifically the `Session::new()`. Internally, `Session::new()` uses
+[`get_deposit()`](#lib-get-deposit) to get the deposit if it exists.
+
+```{mermaid}
+%%| label: fig-get-cli
+%%| fig-cap: "The flow of input and output through the `get()` CLI function."
+%%| fig-alt: >-
+%%|   Diagram showing the flow of input and output through the CLI function.
+
+flowchart TD
+    sandbox[/"--sandbox"/]
+    metadata_file[/"[metadata-file]"/]
+    token["get_token()"]
+    session[("Session::new()")]
+    read_metadata["read_metadata()"]
+    metadata[("Metadata {...}")]
+    output[/"Deposit<br>or nothing"/]
+
+    metadata_file -->
+      read_metadata -->
+      metadata --> |add ID| session
+
+    sandbox & token -->
+      session -->
+      output
+```
+
 ### {{< var wip >}} `sync()` {#cli-sync}
 
 Because of the wide variety of potential output formats, the internals of this
@@ -121,6 +151,10 @@ flowchart TD
 ```
 
 ## Library code
+
+This section describes the non-CLI library interface, which the CLI functions
+use internally use. They are a higher-level description, mainly here to provide
+a function signature as well as some reasons their design (if needed).
 
 `enum ToFormats`
 
@@ -219,7 +253,8 @@ flowchart TD
     converted from the Zenodo JSON representation to our `Deposit` struct as
     they aren't needed by zen-do nor needed during communication with the Zenodo
     API. Specifically `doi_url`, `created`, `modified`, and `title` are not
-    kept.
+    kept. The struct also contains `zendo_id` (alongside the `Deposit.id`), if
+    there is one in the `related_identifier` field.
 
 `get_token(sandbox: bool) -> Result<String, Error>`
 
@@ -249,6 +284,28 @@ flowchart TD
     the current deposit on Zenodo needs to be retrieved, do `Session::new()`
     again to start over.
 
+### `Session::get_deposit()` {#lib-get-deposit}
+
+The signature is:
+
+```rust
+impl Session {
+    fn get_deposit(mut self, id: &ZendoId) -> Result<Self, Error> {}
+}
+```
+
+Sends a [`GET` REST API request](https://developers.zenodo.org/#list) to Zenodo
+using [reqwest](https://docs.rs/reqwest/latest/reqwest/). Deserialises the
+Zenodo JSON response into our `Deposit` struct. Uses the Zenodo API `q` query
+parameter on the Zenodo `GET` API to list deposits that have the `ZendoId` in
+the `related_identifier`. Also includes a `try_from()` to convert the Zenodo
+JSON `related_identifier` into our `zendo_id` on `Deposit.zendo_id`, if it
+exists in the JSON (but won't fail if it can't convert any `related_identifier`s
+in the deposit). If no deposit is found, the `Session.deposit` field will be
+kept as `None`. Is a `impl` method on `Session`.
+
+This is used internally in `Session::new()`.
+
 <!-- TODO: Unsure if this should be a `Result` type instead... -->
 
 `Session::is_draft(self: &self) -> bool`
@@ -258,15 +315,33 @@ flowchart TD
     if it is "inprogress", or if the `state` is not "error" and the
     `deposit.submitted` field is false. Is an `impl` method on `Session`.
 
+### `Session::list_deposits()` {#lib-list-deposit}
+
+The signature is:
+
+```rust
+impl Session {
+    list_deposits(self: &self) -> Result<Vec<Deposit>, Error>
+}
+```
+
+Sends a [`get` REST API request](https://developers.zenodo.org/#list) to Zenodo
+using the `reqwest` package. Deserialises the Zenodo JSON response into a vector
+with our `Deposit` struct. Also needs a `try_from()` to convert the Zenodo JSON
+`related_identifier` into our `zendo_id`, if it exists in the JSON (but won't
+fail if it can't convert anything in the deposit). Implemented as an `impl`
+method on `Session`. Outputs an empty `Vec` if no deposit is found.
+
 `Session::new(sandbox, token, zendo_id)`
 
 :   This constructs a new `Session` struct with details needed for reqwest to
     correctly send a request to Zenodo. Based on the `sandbox` value, the `url`
     field will point to either `sandbox.zenodo.org` or `zenodo.org` URLs. If the
     `zendo_id` is given, a request will be sent to Zenodo for the deposit
-    connected to the ID, the response of which will be attached to the `deposit`
-    field to limit repeated requests. Importantly, the main purpose for getting
-    and assigning the `deposit` at this point is to get the Zenodo identifier in
+    connected to the ID using [`Session::get_deposit()`](#lib-get-deposit), the
+    response of which will be attached to the `deposit` field to limit repeated
+    requests. Importantly, the main purpose for getting and assigning the
+    `deposit` at this point is to get the Zenodo identifier in
     [`deposit.id`](https://developers.zenodo.org/?shell#entities). When using
     `new()`, the `reqwest::blocking::Client::new()` will be added to
     `connection` to reuse that object for each request sent to Zenodo. The
