@@ -31,7 +31,7 @@ directory by default:
 - **macOS or Linux:** `$HOME/.cargo/bin`
 - **Windows:** `%USERPROFILE%\.cargo\bin`
 
-To upgrade zen-do with cargo, you can rerun the installation command.
+To upgrade zen-do with Cargo, you can rerun the installation command.
 
 ## uv
 
