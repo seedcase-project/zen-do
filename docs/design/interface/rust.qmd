@@ -253,25 +253,13 @@ flowchart TD
     converted from the Zenodo JSON representation to our `Deposit` struct as
     they aren't needed by zen-do nor needed during communication with the Zenodo
     API. Specifically `doi_url`, `created`, `modified`, and `title` are not
-    kept. The struct also contains `zendo_id`, if there is one in the
-    `related_identifier` field.
+    kept. The struct also contains `zendo_id` (alongside the `Deposit.id`), if
+    there is one in the `related_identifier` field.
 
 `get_token(sandbox: bool) -> Result<String, Error>`
 
 :   As described in the [CLI](cli.qmd) page, this gets the token from either the
     keyring or from the env variables.
-
-### `find_deposit()` {#lib-find-deposit}
-
-The signature is:
-
-```rust
-find_deposit(deposits: Vec<Deposit>, zendo_id: &ZendoId) -> Result<Option<Deposit>, Error>
-```
-
-Uses the `ZendoId` to find the matching deposit. If it doesn't find one, it
-outputs `None`. If there are found more than one `Deposit` with the `ZendoId`,
-this function returns an error.
 
 `Session {header, url, connection, zendo_id, deposit}`
 
@@ -306,43 +294,17 @@ impl Session {
 }
 ```
 
-Sends a [`get` REST API request](https://developers.zenodo.org/#list) to Zenodo
+Sends a [`GET` REST API request](https://developers.zenodo.org/#list) to Zenodo
 using [reqwest](https://docs.rs/reqwest/latest/reqwest/). Deserialises the
-Zenodo JSON response into our `Deposit` struct. Also includes a `try_from()` to
-convert the Zenodo JSON `related_identifier` into our `zendo_id`, if it exists
-in the JSON (but won't fail if it can't convert any `related_identifier`s in the
-deposit). If no deposit is found, the `Session.deposit` field will be kept as
-`None`. Is a `impl` method on `Session`.
+Zenodo JSON response into our `Deposit` struct. Uses the Zenodo API `q` query
+parameter on the Zenodo `GET` API to list deposits that have the `ZendoId` in
+the `related_identifier`. Also includes a `try_from()` to convert the Zenodo
+JSON `related_identifier` into our `zendo_id` on `Deposit.zendo_id`, if it
+exists in the JSON (but won't fail if it can't convert any `related_identifier`s
+in the deposit). If no deposit is found, the `Session.deposit` field will be
+kept as `None`. Is a `impl` method on `Session`.
 
 This is used internally in `Session::new()`.
-
-```{mermaid}
-%%| label: fig-lib-get-deposit
-%%| fig-cap: >-
-%%|   The flow of input and output through the `Session::get_deposit()` CLI
-%%|   function.
-%%| fig-alt: >-
-%%|   Diagram showing the flow of input and output through the CLI function.
-
-flowchart TD
-    session[/"Session {...}"/]
-    zendo_id[/"ZendoId"/]
-    output[/"Result\< Session, Error \>"/]
-
-    list["list_deposits()"]
-    deposits[("Vec\< Deposit \>")]
-    find_deposit["find_deposit()"]
-
-    session -->
-      list -->
-      deposits -->
-      find_deposit
-
-    session -->
-      zendo_id -->
-      find_deposit -->
-      output
-```
 
 <!-- TODO: Unsure if this should be a `Result` type instead... -->
 
