@@ -270,8 +270,8 @@ find_deposit(deposits: Vec<Deposit>, zendo_id: &ZendoId) -> Result<Option<Deposi
 ```
 
 Uses the `ZendoId` to find the matching deposit. If it doesn't find one, it
-outputs `None`. If there are found more than one `Deposit` with the  `ZendoId`, this function
-returns an error.
+outputs `None`. If there are found more than one `Deposit` with the `ZendoId`,
+this function returns an error.
 
 `Session {header, url, connection, zendo_id, deposit}`
 
@@ -364,8 +364,8 @@ impl Session {
 ```
 
 Sends a [`get` REST API request](https://developers.zenodo.org/#list) to Zenodo
-using the `reqwest` package. Deserialises the Zenodo JSON response into a vector with our
-`Deposit` struct. Also needs a `try_from()` to convert the Zenodo JSON
+using the `reqwest` package. Deserialises the Zenodo JSON response into a vector
+with our `Deposit` struct. Also needs a `try_from()` to convert the Zenodo JSON
 `related_identifier` into our `zendo_id`, if it exists in the JSON (but won't
 fail if it can't convert anything in the deposit). Implemented as an `impl`
 method on `Session`. Outputs an empty `Vec` if no deposit is found.
