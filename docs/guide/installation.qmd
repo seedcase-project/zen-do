@@ -11,7 +11,7 @@ zen-do.
 ## Cargo
 
 First, install [Rust](https://rust-lang.org/tools/install/) and Cargo. Then
-install zen-do from [crates.io](https://crates.io) with
+install zen-do from [crates.io](https://crates.io) with:
 
 ```bash {filename="Terminal"}
 cargo install zen-do
@@ -46,7 +46,7 @@ uvx zen-do --version
 :::::
 
 First, install [uv](https://docs.astral.sh/uv). Then install zen-do from PyPI
-with
+with:
 
 ```bash {filename="Terminal"}
 uv tool install zen-do
