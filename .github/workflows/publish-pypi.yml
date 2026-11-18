@@ -171,6 +171,8 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    environment:
+      name: "pypi"
     needs: [linux, musllinux, windows, macos, sdist]
     steps:
       # This is a useful security step to check for unexpected outbound calls from the runner,

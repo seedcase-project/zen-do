@@ -15,9 +15,6 @@ jobs:
   publish-crates-io:
     name: "Publish to crates.io"
     runs-on: ubuntu-latest
-    permissions:
-      # Required for authentication to crates.io via trusted publishing.
-      id-token: write
     environment:
       name: "crates-io"
     steps:
