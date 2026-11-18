@@ -475,7 +475,7 @@ a function signature as well as some reasons their design (if needed).
 :   As an `impl` method on `Session`, this adds files to a deposit. Must be in
     the `"inprogress"` state or have `"submitted"` be false.
 
-`Session::as_new_version(self: &mut self) -> Result<Self, Error>`
+`Session::create_new_version(self: &mut self) -> Result<Self, Error>`
 
 :   This `impl` method on `Session` converts an existing deposit into a ["new
     version"](https://developers.zenodo.org/#new-version). It is similar to
@@ -546,7 +546,7 @@ a function signature as well as some reasons their design (if needed).
     `new()`, the `reqwest::blocking::Client::new()` will be added to
     `connection` to reuse that object for each request sent to Zenodo.
 
-`Session::publish_deposit(self: &self) -> Result<Self, Error>`
+`Session::publish_deposit(self: &self) -> Result<(), Error>`
 
 :   This `impl` method on `Session` sends a
     [publish](https://developers.zenodo.org/?shell#publish) request to Zenodo on
