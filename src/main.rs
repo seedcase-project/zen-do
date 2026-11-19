@@ -161,12 +161,6 @@ pub fn init(args: &InitArgs) -> Result<(), Box<dyn Error>> {
         return Err("A `.zenodo.toml` file already exists in this directory.".into());
     }
 
-    // Rust cannot display a PathBuf, so we need to convert it to a str. A str
-    // is restricted to utf-8.
-    path.file_name()
-        .and_then(|name| name.to_str())
-        .ok_or("Current directory contains unsupported characters")?;
-
     write_init(&metadata_path)?;
 
     Ok(())

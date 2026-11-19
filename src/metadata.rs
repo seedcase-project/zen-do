@@ -207,7 +207,16 @@ pub fn write_metadata(metadata: &Metadata, path: &Path) -> Result<(), Box<dyn Er
     Ok(())
 }
 
-// Only used for the `init` command.
+/// Initiates a TOML file with comments and default Zenodo metadata.
+///
+/// # Arguments
+///
+/// - `path`: The path to the file to save the `metadata`.
+///
+/// # Errors
+///
+/// Errors when writing to file, such as if there is a problem with the file
+/// itself or where it will be saved.
 pub fn write_init(path: &Path) -> Result<(), Box<dyn Error>> {
     let toml_str = Metadata::toml_example();
     fs::write(path, toml_str)?;
