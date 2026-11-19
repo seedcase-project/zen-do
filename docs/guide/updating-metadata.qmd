@@ -1,0 +1,61 @@
+---
+title: "Updating the metadata on Zenodo"
+description: |
+  Use the `update` command to update metadata on an existing Zenodo deposit without changing its files or DOI.
+order: 3
+---
+
+Imagine this:
+
+> You have published a record on Zenodo but afterwards discovered a typo, need
+> to correct information, or want to add missing metadata after publishing a
+> deposit.
+
+Instead of making a new record, you just want to update the metadata without
+having to upload the files again or create a new DOI.
+
+The `update` command updates the metadata of an existing Zenodo deposit based on
+the `.zenodo.toml` file.
+
+Unlike the publish command, update only changes the metadata associated with an
+existing deposit. The files in the deposit remain unchanged, and the existing
+DOI is preserved.
+
+The command has one required argument: the path to the `.zenodo.toml` file. If
+no path is provided, it defaults to `.zenodo.toml` in the working directory.
+
+For example, to update the metadata of a deposit using the default
+`.zenodo.toml` file, run:
+
+```bash {filename="Terminal"}
+zen-do update
+```
+
+The following optional arguments are available:
+
+- `--sandbox`: Update the deposit in the Zenodo sandbox environment instead of
+  the main Zenodo environment. This is useful for testing changes before
+  updating a real deposit.
+- `--draft`: Update the deposit without publishing the changes to the record.
+  This allows you to review the updated deposit before publishing it.
+- `--yes`: Skip the confirmation prompt before updating. This is particularly
+  useful in automated workflows, such as CI/CD pipelines.
+
+To update a deposit in the sandbox environment without publishing the changes,
+run:
+
+```bash {filename="Terminal"}
+zen-do update --sandbox --draft
+```
+
+By default, `update` asks for confirmation before making changes. To bypass this
+prompt, for example in a continuous delivery workflow, run:
+
+```bash {filename="Terminal"}
+zen-do update --yes
+```
+
+Note that `update` requires an existing Zenodo deposit. If no deposit exists,
+the command will fail. The deposit must first be published as a record (see [the
+*publishing a record* guide](publishing.qmd)) before its metadata can be
+updated.
