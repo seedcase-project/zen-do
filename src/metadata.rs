@@ -20,7 +20,7 @@ orcid = "12345"
 
 [[related_identifiers]]
 identifier = "random"
-relation = "link"
+relation = "isIdenticalTo"
 resource_type = "test"
 "#;
 
