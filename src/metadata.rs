@@ -167,7 +167,7 @@ pub enum RelatedIdentifierRelation {
     IsCompiledBy,
     Compiles,
     IsVariantFormOf,
-    IsOriginalFormof,
+    IsOriginalFormOf,
     #[default] // TODO: Semi-randomly chose this as the default. Thoughts?
     IsIdenticalTo,
     IsAlternateIdentifier,
@@ -178,7 +178,7 @@ pub enum RelatedIdentifierRelation {
     Requires,
     IsRequiredBy,
     IsObsoletedBy,
-    Obsolete,
+    Obsoletes,
 }
 
 #[derive(Debug, Deserialize)]
