@@ -1,6 +1,6 @@
 // The `main.rs` file is the binary entry-point, e.g. for CLIs
 
-use ::zen_do::metadata::{Metadata, write_metadata};
+use ::zen_do::metadata::write_init;
 use clap::{Args, Parser, Subcommand};
 use std::error::Error;
 use std::path::PathBuf;
@@ -161,16 +161,7 @@ pub fn init(args: &InitArgs) -> Result<(), Box<dyn Error>> {
         return Err("A `.zenodo.toml` file already exists in this directory.".into());
     }
 
-    // Rust cannot display a PathBuf, so we need to convert it to a str. A str
-    // is restricted to utf-8.
-    let project_name = path
-        .file_name()
-        .and_then(|name| name.to_str())
-        .ok_or("Current directory contains unsupported characters")?;
-
-    let metadata = Metadata::new(project_name);
-
-    write_metadata(&metadata, &metadata_path)?;
+    write_init(&metadata_path)?;
 
     Ok(())
 }
@@ -239,7 +230,8 @@ mod tests {
         // Remove placeholder:
         let contents = std::fs::read_to_string(&metadata_file).unwrap();
         let contents = contents
-            .replace("<github-org>", "my-org")
+            .replace("<github-user>", "my-org")
+            .replace("<repo-name>", "zen-do")
             .replace("<output-type>", "docs");
         std::fs::write(&metadata_file, contents).unwrap();
 

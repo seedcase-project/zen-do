@@ -31,6 +31,7 @@ toml = "1.1.4"
 clap = { version = "4.6.6", features = ["derive"] }
 keyring = "4.2.0"
 keyring-core = "1.0.0"
+toml-example = "0.17.2"
 
 [dev-dependencies]
 temp-env = "0.3.6"
