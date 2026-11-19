@@ -31,7 +31,7 @@ build tools that make data more
 [FAIR](https://www.go-fair.org/fair-principles/), easier to access and share,
 and more likely to be (re)used. However, a secondary aim of Seedcase is to build
 tools that make it easier to do open science. To support this goal, zen-do
-simplifies specific tasks related to disseminating different scientific output.
+simplifies specific tasks related to disseminating different scientific outputs.
 
 ### Being FAIR should be easy
 

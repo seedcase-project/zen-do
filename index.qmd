@@ -44,7 +44,7 @@ publishing Zenodo deposits from a metadata file and your existing research files
   published on Zenodo.
 - Manage your project on your Zenodo account from the terminal.
 - Sync metadata between formats such as `.zenodo.toml`, `.zenodo.json`,
-  `_quarto.yml`, `pyproject.toml`, and `CITATION.cff`
+  `_quarto.yml`, `pyproject.toml`, and `CITATION.cff`.
 - Publish and update projects from the terminal.
 :::::::
 :::::

@@ -3,7 +3,7 @@
 Since we follow [Conventional
 Commits](https://decisions.seedcase-project.org/why-conventional-commits/),
 we're able to automatically create formal releases based on the commit messages.
-The releases are also published to `crate.io` for package distribution and
+The releases are also published to `crates.io` for package distribution and
 Zenodo for easier discovery, archival, and citation purposes. We use
 [Cocogitto](https://decisions.seedcase-project.org/why-semantic-release-with-cocogitto/)
 to be able to automatically create these releases, which uses
