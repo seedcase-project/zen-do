@@ -1,7 +1,7 @@
 ---
 title: "Get an overview of Zenodo deposits"
 description: |
-  Use the `list` and `get` commands to retrieve existing Zenodo deposits and find deposits matching a metadata file.
+  Use the `list` commands to retrieve all your Zenodo deposits and `get` to find a specific deposit.
 order: 4
 ---
 
