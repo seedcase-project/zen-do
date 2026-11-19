@@ -152,8 +152,10 @@ pub enum RelatedIdentifierRelation {
     IsSupplementedBy,
     IsContinuedBy,
     Continues,
-    IsDescribedBy, Describes,
-    HasMetadata, IsMetadataFor,
+    IsDescribedBy,
+    Describes,
+    HasMetadata,
+    IsMetadataFor,
     IsNewVersionOf,
     IsPreviousVersionOf,
     IsPartOf,
@@ -176,7 +178,7 @@ pub enum RelatedIdentifierRelation {
     Requires,
     IsRequiredBy,
     IsObsoletedBy,
-    Obsolete
+    Obsolete,
 }
 
 #[derive(Debug, Deserialize)]
