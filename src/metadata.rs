@@ -144,6 +144,42 @@ pub struct RelatedIdentifier {
     pub scheme: Option<String>,
 }
 
+#[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
+#[serde(rename_all = "camelCase")]
+pub enum RelatedIdentifierRelation {
+    IsCitedBy, 
+    Cites,
+    IsSupplementTo, 
+    IsSupplementedBy,
+    IsContinuedBy, 
+    Continues, 
+    IsDescribedBy, Describes, 
+    HasMetadata, IsMetadataFor, 
+    IsNewVersionOf, 
+    IsPreviousVersionOf, 
+    IsPartOf, 
+    HasPart, 
+    IsReferencedBy, 
+    References, 
+    IsDocumentedBy,
+    Documents, 
+    IsCompiledBy, 
+    Compiles, 
+    IsVariantFormOf, 
+    IsOriginalFormof, 
+    #[default] // TODO: Semi-randomly chose this as the default. Thoughts?
+    IsIdenticalTo, 
+    IsAlternateIdentifier, 
+    IsReviewedBy, 
+    Reviews, 
+    IsDerivedFrom, 
+    IsSourceOf, 
+    Requires, 
+    IsRequiredBy, 
+    IsObsoletedBy, 
+    Obsolete
+}
+
 #[derive(Debug, Deserialize)]
 struct RelatedIdentifierCheck {
     pub identifier: String,
