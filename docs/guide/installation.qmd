@@ -4,13 +4,13 @@ description: "Steps to install zen-do to use on the command-line."
 order: 0
 ---
 
-Select your preferred package manager to view installation instructions for
+Select your preferred package manager below to view installation instructions for
 zen-do.
 
 ::: {.panel-tabset}
 ## Cargo
 
-First, install [Rust](https://rust-lang.org/tools/install/) and Cargo. Then
+First, ensure you have Rust and Cargo installed. If not, follow the [Rust installation guide](https://rust-lang.org/tools/install/) which uses `rustup` to install  both. Then,
 install zen-do from [crates.io](https://crates.io) with:
 
 ```bash {filename="Terminal"}
@@ -45,7 +45,7 @@ uvx zen-do --version
 ```
 :::::
 
-First, install [uv](https://docs.astral.sh/uv). Then install zen-do from PyPI
+First, ensure you have [uv](https://docs.astral.sh/uv) installed. Then, install zen-do from PyPI
 with:
 
 ```bash {filename="Terminal"}
