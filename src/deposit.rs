@@ -49,9 +49,9 @@ pub struct DepositFile {
 
 /// The deposit metadata as returned by Zenodo.
 ///
-/// Not the same as `metadata::Metadata`, which holds what the user writes in the
-/// `.zenodo.toml`. Fields are optional here because deposits that weren't made
-/// by zen-do might not have them (e.g., empty drafts).
+/// Not the same as `metadata::Metadata`, which holds what the user writes in
+/// the `.zenodo.toml`. Fields are optional here because deposits that weren't
+/// made by zen-do might not have them (e.g., empty drafts).
 #[derive(Debug, Deserialize)]
 pub struct DepositMetadata {
     /// Title of the deposit.
