@@ -1,0 +1,63 @@
+---
+title: "Get an overview of Zenodo deposits"
+description: |
+  Use the `list` commands to retrieve all your Zenodo deposits and `get` to find a specific deposit.
+order: 4
+---
+
+The `list` and `get` commands can be used to retrieve information about existing
+Zenodo deposits. While `list` retrieves all deposits associated with the
+authenticated Zenodo account, `get` finds the deposit matching a specific
+`zendo_id` archived in the `.zenodo.toml` file.
+
+Both commands are useful for checking whether a deposit already exists and
+retrieving information about it before performing operations such as `update` or
+`publish`.
+
+### Listing deposits
+
+The `list` command retrieve all deposits associated with your Zenodo
+authentication token.
+
+To list deposits in the main Zenodo environment, run:
+
+```bash {filename="Terminal"}
+zen-do list
+```
+
+The optional --sandbox argument retrieves deposits from the Zenodo sandbox
+environment instead of the main Zenodo environment:
+
+```bash {filename="Terminal"}
+zen-do list --sandbox
+```
+
+### Getting a deposit
+
+While `list` will list *all* deposits, the `get` command only retrieves the
+Zenodo deposit JSON for a unique deposit matching the `zendo_id`. This ID is
+stored in the `.zenodo.toml` file.
+
+The command takes one optional argument: the path to the metadata file. If no
+path is provided, it defaults to `.zenodo.toml` in the working directory.
+
+```bash {filename="Terminal"}
+zen-do get [METADATA_FILE] --sandbox
+```
+
+The command searches the deposits associated with the authenticated Zenodo
+account and identifies a matching deposit using the `zendo_id`. If a matching
+deposit is found, its deposit JSON is returned.
+
+For example, to retrieve the deposit associated with the default `.zenodo.toml`
+file, run:
+
+```bash {filename="Terminal"}
+zen-do get
+```
+
+To search for the deposit in the Zenodo sandbox environment, run:
+
+```bash {filename="Terminal"}
+zen-do get --sandbox
+```
