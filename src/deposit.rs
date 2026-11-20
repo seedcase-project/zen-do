@@ -100,3 +100,81 @@ pub struct DepositLinks {
     /// not the new draft.
     pub latest_draft: Option<String>,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const DRAFT_DEPOSIT: &str = r#"{
+    "created": "2001-01-01T10:00:00",
+    "files": [],
+    "id": 1,
+    "links": {
+        "bucket": "https://zenodo.org/api/files/568377dd-daf8-4235-85e1-a56011ad454b",
+        "latest_draft": "https://zenodo.org/api/deposit/depositions/542201",
+        "self": "https://zenodo.org/api/deposit/depositions/542201"
+    },
+    "metadata": {"upload_type": "software"},
+    "modified": "2020-01-01T10:00:00",
+    "owner": 1,
+    "record_id": 1,
+    "state": "inprogress",
+    "submitted": false
+    }"#;
+
+    const PUBLISHED_DEPOSIT: &str = r#"{
+    "created": "2001-01-01T10:00:00",
+    "files": [{"id": "abc-123", "filename": "report.pdf", "filesize": 100, "checksum": "x"}],
+    "id": 2,
+    "links": {
+        "latest_draft": "https://zenodo.org/api/deposit/depositions/542201"
+    },
+    "doi": "10.5072/zenodo.542201",
+    "metadata": {
+        "title": "The published deposit title",
+        "related_identifiers": [{"identifier": "urn:zendo:myorg:myproject:report", "relation": "isIdenticalTo", "scheme": "urn"}]
+    },
+    "modified": "2020-01-01T10:00:00",
+    "owner": 1,
+    "record_id": 1,
+    "state": "done",
+    "submitted": true,
+    "title": "Another title that is not kept."
+    }"#;
+
+    #[test]
+    fn test_parse_draft() {
+        let deposit: Deposit =
+            serde_json::from_str(DRAFT_DEPOSIT).expect("draft deposit should parse");
+
+        assert!(deposit.files.is_empty());
+        assert_eq!(deposit.id, 1);
+        assert!(deposit.doi.is_none());
+        assert!(deposit.links.bucket.is_some());
+        assert!(deposit.metadata.title.is_none());
+        assert!(deposit.metadata.related_identifiers.is_empty());
+        assert!(matches!(deposit.state, DepositState::InProgress));
+        assert!(!deposit.submitted);
+    }
+
+    #[test]
+    fn test_parse_published() {
+        let deposit: Deposit =
+            serde_json::from_str(PUBLISHED_DEPOSIT).expect("published deposit should parse");
+        let related = &deposit.metadata.related_identifiers[0];
+
+        assert_eq!(deposit.files[0].filename, "report.pdf");
+        assert_eq!(deposit.id, 2);
+        assert!(deposit.links.bucket.is_none());
+        assert!(deposit.links.latest_draft.is_some());
+        assert_eq!(deposit.doi, Some("10.5072/zenodo.542201".to_string()));
+        assert_eq!(
+            deposit.metadata.title,
+            Some("The published deposit title".to_string())
+        );
+        assert_eq!(related.identifier, "urn:zendo:myorg:myproject:report");
+        assert_eq!(related.relation, "isIdenticalTo");
+        assert!(matches!(deposit.state, DepositState::Done));
+        assert!(deposit.submitted);
+    }
+}
