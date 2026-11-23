@@ -94,6 +94,11 @@ impl ZendoId {
     pub fn as_str(&self) -> &str {
         &self.0
     }
+
+    #[must_use]
+    pub fn to_urn(&self) -> String {
+        format!("{}{}", Self::PREFIX, self.0)
+    }
 }
 
 /// The type containing the details of the creator/author of a Zenodo deposit.
@@ -143,7 +148,7 @@ impl TryFrom<RelatedIdentifierCheck> for RelatedIdentifier {
     type Error = String;
 
     fn try_from(related_identifier: RelatedIdentifierCheck) -> Result<Self, Self::Error> {
-        if related_identifier.identifier.starts_with("urn:zendo:")
+        if related_identifier.identifier.starts_with(ZendoId::PREFIX)
             && related_identifier.relation == "isIdenticalTo"
         {
             return Err(
