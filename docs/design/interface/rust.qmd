@@ -480,7 +480,8 @@ a function signature as well as some reasons their design (if needed).
 
 :   This `impl` method on `Session` converts an existing deposit into a ["new
     version"](https://developers.zenodo.org/#new-version). It is needed if new
-    files are going to be added to the deposit.
+    files are going to be added to the deposit. Sends a post request and then
+    needs to take the response and add it to the `Session.deposit` field.
 
 `Session::create_deposit(self: &mut self, metadata: &Metadata) -> Result<&mut Self, Error>`
 
