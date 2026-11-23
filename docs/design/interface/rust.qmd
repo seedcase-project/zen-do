@@ -417,6 +417,7 @@ flowchart TD
     decision_draft{"draft?"}
     decision_editable{"editable?"}
 
+    sandbox --> token
     sandbox & token -->
       session
 
