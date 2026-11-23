@@ -2,10 +2,6 @@ use serde::Deserialize;
 
 // TODO: `created` and `modified` might be useful info for list. We could
 // include them later.
-// TODO: I've also not kept `record_id`, `record_url`, and `owner` to keep this
-// simple. Do we agree?
-// TODO: It's not clear to me whether we still need to keep a `zendo_id` in this
-// struct or it's fine to keep in related_identifiers. Not included for now.
 /// A deposit as returned by the Zenodo API.
 ///
 /// Only holds the fields zen-do uses. Any other fields in the response from
@@ -35,8 +31,6 @@ pub struct Deposit {
     pub links: DepositLinks,
 }
 
-// TODO: Have not included filesize and checksum bc I don't think we need them.
-// Agree?
 /// A file attached to a deposit on Zenodo.
 #[derive(Debug, Deserialize)]
 pub struct DepositFile {
