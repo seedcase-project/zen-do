@@ -259,7 +259,7 @@ flowchart TD
 ### {{< var wip >}} `list()` {#cli-list}
 
 This function only has one argument, `--sandbox`. Otherwise, it simply lists all
-deposits on a Zenodo account associated with the given token.
+deposits (including drafts) on a Zenodo account associated with the given token.
 
 ```{mermaid}
 %%| label: fig-list-cli
@@ -271,18 +271,17 @@ deposits on a Zenodo account associated with the given token.
 %%|   function.
 
 flowchart TD
-    sandbox[/"--sandbox"/]:::inputs
+    sandbox[/"--sandbox"/]
     token["get_token()"]
     session[("Session::new()")]
     list["list_deposits()"]
     output[/"Vec\< Deposit \><br>or nothing"/]
 
+    sandbox --> token
     sandbox & token -->
       session -->
       list -->
       output
-
-    classDef inputs fill:lightgray,stroke-width:3px
 ```
 
 ## Library code
