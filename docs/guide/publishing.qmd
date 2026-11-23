@@ -17,8 +17,6 @@ In order to publish on Zenodo, you need to create and fill out the metadata for
 your (future) published record in the `.zenodo.toml` file (or a similarly named
 TOML file). You can create an empty one with the `zen-do init` command.
 
-{{< include /docs/includes/_use-uv.qmd >}}
-
 The file or files that will be part of the published record must be in the same
 folder as the `.zenodo.toml` file or in a subfolder within that folder (see our
 [design docs](/docs/design/interface/inputs.qmd) for more details about this).
