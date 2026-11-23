@@ -4,3 +4,4 @@
 pub mod get_token; // Remove "pub" when functions that use it have been implemented
 pub mod metadata;
 pub mod session;
+pub mod sync;
