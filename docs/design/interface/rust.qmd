@@ -32,6 +32,101 @@ diagrams.
 The `init` CLI command isn't shown here as it is a very simple command to create
 an `.zenodo.toml` file with empty `Metadata` fields.
 
+### {{< var wip >}} `publish()` {#cli-publish}
+
+The meaning of `--draft` compared to `--yes` has a difference and results in
+different outcomes. Making a draft with `--draft` means the user wants to view
+the deposit on Zenodo to confirm things before publishing. `--yes` is a flag
+that tells `update()` to publish without prompting for a confirmation, which
+doesn't mean anything when used with `--draft` (though nothing will happen if
+both are used together). This is mainly to ensure that a command wasn't ran
+accidentally.
+
+While `is_editable()` is a `bool`, in the `true` case we output an error to
+`stderr` since we don't want to modify a deposit that is in the editable state.
+
+```{mermaid}
+%%| label: fig-publish-cli
+%%| fig-cap: "The flow of input and output through the `publish()` CLI function."
+%%| fig-alt: >-
+%%|   Diagram showing the flow of input and output from input to output. There
+%%|   are various shapes for each box, which is described at the top of the
+%%|   document.
+
+flowchart TD
+    draft[/"--draft"/]:::inputs
+    yes[/"--yes"/]:::inputs
+    sandbox[/"--sandbox"/]:::inputs
+    metadata_file[/"[metadata-file]"/]:::inputs
+    files[/"--file"/]:::inputs
+
+    token["get_token()"]
+    session[("Session::new()")]
+    confirm_publish["confirm_publish()"]
+    read_metadata["read_metadata()"]
+    metadata[("Metadata {...}")]
+    session_without_files[("Session {...}<br>Without files")]
+    create_deposit["create_deposit()"]
+    is_editable["is_editable()"]
+    create_new_version["create_new_version()"]
+    add_files["add_files()"]
+    delete_files["delete_files()"]
+    update_deposit["update_deposit()"]
+    publish["publish_deposit()"]
+    discard_deposit["discard_deposit()"]
+    output[/"Deposit<br>or nothing"/]
+
+    decision_publish{"publish?"}
+    decision_draft{"draft?"}
+    decision_editable{"editable?"}
+    decision_has_deposit{"has deposit?"}
+
+    sandbox --> token
+    sandbox & token -->
+      session
+
+    draft -->
+      decision_draft -->|true| output
+
+    files --> add_files
+
+    session -->
+      decision_has_deposit -->|Some| is_editable -->
+      decision_editable -->|false| create_new_version
+
+    decision_has_deposit -->|None| create_deposit
+    metadata -->
+      create_deposit -->
+      session_without_files
+
+    decision_editable --> |true| error[/Error/]
+
+    create_new_version -->
+      delete_files -->
+      session_without_files -->
+      add_files
+
+    add_files & metadata -->
+      update_deposit -->
+      decision_draft -->|false| decision_publish
+
+    decision_publish -->|true| publish -->
+      output
+
+    metadata_file -->
+      read_metadata -->
+      metadata
+
+    metadata -->|add ZendoID| session
+
+    yes -->
+      confirm_publish -->
+      decision_publish -->|false| discard_deposit -->
+      output
+
+    classDef inputs fill:lightgray,stroke-width:3px
+```
+
 ### {{< var wip >}} `sync()` {#cli-sync}
 
 Because of the wide variety of potential output formats, the internals of this
@@ -285,102 +380,6 @@ flowchart TD
     classDef inputs fill:lightgray,stroke-width:3px
 ```
 
-### {{< var wip >}} `publish()` {#cli-publish}
-
-The meaning of `--draft` compared to `--yes` has a difference and results
-in different outcomes. Making a draft with `--draft` means the user wants to
-view the deposit on Zenodo to confirm things before publishing. `--yes` is a
-flag that tells `update()` to publish without prompting for a confirmation,
-which doesn't mean anything when used with `--draft` (though nothing will happen
-if both are used together). This is mainly to ensure that a command wasn't ran
-accidentally.
-
-While `has_deposit()` outputs a `Result` type, rather than send to `stderr` in
-`publish()` we instead create a new deposit. Likewise, while `is_editable()` is
-a `bool`, in the `true` case we output an error to `stderr` since we don't want
-to modify a deposit that is in the editable state.
-
-```{mermaid}
-%%| label: fig-publish-cli
-%%| fig-cap: "The flow of input and output through the `publish()` CLI function."
-%%| fig-alt: >-
-%%|   Diagram showing the flow of input and output from input to output. There
-%%|   are various shapes for each box, which is described at the top of the
-%%|   document.
-
-flowchart TD
-    draft[/"--draft"/]:::inputs
-    yes[/"--yes"/]:::inputs
-    sandbox[/"--sandbox"/]:::inputs
-    metadata_file[/"[metadata-file]"/]:::inputs
-    files[/"--file"/]:::inputs
-
-    token["get_token()"]
-    session[("Session::new()")]
-    confirm_publish["confirm_publish()"]
-    read_metadata["read_metadata()"]
-    metadata[("Metadata {...}")]
-    session_without_files[("Session {...}<br>Without files")]
-    create_deposit["create_deposit()"]
-    has_deposit["has_deposit()"]
-    is_editable["is_editable()"]
-    as_new_version["as_new_version()"]
-    add_files["add_files()"]
-    delete_files["delete_files()"]
-    update_deposit["update_deposit()"]
-    publish["publish_deposit()"]
-    discard_deposit["discard_deposit()"]
-    output[/"Deposit<br>or nothing"/]
-
-    decision_new_deposit{"new deposit?"}
-    decision_publish{"publish?"}
-    decision_draft{"draft?"}
-    decision_editable{"editable?"}
-
-    sandbox & token -->
-      session
-
-    draft -->
-      decision_draft -->|true| output
-
-    files --> add_files
-
-    session -->
-      has_deposit -->
-      decision_new_deposit -->|Ok| is_editable -->
-      decision_editable -->|false| as_new_version
-
-    decision_new_deposit -->|Err| create_deposit
-    metadata -->
-      create_deposit -->
-      session_without_files
-
-    decision_editable --> |true| error[/Error/]
-
-    as_new_version & metadata -->
-      update_deposit -->
-      delete_files -->
-      request_without_files -->
-      add_files -->
-      decision_draft -->|false| decision_publish
-
-    decision_publish -->|true| publish -->
-      output
-
-    metadata_file -->
-      read_metadata -->
-      metadata
-
-    metadata -->|add ID| session
-
-    yes -->
-      confirm_publish -->
-      decision_publish -->|false| discard_deposit -->
-      output
-
-    classDef inputs fill:lightgray,stroke-width:3px
-```
-
 ## Library code
 
 This section describes the non-CLI library interface, which the CLI functions
@@ -402,8 +401,9 @@ a function signature as well as some reasons their design (if needed).
 `confirm_publish(yes: bool) -> bool`
 
 :   A simple helper function to print a message confirming whether the Zenodo
-    deposit should be published. The value of `yes` will also be the value of
-    the output.
+    deposit should be published. The value of `yes` comes from the `--yes` CLI
+    option and will only be the output if `yes` is given via the `--yes` flag
+    (e.g. is `true`).
 
 <!-- TODO: Confirm whether response contains the deposit, then it can be added to `Deposit` -->
 
@@ -470,22 +470,29 @@ a function signature as well as some reasons their design (if needed).
     synchronous connection. The fields `zendo_id`, `deposit`, and `response` are
     `Option` types.
 
-`Session::add_files(self: &self, files: NonEmptyVec<&Path>) -> Result<Self, Error>`
+`Session::add_files(self: &self, files: NonEmptyVec<&Path>) -> Result<&Self, Error>`
 
-:   As an `impl` method on `Session`, this adds files to a deposit. Must be in
-    the `"inprogress"` state or have `"submitted"` be false.
+:   As an `impl` method on `Session`, this adds files to a deposit. Must have
+    the `"submitted"` field be false (i.e. is unsubmitted). Needs one API call
+    per file.
 
-`Session::create_new_version(self: &mut self) -> Result<Self, Error>`
+`Session::create_new_version(self: &mut self) -> Result<&mut Self, Error>`
 
 :   This `impl` method on `Session` converts an existing deposit into a ["new
-    version"](https://developers.zenodo.org/#new-version). It is needed if new files are
-    going to be added to the deposit.
+    version"](https://developers.zenodo.org/#new-version). It is needed if new
+    files are going to be added to the deposit.
 
-`Session::create_deposit(self: &mut self, metadata: &Metadata) -> Result<Self, Error>`
+`Session::create_deposit(self: &mut self, metadata: &Metadata) -> Result<&mut Self, Error>`
 
 :   This `impl` method on `Session` creates a new deposit from the `Metadata` in
     the Zenodo TOML file. Will add the `deposit` details from the Zenodo API
     response.
+
+`Session::delete_files(self: &mut self) -> Result<&mut Self, Error>`
+
+:   As an `impl` method on `Session`, this deletes all files in a deposit by
+    sending delete requests to Zenodo. Gets the list of files from the
+    `Session.deposit.` fields. Needs one API call per file.
 
 `Session::discard_deposit(self: &self) -> Result<Self, Error>`
 
@@ -554,8 +561,9 @@ a function signature as well as some reasons their design (if needed).
 `Session::update_deposit(self: &mut self, metadata: &Metadata) -> Result<Self, Error>`
 
 :   As an `impl` method on `Session`, it takes the `Metadata` from the Zenodo
-    TOML file and updates the `Session.deposit.metadata` field. Since it
-    modifies the `Session` struct, it must be mutable.
+    TOML file and updates the `Session.deposit.metadata` field as well as
+    sending an update request to Zenodo. Since it modifies the `Session` struct,
+    it must be mutable.
 
 `trait left_join(self, right: Option<Self>) -> Self`
 
