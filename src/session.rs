@@ -13,7 +13,7 @@ pub struct Session {
     pub header: reqwest::header::HeaderMap,
 
     /// Zenodo depositions endpoint, for either production or the sandbox.
-    pub url: String, // TODO: Use URL type instead? Zenodo API uses string.
+    pub url: reqwest::Url, // TODO: Use URL type instead? Zenodo API uses string.
 
     /// Blocking client, reused for each request to Zenodo.
     pub connection: reqwest::blocking::Client,
