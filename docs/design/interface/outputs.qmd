@@ -1,5 +1,6 @@
 ---
 title: "Outputs"
+order: 2
 ---
 
 There are a few different outputs that zen-do produces. The main one is the

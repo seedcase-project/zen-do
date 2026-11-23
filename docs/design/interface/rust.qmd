@@ -1,5 +1,6 @@
 ---
 title: "Rust library"
+order: 4
 ---
 
 This document describes the design of the Rust library and of the individual CLI
