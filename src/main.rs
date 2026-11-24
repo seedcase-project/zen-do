@@ -1,10 +1,9 @@
 // The `main.rs` file is the binary entry-point, e.g. for CLIs
 
-use zen_do::metadata::write_init;
 use clap::{Args, Parser, Subcommand};
 use std::error::Error;
 use std::path::{Path, PathBuf};
-use zen_do::metadata::{Metadata, read_metadata, write_metadata};
+use zen_do::metadata::{read_metadata, write_init};
 use zen_do::sync::{ZenodoJson, sync_format};
 
 // TODO: Include `verbose` flag everywhere with `clap-verbosity-flag`?
