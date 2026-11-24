@@ -89,6 +89,8 @@ pub struct Metadata {
 }
 
 impl ZendoId {
+    const PREFIX: &str = "urn:zendo:";
+
     // Method that returns a reference to the inner string without copying it.
     #[must_use]
     pub fn as_str(&self) -> &str {
