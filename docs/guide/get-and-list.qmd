@@ -12,7 +12,7 @@ Zenodo account matching a specific `zendo_id` kept in the `.zenodo.toml` file.
 
 Both commands are useful for checking whether a deposit already exists and
 retrieving information about it before performing operations such as
-[`update`](update.qmd) or [`publish`](publishing.qmd).
+[`update`](updating-metadata.qmd) or [`publish`](publishing.qmd).
 
 ::: callout-note
 <!-- TODO: Replace with an `includes` snippet for reuse across guides -->
