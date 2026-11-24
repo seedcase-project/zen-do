@@ -5,9 +5,8 @@ description: |
 order: 3
 ---
 
-> You have published a record on Zenodo but afterwards discovered a typo, need
-> to correct information, or want to add missing metadata after publishing a
-> deposit.
+Have you published a record on Zenodo but afterwards discovered a typo, need to
+correct information, or want to add missing metadata after publishing a deposit?
 
 Instead of making a new record, you just want to update the metadata without
 having to upload the files again or create a new DOI.
@@ -33,9 +32,9 @@ The `update` command has three important argument:
 
 - `[METADATA-FILE]`: The path to the `.zenodo.toml` file. If no path is
   provided, it defaults to `.zenodo.toml` in the working directory.
-- `--sandbox`: Update the deposit in the Zenodo sandbox environment instead of
-  the main Zenodo environment. This is useful for testing changes before
-  updating a real deposit.
+- `--sandbox`: Update the deposit in the Zenodo sandbox instead of the main
+  Zenodo website. This is useful for testing changes before updating a real
+  deposit.
 - `--draft`: Update the deposit without publishing the changes to the record.
   This allows you to review the updated deposit before publishing it.
 
@@ -46,7 +45,7 @@ For example, to update the metadata of a deposit using the default
 zen-do update --draft
 ```
 
-To update a deposit in the sandbox environment, run:
+To update a deposit in the sandbox, run:
 
 ```bash {filename="Terminal"}
 zen-do update --sandbox
