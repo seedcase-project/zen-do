@@ -1,5 +1,6 @@
 ---
 title: "Command line"
+order: 3
 ---
 
 This documents the command-line interface (CLI) and its Rust counterparts,

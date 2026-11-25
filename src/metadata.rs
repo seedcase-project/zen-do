@@ -87,6 +87,7 @@ pub struct Metadata {
 }
 
 impl ZendoId {
+    const PREFIX: &str = "urn:zendo:";
     // Only used for writing with init - compiler will not read a placeholder
     #[must_use]
     pub fn placeholder(project_name: &str) -> Self {
@@ -96,6 +97,11 @@ impl ZendoId {
     #[must_use]
     pub fn as_str(&self) -> &str {
         &self.0
+    }
+
+    #[must_use]
+    pub fn to_urn(&self) -> String {
+        format!("{}{}", Self::PREFIX, self.0)
     }
 }
 
@@ -156,7 +162,7 @@ impl TryFrom<RelatedIdentifierCheck> for RelatedIdentifier {
     type Error = String;
 
     fn try_from(related_identifier: RelatedIdentifierCheck) -> Result<Self, Self::Error> {
-        if related_identifier.identifier.starts_with("urn:zendo:")
+        if related_identifier.identifier.starts_with(ZendoId::PREFIX)
             && related_identifier.relation == "isIdenticalTo"
         {
             return Err(
