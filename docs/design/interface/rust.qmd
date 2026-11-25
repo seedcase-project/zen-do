@@ -156,8 +156,8 @@ flowchart TD
 ## Library code
 
 This section describes the non-CLI library interface, which the CLI functions
-use internally use. They are a higher-level description, mainly here to provide
-a function signature as well as some reasons their design (if needed).
+use internally use. They are higher-level descriptions, mainly here to provide
+function signatures as well as some reasons for their design (if needed).
 
 `enum ToFormats`
 
@@ -329,7 +329,7 @@ Sends a [`get` REST API request](https://developers.zenodo.org/#list) to Zenodo
 using the `reqwest` package. Deserialises the Zenodo JSON response into a vector
 with our `Deposit` struct. Implemented as an `impl` method on `Session`. Outputs
 an empty `Vec` if no deposit is found. Gets all deposits, both draft and
-published. While the Zenodo API includes "page size", we return all deposits
+published for the user's Zenodo account, authenticated by their token. While the Zenodo API includes "page size", we return all deposits
 without a size constraint. That's because in our use-case we don't have a large
 number of deposits to manage (likely <100), nor do the majority of accounts
 contain such large number of deposits that this would be an issue (from what
