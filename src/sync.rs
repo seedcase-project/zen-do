@@ -1,6 +1,6 @@
 use crate::metadata::{Creator, Metadata, RelatedIdentifier};
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, error::Error, fs, path::Path};
+use std::{collections::BTreeMap, error::Error, fs, path::Path};
 
 /// Provides the filename used to store the format.
 pub trait FormatFileName {
@@ -92,7 +92,7 @@ pub struct ZenodoJson {
 
     // Any other fields in .zenodo.json
     #[serde(flatten)]
-    pub extra: HashMap<String, serde_json::Value>,
+    pub extra: BTreeMap<String, serde_json::Value>,
 }
 
 impl From<&Metadata> for ZenodoJson {
@@ -114,7 +114,7 @@ impl From<&Metadata> for ZenodoJson {
             upload_type: metadata.upload_type.clone(),
             creators: metadata.creators.iter().map(JsonCreator::from).collect(),
             related_identifiers,
-            extra: HashMap::new(),
+            extra: BTreeMap::new(),
         }
     }
 }
