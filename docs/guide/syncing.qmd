@@ -12,8 +12,9 @@ or contain similar metadata about a project alongside other information, such as
 [`CITATION.cff`](https://citation-file-format.github.io/) or
 [`pyproject.toml`](https://packaging.python.org/en/latest/guides/writing-pyproject-toml/).
 
-zen-do uses `.zenodo.toml` as the central source of metadata and can synchronise its values to other metadata files, providing consistency across your project. The following formats are supported or planned to be
-supported:
+zen-do uses `.zenodo.toml` as the central source of metadata and can synchronise
+its values to other metadata files, providing consistency across your project.
+The following formats are supported or planned to be supported:
 
   | Status                | Format                                                                                      | `--to` value       |
   | --------------------- | ------------------------------------------------------------------------------------------- | ------------------ |
