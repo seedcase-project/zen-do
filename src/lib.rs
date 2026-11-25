@@ -4,4 +4,5 @@
 pub mod deposit;
 pub mod get_token;
 pub mod metadata;
+pub mod session;
 pub mod sync;
