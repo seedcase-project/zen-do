@@ -238,7 +238,7 @@ mod tests {
     // To import all code from above in this file.
     use super::*;
     use ::zen_do::metadata::{Creator, RelatedIdentifier, ZendoId, read_metadata};
-    use std::{collections::HashMap, fs};
+    use std::{collections::BTreeMap, fs};
     use zen_do::sync::{FormatFileName, JsonCreator, JsonRelatedIdentifier};
 
     #[test]
@@ -321,7 +321,7 @@ mod tests {
         let zenodo_json_path = metadata_path.parent().unwrap().join(ZenodoJson::FILE_NAME);
         let zenodo_json = read_zenodo_json(&zenodo_json_path);
         assert_zenodo_json_matches_metadata(&zenodo_json, &metadata);
-        assert_eq!(zenodo_json.extra, HashMap::new());
+        assert_eq!(zenodo_json.extra, BTreeMap::new());
     }
 
     #[test]
@@ -349,7 +349,7 @@ mod tests {
         let (zenodo_toml_path, metadata) = create_zenodo_toml(temp_dir.path());
         let (zenodo_json_path, old_zenodo_json) = create_zenodo_json(
             temp_dir.path(),
-            Some(HashMap::from([
+            Some(BTreeMap::from([
                 ("access_right".into(), "open".into()),
                 (
                     "communities".into(),
@@ -405,7 +405,7 @@ mod tests {
 
         let zenodo_json = read_zenodo_json(&zenodo_json_path);
         assert_zenodo_json_matches_metadata(&zenodo_json, &metadata);
-        assert_eq!(zenodo_json.extra, HashMap::new());
+        assert_eq!(zenodo_json.extra, BTreeMap::new());
     }
 
     fn create_zenodo_toml(temp_dir: &Path) -> (PathBuf, Metadata) {
@@ -433,7 +433,7 @@ mod tests {
     }
     fn create_zenodo_json(
         temp_dir: &Path,
-        extra: Option<HashMap<String, serde_json::Value>>,
+        extra: Option<BTreeMap<String, serde_json::Value>>,
     ) -> (PathBuf, ZenodoJson) {
         let zenodo_json_path = temp_dir.join(ZenodoJson::FILE_NAME);
 
