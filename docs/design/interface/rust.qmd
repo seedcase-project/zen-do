@@ -301,8 +301,9 @@ using [reqwest](https://docs.rs/reqwest/latest/reqwest/) for any deposit
 matching the `ZendoId`, including draft deposits. Deserialises the Zenodo JSON
 response into our `Deposit` struct. Uses the Zenodo API `q` query parameter on
 the Zenodo `GET` API to list deposits that have the `ZendoId` in the
-`related_identifier`. If no deposit is found, the `Session.deposit` field will
-be kept as `None`. If multiple deposits are found, it will fail.
+[`related_identifier`](inputs.qmd#sec-zendo-id) field. If no deposit is found,
+the `Session.deposit` field will be kept as `None`. If multiple deposits are
+found, it will fail.
 
 Is a `impl` method on `Session`. This is used internally in `Session::new()`,
 described [below](#lib-session-new).
