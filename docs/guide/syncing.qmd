@@ -1,7 +1,7 @@
 ---
 title: "Syncing metadata files with `.zenodo.toml`"
 description: |
-  Use the `sync` command to sync metadata from `.zenodo.toml` to other metadata file formats.
+  Use the `sync` command to synchronise metadata from `.zenodo.toml` to other metadata file formats.
 order: 2
 ---
 
@@ -12,8 +12,7 @@ or contain similar metadata about a project alongside other information, such as
 [`CITATION.cff`](https://citation-file-format.github.io/) or
 [`pyproject.toml`](https://packaging.python.org/en/latest/guides/writing-pyproject-toml/).
 
-zen-do can sync metadata from `.zenodo.toml` to other metadata files to help
-keep everything consistent. The following formats are supported or planned to be
+zen-do uses `.zenodo.toml` as the central source of metadata and can synchronise its values to other metadata files, providing consistency across your project. The following formats are supported or planned to be
 supported:
 
   | Status                | Format                                                                                      | `--to` value       |
@@ -46,4 +45,4 @@ zen-do sync path/to/.zenodo.toml --to citation-cff
 ```
 
 If you omit the path to `.zenodo.toml`, it will default to `.zenodo.toml` in the
-working directory.
+current working directory.
