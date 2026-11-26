@@ -57,10 +57,10 @@ struct SandboxArg {
 }
 
 #[derive(Args, Debug)]
-struct MetadataFileArg {
+struct MetadataPathArg {
     /// The path to `.zenodo.toml`.
     #[arg(default_value = ".zenodo.toml")]
-    metadata_file: PathBuf,
+    metadata_path: PathBuf,
 }
 
 #[derive(Args, Debug)]
@@ -87,7 +87,7 @@ struct ListArgs {
 #[derive(Args, Debug)]
 struct UpdateArgs {
     #[command(flatten)]
-    metadata_file: MetadataFileArg,
+    metadata_path: MetadataPathArg,
 
     #[command(flatten)]
     sandbox: SandboxArg,
@@ -99,7 +99,7 @@ struct UpdateArgs {
 #[derive(Args, Debug)]
 struct DiscardArgs {
     #[command(flatten)]
-    metadata_file: MetadataFileArg,
+    metadata_path: MetadataPathArg,
 
     #[command(flatten)]
     sandbox: SandboxArg,
@@ -108,7 +108,7 @@ struct DiscardArgs {
 #[derive(Args, Debug)]
 struct GetArgs {
     #[command(flatten)]
-    metadata_file: MetadataFileArg,
+    metadata_path: MetadataPathArg,
 
     #[command(flatten)]
     sandbox: SandboxArg,
@@ -117,7 +117,7 @@ struct GetArgs {
 #[derive(Args, Debug)]
 struct PublishArgs {
     #[command(flatten)]
-    metadata_file: MetadataFileArg,
+    metadata_path: MetadataPathArg,
 
     // TODO: Also as NonEmpty (or NonEmptyVec from non_empty_vec?)
     /// The path(s) to the file(s) to upload.
@@ -139,7 +139,7 @@ enum ToFormats {
 #[derive(Args, Debug)]
 struct SyncArgs {
     #[command(flatten)]
-    metadata_file: MetadataFileArg,
+    metadata_path: MetadataPathArg,
 
     /// The format to sync the metadata file to.
     #[arg(short, long, required = true)]
@@ -181,9 +181,9 @@ pub fn init(args: &InitArgs) -> Result<(), Box<dyn Error>> {
 }
 
 fn sync(args: &SyncArgs) -> Result<(), Box<dyn Error>> {
-    let metadata_file = &args.metadata_file.metadata_file;
-    let metadata = read_metadata(metadata_file)?;
-    let parent = metadata_file.parent().unwrap_or(Path::new("."));
+    let metadata_path = &args.metadata_path.metadata_path;
+    let metadata = read_metadata(metadata_path)?;
+    let parent = metadata_path.parent().unwrap_or(Path::new("."));
 
     match args.to {
         ToFormats::ZenodoJson => sync_format::<ZenodoJson>(&metadata, parent),
@@ -250,23 +250,23 @@ mod tests {
         })
         .unwrap();
 
-        let metadata_file = temp_dir.path().join(".zenodo.toml");
+        let metadata_path = temp_dir.path().join(".zenodo.toml");
 
         // 1. Was the file created?
-        assert!(metadata_file.is_file());
+        assert!(metadata_path.is_file());
 
         // 2. Should fail to read due to placeholder value:
-        assert!(read_metadata(&metadata_file).is_err());
+        assert!(read_metadata(&metadata_path).is_err());
 
         // Remove placeholder:
-        let contents = std::fs::read_to_string(&metadata_file).unwrap();
+        let contents = std::fs::read_to_string(&metadata_path).unwrap();
         let contents = contents
             .replace("<github-org>", "my-org")
             .replace("<output-type>", "docs");
-        std::fs::write(&metadata_file, contents).unwrap();
+        std::fs::write(&metadata_path, contents).unwrap();
 
         // 3. Can read_metadata parse it?
-        let metadata = read_metadata(&metadata_file).unwrap();
+        let metadata = read_metadata(&metadata_path).unwrap();
 
         assert_eq!(metadata.title, "");
         assert_eq!(metadata.upload_type, "");
@@ -276,10 +276,10 @@ mod tests {
     #[test]
     fn test_init_command_with_prior_file() {
         let temp_dir = tempfile::tempdir().unwrap();
-        let metadata_file = temp_dir.path().join(".zenodo.toml");
+        let metadata_path = temp_dir.path().join(".zenodo.toml");
 
         // Create an existing metadata file.
-        std::fs::write(&metadata_file, "").unwrap();
+        std::fs::write(&metadata_path, "").unwrap();
 
         assert!(
             init(&InitArgs {
@@ -290,14 +290,14 @@ mod tests {
     }
 
     #[test]
-    fn sync_returns_error_when_metadata_file_missing() {
+    fn sync_returns_error_when_metadata_path_missing() {
         let temp_dir = tempfile::tempdir().unwrap();
-        let metadata_file = temp_dir.path().join(".zenodo.toml");
+        let metadata_path = temp_dir.path().join(".zenodo.toml");
 
         assert!(
             sync(&SyncArgs {
-                metadata_file: MetadataFileArg {
-                    metadata_file: metadata_file.clone(),
+                metadata_path: MetadataPathArg {
+                    metadata_path: metadata_path.clone(),
                 },
                 to: ToFormats::ZenodoJson,
             })
@@ -311,8 +311,8 @@ mod tests {
         let (metadata_path, metadata) = create_zenodo_toml(temp_dir.path());
 
         sync(&SyncArgs {
-            metadata_file: MetadataFileArg {
-                metadata_file: metadata_path.clone(),
+            metadata_path: MetadataPathArg {
+                metadata_path: metadata_path.clone(),
             },
             to: ToFormats::ZenodoJson,
         })
@@ -331,8 +331,8 @@ mod tests {
         let (zenodo_json_path, old_zenodo_json) = create_zenodo_json(temp_dir.path(), None);
 
         sync(&SyncArgs {
-            metadata_file: MetadataFileArg {
-                metadata_file: zenodo_toml_path.clone(),
+            metadata_path: MetadataPathArg {
+                metadata_path: zenodo_toml_path.clone(),
             },
             to: ToFormats::ZenodoJson,
         })
@@ -363,8 +363,8 @@ mod tests {
         );
 
         sync(&SyncArgs {
-            metadata_file: MetadataFileArg {
-                metadata_file: zenodo_toml_path.clone(),
+            metadata_path: MetadataPathArg {
+                metadata_path: zenodo_toml_path.clone(),
             },
             to: ToFormats::ZenodoJson,
         })
@@ -396,8 +396,8 @@ mod tests {
         .unwrap();
 
         sync(&SyncArgs {
-            metadata_file: MetadataFileArg {
-                metadata_file: zenodo_toml_path.clone(),
+            metadata_path: MetadataPathArg {
+                metadata_path: zenodo_toml_path.clone(),
             },
             to: ToFormats::ZenodoJson,
         })
