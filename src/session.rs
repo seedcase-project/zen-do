@@ -1,4 +1,7 @@
+use crate::deposit::Deposit;
 use crate::metadata::ZendoId;
+use reqwest::header;
+use std::error::Error;
 
 /// Zenodo session.
 ///
@@ -23,5 +26,48 @@ pub struct Session {
 
     /// The deposit from Zenodo. `None` if it hasn't been fetched or
     /// wasn't found.
-    pub deposit: Option<String>, // Option<Deposit> // TODO: Depends on #308
+impl Session {
+    /// Creates a new session for sending requests to Zenodo.
+    ///
+    /// Sets up the authorisation header, the depositions URL, and a reusable
+    /// connection/client.
+    ///
+    /// # Arguments
+    ///
+    /// - `sandbox` (`bool`) - Whether to use the Zenodo sandbox or the real
+    ///   Zenodo API.
+    /// - `token` (`&str`) - The Zenodo personal access token.
+    /// - `zendo_id` (`Option<ZendoId>`) - The Zendo ID of the deposit, if any.
+    ///
+    /// # Errors
+    ///
+    /// Errors if the token can't be used as a header value.
+    pub fn new(
+        sandbox: bool,
+        token: &str,
+        zendo_id: Option<ZendoId>,
+    ) -> Result<Self, Box<dyn Error>> {
+        let mut authorization_value = header::HeaderValue::from_str(&format!("Bearer {token}"))?;
+        // Mark that the header represents sensitive information.
+        authorization_value.set_sensitive(true);
+
+        let mut headers = header::HeaderMap::new();
+        headers.insert(header::AUTHORIZATION, authorization_value);
+        headers.insert(
+            header::CONTENT_TYPE,
+            header::HeaderValue::from_static("application/json"),
+        );
+
+        let host = if sandbox { "sandbox.zenodo" } else { "zenodo" };
+        let url = reqwest::Url::parse(&format!("https://{host}.org/api/deposit/depositions"))?;
+
+        Ok(Session {
+            headers,
+            url,
+            connection: reqwest::blocking::Client::new(),
+            zendo_id,
+            deposit: None, // TODO: Change when get_deposit() is implemented.
+        })
+    }
+}
 }
