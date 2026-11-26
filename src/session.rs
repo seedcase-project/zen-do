@@ -70,4 +70,48 @@ impl Session {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new_session_without_zendo_id() {
+        let session = Session::new(false, "my_token", None).expect("valid session");
+
+        assert!(session.headers[header::AUTHORIZATION].is_sensitive());
+        assert_eq!(session.headers[header::AUTHORIZATION], "Bearer my_token");
+        assert_eq!(
+            session.url.as_str(),
+            "https://zenodo.org/api/deposit/depositions"
+        );
+        assert_eq!(session.zendo_id, None);
+    }
+
+    #[test]
+    fn test_new_sandbox_session_with_zendo_id() {
+        let id_str = "name:project:type";
+        let zendo_id = ZendoId::try_from(id_str.to_string()).expect("valid zendo_id");
+        let sandbox_session =
+            Session::new(true, "my_token", Some(zendo_id)).expect("valid session");
+
+        assert!(sandbox_session.headers[header::AUTHORIZATION].is_sensitive());
+        assert_eq!(
+            sandbox_session.headers[header::AUTHORIZATION],
+            "Bearer my_token"
+        );
+        assert_eq!(
+            sandbox_session.url.as_str(),
+            "https://sandbox.zenodo.org/api/deposit/depositions"
+        );
+        assert_eq!(
+            sandbox_session.zendo_id.as_ref().map(ZendoId::as_str),
+            Some(id_str)
+        );
+    }
+
+    #[test]
+    fn test_new_session_rejects_invalid_token() {
+        assert!(Session::new(true, "bad\ntoken", None).is_err());
+    }
 }
