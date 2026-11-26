@@ -1,4 +1,3 @@
-use crate::deposit::Deposit;
 use crate::metadata::ZendoId;
 use reqwest::header;
 use std::error::Error;
@@ -26,6 +25,9 @@ pub struct Session {
 
     /// The deposit from Zenodo. `None` if it hasn't been fetched or
     /// wasn't found.
+    pub deposit: Option<String>, // TODO: Depends on #308
+}
+
 impl Session {
     /// Creates a new session for sending requests to Zenodo.
     ///
