@@ -10,7 +10,7 @@ use crate::metadata::ZendoId;
 /// so it doesn't need any `async` structures.
 pub struct Session {
     /// Headers sent with each request, including the authorization token.
-    pub header: reqwest::header::HeaderMap,
+    pub headers: header::HeaderMap,
 
     /// Zenodo depositions endpoint, for either production or the sandbox.
     pub url: reqwest::Url, // TODO: Use URL type instead? Zenodo API uses string.
