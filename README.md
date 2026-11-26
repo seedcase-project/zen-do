@@ -60,6 +60,7 @@ requests :tada:
 
 [@DanMazJen](https://github.com/DanMazJen),
 [@fruvago](https://github.com/fruvago),
+[@joelostblom](https://github.com/joelostblom),
 [@lwjohnst86](https://github.com/lwjohnst86),
 [@signekb](https://github.com/signekb)
 

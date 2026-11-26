@@ -87,6 +87,7 @@ pub struct Metadata {
 }
 
 impl ZendoId {
+    const PREFIX: &str = "urn:zendo:";
     // Only used for writing with init - compiler will not read a placeholder
     #[must_use]
     pub fn placeholder(project_name: &str) -> Self {
@@ -96,6 +97,11 @@ impl ZendoId {
     #[must_use]
     pub fn as_str(&self) -> &str {
         &self.0
+    }
+
+    #[must_use]
+    pub fn to_urn(&self) -> String {
+        format!("{}{}", Self::PREFIX, self.0)
     }
 }
 
@@ -196,7 +202,7 @@ impl TryFrom<RelatedIdentifierCheck> for RelatedIdentifier {
     type Error = String;
 
     fn try_from(related_identifier: RelatedIdentifierCheck) -> Result<Self, Self::Error> {
-        if related_identifier.identifier.starts_with("urn:zendo:")
+        if related_identifier.identifier.starts_with(ZendoId::PREFIX)
             && related_identifier.relation == RelatedIdentifierRelation::IsIdenticalTo
         {
             return Err(
@@ -310,10 +316,10 @@ mod tests {
     #[test]
     fn test_get_zendo_id() {
         let temp_dir = tempfile::tempdir().unwrap();
-        let metadata_file = temp_dir.path().join(".zenodo.toml");
+        let metadata_path = temp_dir.path().join(".zenodo.toml");
 
         std::fs::write(
-            &metadata_file,
+            &metadata_path,
             r#"
         title = ""
         upload_type = ""
@@ -324,7 +330,7 @@ mod tests {
         )
         .unwrap();
 
-        let metadata = read_metadata(metadata_file.as_path()).unwrap();
+        let metadata = read_metadata(metadata_path.as_path()).unwrap();
 
         let urn = metadata.zendo_id.as_str();
 
@@ -334,10 +340,10 @@ mod tests {
     #[test]
     fn test_zendo_id_character_space() {
         let temp_dir = tempfile::tempdir().unwrap();
-        let metadata_file = temp_dir.path().join(".zenodo.toml");
+        let metadata_path = temp_dir.path().join(".zenodo.toml");
 
         std::fs::write(
-            &metadata_file,
+            &metadata_path,
             r#"
         title = ""
         upload_type = ""
@@ -348,16 +354,16 @@ mod tests {
         )
         .unwrap();
 
-        assert!(read_metadata(metadata_file.as_path()).is_err());
+        assert!(read_metadata(metadata_path.as_path()).is_err());
     }
 
     #[test]
     fn test_user_manually_setting_zendo_urn_related_identifier() {
         let temp_dir = tempfile::tempdir().unwrap();
-        let metadata_file = temp_dir.path().join(".zenodo.toml");
+        let metadata_path = temp_dir.path().join(".zenodo.toml");
 
         std::fs::write(
-            &metadata_file,
+            &metadata_path,
             r#"
         title = ""
         upload_type = ""
@@ -370,7 +376,7 @@ mod tests {
         )
         .unwrap();
 
-        let err = read_metadata(metadata_file.as_path()).unwrap_err();
+        let err = read_metadata(metadata_path.as_path()).unwrap_err();
         assert!(
             err.to_string().contains(
                 "Manual setup of zen-do URN is not allowed. Please use the field `zendo_id`"

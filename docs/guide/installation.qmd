@@ -4,46 +4,69 @@ description: "Steps to install zen-do to use on the command-line."
 order: 0
 ---
 
-Before installing zen-do, you need to have [Rust and
-Cargo](https://rust-lang.org/tools/install/) installed. zen-do currently is only
-available on the GitHub repository and needs to be built from the source files.
-You can download the repository and build the package by running the following
-command:
+Select your preferred package manager below to view installation instructions
+for zen-do.
 
-```bash {filename="Terminal"}
-cargo install --git https://github.com/seedcase-project/zen-do
-```
+::: {.panel-tabset}
+## Cargo
 
-Cargo installs packages in different folders, depending on your operating
-system:
-
-*On MacOS or Linux:*
-
-```bash {filename="Terminal"}
-cd $HOME/.cargo/bin
-```
-
-*On Windows:*
-
-```bash {filename="Terminal"}
-cd %USERPROFILE%\.cargo\bin
-```
-
-::: callout-note
-Since zen-do is not yet on [crates.io](https://crates.io), you also need to have
-Git installed on your computer. When we officially release zen-do, you won't
-need Git to install zen-do and will be able to install using the command:
+First, ensure you have Rust and Cargo installed. If not, follow the [Rust
+installation guide](https://rust-lang.org/tools/install/) which uses `rustup` to
+install both. Then, install zen-do from [crates.io](https://crates.io) with:
 
 ```bash {filename="Terminal"}
 cargo install zen-do
 ```
-:::
 
 To confirm that zen-do was installed correctly, run:
 
 ```bash {filename="Terminal"}
 zen-do --version
 ```
+
+If the `zen-do` command cannot be found, try restarting your terminal. If you
+still have issues after that, check that the installation directory is on your
+`PATH` so you can run Cargo installs the zen-do executable in the following
+directory by default:
+
+- **macOS or Linux:** `$HOME/.cargo/bin`
+- **Windows:** `%USERPROFILE%\.cargo\bin`
+
+To upgrade zen-do with Cargo, you can rerun the installation command.
+
+## uv
+
+::::: callout-tip
+If you prefer to not install zen-do as a standalone command, you can use `uvx`
+to install and run it in one step instead. To use `uvx` with zen-do, prefix the
+command invocation with `uvx` each time you type out a zen do command:
+
+```bash {filename="Terminal"}
+uvx zen-do --version
+```
+:::::
+
+First, ensure you have [uv](https://docs.astral.sh/uv) installed. Then, install
+zen-do from PyPI with:
+
+```bash {filename="Terminal"}
+uv tool install zen-do
+```
+
+To confirm that zen-do was installed correctly, run:
+
+```bash {filename="Terminal"}
+zen-do --version
+```
+
+If the `zen-do` command cannot be found, try restarting your terminal.
+
+To upgrade zen-do with uv, you can run:
+
+```bash {filename="Terminal"}
+uv tool upgrade --all
+```
+:::
 
 <!-- TODO: uncomment when we have auto-completions
 ## Shell auto-completions

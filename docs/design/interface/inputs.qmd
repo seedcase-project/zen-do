@@ -1,5 +1,6 @@
 ---
 title: "Inputs"
+order: 1
 ---
 
 Most of zen-do's functionality takes one or more of these main inputs:
