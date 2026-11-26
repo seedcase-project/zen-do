@@ -1,5 +1,6 @@
 ---
 title: "Rust library"
+order: 4
 ---
 
 This document describes the design of the Rust library and of the individual CLI
@@ -22,15 +23,124 @@ specific meanings.
 All the CLI functions take one argument: `args`. The type of the `args` depends
 on the function name, but their struct type is always the function name with
 `Args` as the suffix (e.g. `ListArgs`). These structs are created when Rust
-parses the command when it is used on the CLI.
+parses the command when it is used on the CLI. The output of these CLI functions
+is typical Rust types (e.g. `Result`), however, when used within `main()` after
+parsing the CLI args, they get converted to pretty printed stdout.
 
-Many functions or methods return a `Result` type. In those cases, the design
-diagrams assume that the error will contain the correct message and be send to
-`stderr`. So arrows and boxes are not included for errors to simplify the
-diagrams.
+Many internal functions or methods return a `Result` type. In those cases, the
+design diagrams assume that the error will contain the correct message and be
+send to `stderr`. So arrows and boxes are not included for errors to simplify
+the diagrams.
 
 The `init` CLI command isn't shown here as it is a very simple command to create
-an `.zenodo.toml` file with empty `Metadata` fields.
+a `.zenodo.toml` file with empty `Metadata` fields.
+
+### {{< var wip >}} `discard()` {#cli-discard}
+
+This relatively simple function, like [`get()`](#cli-get), has an internal
+`discard_deposit()` method that is used in other CLI functions. However, unlike
+`get_deposit()` that requires a bit more steps, the [discard Zenodo
+API](https://developers.zenodo.org/#discard) request used in `discard_deposit()`
+is a (mostly) simple `POST` request to the `discard` endpoint.
+
+```{mermaid}
+%%| label: fig-discard-cli
+%%| fig-cap: "The flow of input and output through the `discard()` CLI function."
+%%| fig-alt: >-
+%%|   Diagram showing the flow of input and output through the CLI function.
+
+flowchart TD
+    sandbox[/"--sandbox"/]:::inputs
+    metadata_file[/"[metadata-file]"/]:::inputs
+    token["get_token()"]
+    session[("Session::new()")]
+    read_metadata["read_metadata()"]
+    metadata[("Metadata {...}")]
+    is_draft["is_draft()"]
+    discard_deposit["discard_deposit()"]
+    output[/"Message<br>or nothing<br>(stdout)"/]
+
+    decision_draft{"draft?"}
+    has_deposit{"has deposit?"}
+
+    metadata_file -->
+      read_metadata -->
+      metadata -->|add ID| session
+
+    session --> discard_deposit
+
+    sandbox & token -->
+      session -->
+      has_deposit -->|true| is_draft -->
+      decision_draft
+
+    has_deposit -->|false| output
+
+    decision_draft -->|true| discard_deposit -->
+      output
+
+    decision_draft -->|false| output
+
+    classDef inputs fill:lightgray,stroke-width:3px
+```
+
+### {{< var wip >}} `get()` {#cli-get}
+
+The internals of this function are used in several other CLI functions,
+specifically the `Session::new()`. Internally, `Session::new()` uses
+[`get_deposit()`](#lib-get-deposit) to get the deposit if it exists.
+
+```{mermaid}
+%%| label: fig-get-cli
+%%| fig-cap: "The flow of input and output through the `get()` CLI function."
+%%| fig-alt: >-
+%%|   Diagram showing the flow of input and output through the CLI function.
+
+flowchart TD
+    sandbox[/"--sandbox"/]
+    metadata_file[/"[metadata-file]"/]
+    token["get_token()"]
+    session[("Session::new()")]
+    read_metadata["read_metadata()"]
+    metadata[("Metadata {...}")]
+    output[/"Deposit<br>or nothing"/]
+
+    metadata_file -->
+      read_metadata -->
+      metadata --> |add ID| session
+
+    sandbox & token -->
+      session -->
+      output
+```
+
+### {{< var wip >}} `list()` {#cli-list}
+
+This function only has one argument, `--sandbox`. Otherwise, it simply lists all
+deposits (including drafts) on a Zenodo account associated with the given token.
+
+```{mermaid}
+%%| label: fig-list-cli
+%%| fig-cap: >-
+%%|   The flow of input and output through the `list()` CLI function. Bolded and
+%%|   gray box is the input arguments to `list()`.
+%%| fig-alt: >-
+%%|   Diagram showing the flow of input and output through the CLI list
+%%|   function.
+
+flowchart TD
+    sandbox[/"--sandbox"/]
+    token["get_token()"]
+    session[("Session::new()")]
+    list["list_deposits()"]
+    output[/"Vec\< Deposit \><br>or nothing"/]
+
+    sandbox --> token
+    sandbox & token -->
+      session -->
+      list -->
+      output
+```
 
 ### {{< var wip >}} `sync()` {#cli-sync}
 
@@ -72,6 +182,10 @@ flowchart TD
 ```
 
 ## Library code
+
+This section describes the non-CLI library interface, which the CLI functions
+use internally use. They are higher-level descriptions, mainly here to provide
+function signatures as well as some reasons for their design (if needed).
 
 `enum ToFormats`
 
@@ -161,149 +275,6 @@ flowchart TD
     classDef inner fill:none
 ```
 
-### {{< var wip >}} `discard()` {#cli-discard}
-
-This relatively simple function, like [`get()`](#cli-get), has an internal
-`discard_deposit()` method that is used in other CLI functions. However, unlike
-`get_deposit()` that requires a bit more steps, the [discard Zenodo
-API](https://developers.zenodo.org/#discard) request used in `discard_deposit()`
-is a (mostly) simple `POST` request to the `discard` endpoint.
-
-```{mermaid}
-%%| label: fig-discard-cli
-%%| fig-cap: "The flow of input and output through the `discard()` CLI function."
-%%| fig-alt: >-
-%%|   Diagram showing the flow of input and output through the CLI function.
-
-flowchart TD
-    sandbox[/"--sandbox"/]:::inputs
-    metadata_file[/"[metadata-file]"/]:::inputs
-    token["get_token()"]
-    session[("Session::new()")]
-    read_metadata["read_metadata()"]
-    metadata[("Metadata {...}")]
-    require_deposit["require_deposit()"]
-    is_draft["is_draft()"]
-    discard_deposit["discard_deposit()"]
-    output[/"Message<br>or nothing<br>(stdout)"/]
-
-    decision_draft{"draft?"}
-
-    metadata_file -->
-      read_metadata -->
-      metadata -->|add ID| session
-
-    session --> discard_deposit
-
-    sandbox & token -->
-      session -->
-      require_deposit -->
-      is_draft --> decision_draft
-      decision_draft -->|true| discard_deposit -->
-      output
-
-    decision_draft -->|false| output
-
-    classDef inputs fill:lightgray,stroke-width:3px
-```
-
-### {{< var wip >}} `get()` {#cli-get}
-
-The internals of this function are used in several other CLI functions. That is
-why the subgraph `get_deposit()` library function is shown in this diagram, to
-highlight that it will be reused.
-
-```{mermaid}
-%%| label: fig-get-cli
-%%| fig-cap: "The flow of input and output through the `get()` CLI function."
-%%| fig-alt: >-
-%%|   Diagram showing the flow of input and output through the CLI function.
-
-flowchart TD
-    sandbox[/"--sandbox"/]:::inputs
-    metadata_file[/"[metadata-file]"/]:::inputs
-    token["get_token()"]
-    session[("Session::new()")]
-    read_metadata["read_metadata()"]
-    metadata[("Metadata {...}")]
-    output[/"Deposit<br>or nothing"/]
-
-    subgraph get_deposit ["get_deposit()"]
-      list["list_deposits()"]
-      deposits[("Vec\< Deposit \>")]
-      check_ids["check_ids()"]
-      checked_deposits[("CheckedDeposits")]
-      keep_matching_id["keep_matching_id()"]
-    end
-
-    metadata_file -->
-      read_metadata -->
-      metadata --> |add ID| session
-
-    sandbox & token -->
-      session -->
-      list -->
-      deposits -->
-      check_ids -->
-      checked_deposits -->
-      keep_matching_id
-
-    session -->|add ID| keep_matching_id -->
-      output
-
-    get_deposit:::outer_function
-    classDef outer_function fill:none
-    classDef inputs fill:lightgray,stroke-width:3px
-```
-
-### {{< var wip >}} `list()` {#cli-list}
-
-This function only has one argument, `--sandbox`. Otherwise, it simply lists all
-deposits (including drafts) on a Zenodo account associated with the given token.
-
-```{mermaid}
-%%| label: fig-list-cli
-%%| fig-cap: >-
-%%|   The flow of input and output through the `list()` CLI function. Bolded and
-%%|   gray box is the input arguments to `list()`.
-%%| fig-alt: >-
-%%|   Diagram showing the flow of input and output through the CLI list
-%%|   function.
-
-flowchart TD
-    sandbox[/"--sandbox"/]
-    token["get_token()"]
-    session[("Session::new()")]
-    list["list_deposits()"]
-    output[/"Vec\< Deposit \><br>or nothing"/]
-
-    sandbox --> token
-    sandbox & token -->
-      session -->
-      list -->
-      output
-```
-
-## Library code
-
-This section describes the non-CLI library interface, which the CLI functions
-use internally use. They are a higher-level description, mainly here to provide
-a function signature as well as some reasons their design (if needed).
-
-`check_ids(deposits: Vec<Deposit>) -> Result<CheckedDeposits, Error>`
-
-:   Checks a list of deposits for any duplicate `zendo_id` identifiers contained
-    within the `related_identifier` Zenodo field. Outputs a `Result` type with
-    `CheckedDeposits` newtype that contains `Vec<Deposit>` in the `Ok()` arm and
-    an `Error` if the check failed, i.e. if found any duplicates.
-
-`CheckedDeposits(Vec<Deposit>)`
-
-:   This newtype pattern is used to make sure downstream functions use an object
-    that has been checked.
-
-<!-- TODO: Confirm whether response contains the deposit, then it can be added to `Deposit` -->
-
 `Deposit {...}`
 
 :   A struct that represents the JSON response received from Zenodo. Mainly
@@ -315,44 +286,12 @@ a function signature as well as some reasons their design (if needed).
     API. Specifically `doi_url`, `created`, `modified`, and `title` are not
     kept.
 
-`enum Formats`
-
-:   This `enum` contains all the different formats we convert to, as listed in
-    the [CLI](cli.qmd#cli-convert) page.
-
 `get_token(sandbox: bool) -> Result<String, Error>`
 
 :   As described in the [CLI](cli.qmd) page, this gets the token from either the
     keyring or from the env variables.
 
-`keep_matching_id(checked_deposits: CheckedDeposits, zendo_id: &ZendoId) -> Option<Deposit>`
-
-:   Takes the `CheckedDeposits` newtype pattern to ensure the internal
-    `Vec<Deposit>` has only deposits that don't have any duplicate `ZendoId`.
-    Compares the ID from the metadata file and outputs the deposit from
-    `CheckedDeposits` with the matching ID (if any).
-
-`Metadata {...}`
-
-:   This contains the metadata from the Zenodo TOML file, i.e., `.zenodo.toml`.
-    It will eventually form the deposit's
-    [`metadata`](https://developers.zenodo.org/?shell#depositions) field.
-
-`Metadata::into_format(self: Self, to: Formats) -> T`
-
-:   This `impl` [generic
-    method](https://doc.rust-lang.org/rust-by-example/generics/impl.html) on
-    `Metadata` converts the `Metadata` struct into the selected `to` format
-    using the `Formats` enum. The `T` type is any of the output structs, like
-    `CitationCff`, `ZenodoJson`, or `PyprojectToml`.
-
-`read_metadata(path: &Path) -> Result<Metadata, Error>`
-
-:   Reads the Zenodo TOML file, e.g. `.zenodo.toml`.
-
-<!-- TODO: Not sure if we want to keep the response here...? -->
-
-`Session {sandbox, token, header, url, connection, zendo_id, deposit, response}`
+`Session {header, url, connection, zendo_id, deposit}`
 
 :   The struct acts as a container to hold everything necessary for all the
     various functions that it is used by. It contains the information needed to
@@ -364,34 +303,38 @@ a function signature as well as some reasons their design (if needed).
     are fairly simple, they are sent synchronously. That way we don't need to
     set up any `async` structures. The `connection` field will hold the
     `reqwest::blocking::Client::new()` object, where `blocking` is what sets the
-    synchronous connection. The fields `zendo_id`, `deposit`, and `response` are
-    `Option` types.
+    synchronous connection. The fields `zendo_id` and `deposit` are `Option`
+    types.
 
-`Session::discard_deposit(self: &self) -> Result<Self, Error>`
+`Session::discard_deposit(self: mut self) -> Result<mut self, Error>`
 
 :   This `impl` method on `Session` sends a
     [discard](https://developers.zenodo.org/?shell#discard) request to Zenodo.
-    If the `Session.deposit.metadata` field was modified locally in a previous
-    step, `discard_deposit` won't change it back. That's because we consider
-    running discard as one of the last steps in a sequence of actions. If the
-    current metadata on Zenodo needs to be retrieved, do `Session::new()` again
-    to start over.
+    If the request succeeds, the `Session.deposit` field is set to `None`. If
+    the current deposit on Zenodo needs to be retrieved, do `Session::new()`
+    again to start over.
 
-`Session::get_deposit(self: &mut self, id: &ZendoId) -> Result<Self, Error>`
+### `Session::get_deposit()` {#lib-get-deposit}
 
-:   Sends a [`get` REST API request](https://developers.zenodo.org/#list) to
-    Zenodo using [`reqwest`](https://docs.rs/reqwest/latest/reqwest/).
-    Deserialises the Zenodo JSON response into our `Deposit` struct. Also
-    includes a `try_from()` to convert the Zenodo JSON `related_identifier` into
-    our `zendo_id`, if it exists in the JSON (but won't fail if it can't convert
-    any `related_identifier`s in the deposit). If no deposit is found, the
-    `Session.deposit` field will be kept as `None`. Is a `impl` method on
-    `Session`.
+The signature is:
 
-`Session::require_deposit(self: &self) -> Result<Self, Error>`
+```rust
+impl Session {
+    fn get_deposit(mut self, id: &ZendoId) -> Result<Self, Error> {}
+}
+```
 
-:   A simple `impl` method on `Session` to check that the `Session` has a
-    `deposit` field. Used for CLI commands that require a `deposit` be present.
+Sends a [`GET` REST API request](https://developers.zenodo.org/#list) to Zenodo
+using [reqwest](https://docs.rs/reqwest/latest/reqwest/) for any deposit
+matching the `ZendoId`, including draft deposits. Deserialises the Zenodo JSON
+response into our `Deposit` struct. Uses the Zenodo API `q` query parameter on
+the Zenodo `GET` API to list deposits that have the `ZendoId` in the
+[`related_identifier`](inputs.qmd#sec-zendo-id) field. If no deposit is found,
+the `Session.deposit` field will be kept as `None`. If multiple deposits are
+found, it will fail.
+
+Is a `impl` method on `Session`. This is used internally in `Session::new()`,
+described [below](#lib-session-new).
 
 <!-- TODO: Unsure if this should be a `Result` type instead... -->
 
@@ -399,31 +342,52 @@ a function signature as well as some reasons their design (if needed).
 
 :   Checks the
     [`deposit.state`](https://developers.zenodo.org/?shell#representation) field
-    if it is "inprogress" or if the `deposit.submitted` field is false. Is an
-    `impl` method on `Session`.
+    if it is "inprogress", or if the `state` is not "error" and the
+    `deposit.submitted` field is false. Is an `impl` method on `Session`.
 
-`Session::list_deposits(self: &self) -> Result<Vec<Deposit>, Error>`
+### `Session::list_deposits()` {#lib-list-deposit}
 
-:   Sends a [`get` REST API request](https://developers.zenodo.org/#list) to
-    Zenodo using the `reqwest` package. Deserialises the Zenodo JSON response
-    into our `Deposit` struct. Also needs a `try_from()` to convert the Zenodo
-    JSON `related_identifier` into our `zendo_id`, if it exists in the JSON (but
-    won't fail if it can't convert anything in the deposit). Implemented as an
-    `impl` method on `Session`. Can output an empty `Vec` if no deposit is
-    found.
+The signature is:
 
-`Session::new(sandbox, token, zendo_id)`
+```rust
+impl Session {
+    list_deposits(self: &self) -> Result<Vec<Deposit>, Error>
+}
+```
 
-:   This constructs a new `Session` struct with details needed for reqwest to
-    correctly send a request to Zenodo. Based on the `sandbox` value, the `url`
-    field will point to either `sandbox.zenodo.org` or `zenodo.org` URLs. If the
-    `zendo_id` is given, a request will be sent to Zenodo for the deposit
-    connected to the ID, the response of which will be attached to the `deposit`
-    field to limit repeated requests. Importantly, the main purpose for getting
-    and assigning the `deposit` at this point is to get the Zenodo identifier in
-    [`deposit.id`](https://developers.zenodo.org/?shell#entities). When using
-    `new()`, the `reqwest::blocking::Client::new()` will be added to
-    `connection` to reuse that object for each request sent to Zenodo.
+Sends a [`get` REST API request](https://developers.zenodo.org/#list) to Zenodo
+using the `reqwest` package. Deserialises the Zenodo JSON response into a vector
+with our `Deposit` struct. Implemented as an `impl` method on `Session`. Outputs
+an empty `Vec` if no deposit is found. Gets all deposits, both draft and
+published for the user's Zenodo account, authenticated by their token. While the
+Zenodo API includes "page size", we return all deposits without a size
+constraint. That's because in our use-case we don't have a large number of
+deposits to manage (likely <100), nor do the majority of accounts contain such
+large number of deposits that this would be an issue (from what we've seen).
+
+### `Session::new()` {#lib-session-new}
+
+The signature is:
+
+```rust
+impl Session {
+    new(sandbox: bool, token: String, zendo_id: Option<ZendoId>) -> Result<Self, Error>
+}
+```
+
+This constructs a new `Session` struct with details needed for `reqwest` to
+correctly send a request to Zenodo. Based on the `sandbox` value, the
+`Session.url` field will point to either `sandbox.zenodo.org` or `zenodo.org`
+URLs. If the `zendo_id` is given, a request will be sent to Zenodo for the
+deposit connected to the ID using [`Session::get_deposit()`](#lib-get-deposit),
+the response of which will be attached to the `Session.deposit` field to limit
+repeated requests. Importantly, the main purpose for getting and assigning the
+`Session.deposit` at this point is to get the Zenodo identifier in
+[`deposit.id`](https://developers.zenodo.org/?shell#entities). When using
+`new()`, the `reqwest::blocking::Client::new()` will be added to
+`Session.connection` to reuse that object for each request sent to Zenodo. The
+`token` will be added to the header, which will be added to the `reqwest`
+connection field.
 
 `trait left_join(self, right: Option<Self>) -> Self`
 

@@ -1,9 +1,10 @@
 ---
 title: "Command line"
+order: 3
 ---
 
 This documents the command-line interface (CLI) and its Rust counterparts,
-including some function signatures and explanation of the choices we've made.
+including some function signatures and explanations of the choices we've made.
 This document is primarily to help us (the developers) stay focused on the
 package's scope.
 
@@ -36,21 +37,21 @@ deposit exists or not.
 ## {{< var wip >}} `get` {#cli-get}
 
 ```bash {filename="Terminal"}
-zen-do get [METADATA_FILE] --sandbox
+zen-do get [METADATA-FILE] --sandbox
 ```
 
 The `get` command will get the Zenodo deposit JSON based on the metadata file
 provided. If the deposit doesn't exist, it will output a message about not
 finding a match. This is useful for checking if a deposit already exists for a
 given set of metadata, and if so, getting the deposit information to use for
-updating or publishing it. Internally uses the Rust functions within `list()` to
-get the list of deposits and uses that to find the deposit that matches the
-content of the metadata file using the `zendo_id`.
+updating or publishing it. Internally, it uses the Rust functions within
+`list()` to get the list of deposits and uses that to find the deposit that
+matches the content of the metadata file using the `zendo_id`.
 
 ## {{< var wip >}} `sync` {#cli-sync}
 
 ```bash {filename="Terminal"}
-zen-do sync [METADATA_FILE] --to [FORMAT]
+zen-do sync [METADATA-FILE] --to [FORMAT]
 ```
 
 There are many different file formats and standards that contain similar or even
@@ -74,11 +75,11 @@ syncing between all possible pairs of formats.
 There are several different formats that we've encountered that would be useful
 to keep synchronized with the `.zenodo.toml` file, including:
 
-- {{< var planned >}} `.zenodo.json`: This is the file format that Zenodo looks
-  for in their existing [GitHub release to record
+- {{< var wip >}} `.zenodo.json`: This is the file format that Zenodo looks for
+  in their existing [GitHub release to record
   integration](https://help.zenodo.org/docs/github/describe-software/). Both the
   JSON and TOML formats are equivalent in content.
-- {{< var planned >}} `CITATION.cff`: GitHub uses this file to [display the
+- {{< var wip >}} `CITATION.cff`: GitHub uses this file to [display the
   citation](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-citation-files)
   information for a repository when it is in the root of the repository. This
   contains only a subset of the metadata found in the `.zenodo.toml` file.

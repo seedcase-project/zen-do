@@ -4,9 +4,9 @@ abstract: |
   tasks. The main aim is to make it easy to create a Zenodo deposit using
   metadata from a file kept within a Git repository and upload one or more files
   from the repository to that deposit. While the intended use of zen-do is to
-  integrate with a GitHub Action workflow for continuous deployment, it can also
+  integrate with a GitHub Actions workflow for continuous deployment, it can also
   be used locally from the command line for more interactive use. See
-  <a href="https://sprout.seedcase-project.org">https://sprout.seedcase-project.org</a>.
+  https://zen-do.seedcase-project.org.
 authors:
   - family-names: Brødbæk
     given-names: Signe Kirk
