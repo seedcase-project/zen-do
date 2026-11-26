@@ -6,8 +6,9 @@ pre_bump_hooks = [
   # Quiet the log output of git-cliff, it is noisy.
   "RUST_LOG='none' uvx git-cliff --tag {{version}}",
   "cargo set-version {{version}}",
+  "rattler-build bump-recipe --version {{version}}",
   "uvx --from panache-cli panache format CHANGELOG.md --quiet",
-  "git commit CHANGELOG.md Cargo.toml Cargo.lock -m 'build: 🔖 update version to {{version}}'",
+  "git commit CHANGELOG.md Cargo.toml Cargo.lock recipe.yaml -m 'build: 🔖 update version to {{version}}'",
 ]
 post_bump_hooks = ["git push", "git push --tags"]
 
