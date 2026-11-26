@@ -6,8 +6,8 @@ use std::error::Error;
 /// Zenodo session.
 ///
 /// Holds everything needed to connect to Zenodo, send a request, and keep the
-/// details from the response. Used with [`reqwest`](https://docs.rs/reqwest/latest/reqwest/) to build and send requests
-/// to the Zenodo API.
+/// details from the response. Used with [`reqwest`](https://docs.rs/reqwest/latest/reqwest/)
+/// to build and send requests to the Zenodo API.
 ///
 /// Requests are synchronous because `zen-do` sends few, simple requests,
 /// so it doesn't need any `async` structures.
