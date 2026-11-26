@@ -171,12 +171,12 @@ pub enum RelatedIdentifierRelation {
     Compiles,
     IsVariantFormOf,
     IsOriginalFormOf,
-    #[default] // TODO: Semi-randomly chose this as the default. Thoughts?
     IsIdenticalTo,
     IsAlternateIdentifier,
     IsReviewedBy,
     Reviews,
     IsDerivedFrom,
+    #[default]
     IsSourceOf,
     Requires,
     IsRequiredBy,
