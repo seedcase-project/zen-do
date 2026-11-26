@@ -51,7 +51,7 @@ is a (mostly) simple `POST` request to the `discard` endpoint.
 
 flowchart TD
     sandbox[/"--sandbox"/]:::inputs
-    metadata_file[/"[metadata-file]"/]:::inputs
+    metadata_path[/"[metadata_path]"/]:::inputs
     token["get_token()"]
     session[("Session::new()")]
     read_metadata["read_metadata()"]
@@ -63,7 +63,7 @@ flowchart TD
     decision_draft{"draft?"}
     has_deposit{"has deposit?"}
 
-    metadata_file -->
+    metadata_path -->
       read_metadata -->
       metadata -->|add ID| session
 
@@ -162,7 +162,7 @@ traits are applied to each of the formats structs, e.g. for `CitationCff` or
 %%|   document.
 
 flowchart TD
-    metadata_file[/"[metadata-file]"/]
+    metadata_path[/"[metadata_path]"/]
     to[/"--to"/]
 
     read_metadata["read_metadata()"]
@@ -171,7 +171,7 @@ flowchart TD
     sync_format["sync_format()<br>method"]
     output[/"Updated<br>format file"/]
 
-    metadata_file -->
+    metadata_path -->
       read_metadata -->
       metadata -->
       sync_format
@@ -408,7 +408,7 @@ connection field.
     `read()` and `write()` to point to the correct locations of the output
     format types. For example, with the enum `ToFormat::CitationCff`, the path
     to this file should be `CITATION.cff`, in the same folder as where the
-    `metadata-file` is found.
+    `metadata_path` is found.
 
 `trait read() -> Result<Option<Self>, Error>`
 
