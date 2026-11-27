@@ -10,9 +10,6 @@ on:
       plan:
         required: false
         type: string
-  push:
-    branches:
-      - main
 
 # Limit token permissions for security
 permissions: read-all
