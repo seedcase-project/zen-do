@@ -28,9 +28,9 @@ Unlike the `publish` command, update only changes the metadata associated with
 an existing deposit. The files in the deposit remain unchanged, and the existing
 DOI is preserved.
 
-The `update` command has three important argument:
+The `update` command has three important arguments:
 
-- `[METADATA-FILE]`: The path to the `.zenodo.toml` file. If no path is
+- `[METADATA_PATH]`: The path to the `.zenodo.toml` file. If no path is
   provided, it defaults to `.zenodo.toml` in the working directory.
 - `--sandbox`: Update the deposit in the Zenodo sandbox instead of the main
   Zenodo website. This is useful for testing changes before updating a real
