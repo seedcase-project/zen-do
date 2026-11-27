@@ -1,0 +1,49 @@
+---
+title: "Syncing metadata files with `.zenodo.toml`"
+description: |
+  Use the `sync` command to synchronise metadata from `.zenodo.toml` to other metadata file formats.
+order: 2
+---
+
+The `.zenodo.toml` file contains metadata about a deposit on Zenodo. Other
+metadata files can also describe deposits, such as
+[`.zenodo.json`](https://help.zenodo.org/docs/github/describe-software/zenodo-json/),
+or contain similar metadata about a project alongside other information, such as
+[`CITATION.cff`](https://citation-file-format.github.io/) or
+[`pyproject.toml`](https://packaging.python.org/en/latest/guides/writing-pyproject-toml/).
+
+zen-do uses `.zenodo.toml` as the central source of metadata and can synchronise
+its values to other metadata files, providing consistency across your project.
+The following formats are supported or planned to be supported:
+
+  | Status                | Format                                                                                      | `--to` value       |
+  | --------------------- | ------------------------------------------------------------------------------------------- | ------------------ |
+  | {{< var done >}}      | [`.zenodo.json`](https://help.zenodo.org/docs/github/describe-software/zenodo-json/)        | `zenodo-json`      |
+  | {{< var wip >}}       | [`CITATION.cff`](https://citation-file-format.github.io/)                                   | `citation-cff`     |
+  | {{< var planned >}}   | [`_quarto.yml`](https://quarto.org/docs/projects/quarto-projects.html#project-metadata)     | `quarto-yml`       |
+  | {{< var planned >}}   | [`pyproject.toml`](https://packaging.python.org/en/latest/guides/writing-pyproject-toml/)   | `pyproject-toml`   |
+  | {{< var planned >}}   | [`codemeta.json`](https://codemeta.github.io/)                                              | `codemeta-json`    |
+  | {{< var planned >}}   | [`DESCRIPTION`](https://r-pkgs.org/description.html)                                        | `description`      |
+
+  : Supported metadata formats for syncing.
+
+zen-do expects the target metadata file (i.e., the file you want to sync the
+`.zenodo.toml` metadata to) to be in the same folder as `.zenodo.toml`. If the
+target metadata file doesn't exist in that folder, it will be created there and
+populated with metadata from `.zenodo.toml`. If it already exists, its metadata
+will be updated.
+
+During syncing, fields present in `.zenodo.toml` will be updated in the target
+metadata file. Fields in the target file that are not present in `.zenodo.toml`
+will be left unchanged.
+
+<!-- TODO: Include code chunk that auto-adds examples to the rendered qmd doc -->
+
+For example, to sync `CITATION.cff` with `.zenodo.toml`, run:
+
+```bash {filename="Terminal"}
+zen-do sync path/to/.zenodo.toml --to citation-cff
+```
+
+If you omit the path to `.zenodo.toml`, it will default to `.zenodo.toml` in the
+current working directory.
