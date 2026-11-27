@@ -1,5 +1,5 @@
 ---
-title: "Get an overview of Zenodo deposits"
+title: "Get details about your Zenodo deposits"
 description: |
   Use the `list` command to retrieve all your Zenodo deposits and `get` to find a specific deposit.
 order: 4
@@ -27,8 +27,7 @@ system keyring or as an environment variable.
 
 ### Listing all deposits
 
-The `list` command retrieve all deposits associated with your Zenodo account.
-
+The `list` command retrieves all deposits associated with your Zenodo account.
 To list deposits in your Zenodo account, run:
 
 ```bash {filename="Terminal"}
@@ -46,15 +45,15 @@ zen-do list --sandbox
 ### Getting a specific deposit
 
 While `list` will list *all* deposits in your account, the `get` command only
-retrieves the Zenodo deposit JSON for a deposit in your account matching the
-`zendo_id`. This ID is stored in the `.zenodo.toml` file. (Note: *In the Zenodo
-deposit JSON, the `zendo-id` is found under `related_identifiers`*).
+retrieves information about a specific Zenodo deposit in your account matching
+the `zendo_id`. This ID is stored in the `.zenodo.toml` file. (Note: *In the
+Zenodo deposit JSON, the `zendo-id` is found under `related_identifiers`*).
 
 The command takes two optional arguments:
 
-- The `--sandbox` as described above for `list` --- here, specifying a specific
+- The `--sandbox` as described above for `list`---here, specifying a specific
   deposit.
-- the path to the metadata file. If no path is provided, it defaults to
+- The path to the metadata file. If no path is provided, it defaults to
   `.zenodo.toml` in the working directory.
 
 ```bash {filename="Terminal"}
@@ -63,7 +62,8 @@ zen-do get path/to/.zenodo.toml --sandbox
 
 The command searches all the deposits associated with your account (either the
 sandbox or the main Zenodo website) and identifies a matching deposit using the
-`zendo_id`. If a matching deposit is found, its deposit JSON is returned.
+`zendo_id`. If a matching deposit is found, its deposit JSON is printed to the
+terminal screen.
 
 For example, to retrieve the deposit associated with the default `.zenodo.toml`
 file, run:
