@@ -142,6 +142,101 @@ flowchart TD
       output
 ```
 
+### {{< var wip >}} `publish()` {#cli-publish}
+
+The meaning of `--draft` compared to `--yes` has a difference and results in
+different outcomes. Making a draft with `--draft` means the user wants to view
+the deposit on Zenodo to confirm things before publishing. `--yes` is a flag
+that tells `update()` to publish without prompting for a confirmation, which
+doesn't mean anything when used with `--draft` (though nothing will happen if
+both are used together). This is mainly to ensure that a command wasn't ran
+accidentally.
+
+While `is_draft()` is a `bool`, in the `true` case we output an error to
+`stderr` since we don't want to modify a deposit that is in the editable state.
+
+```{mermaid}
+%%| label: fig-publish-cli
+%%| fig-cap: "The flow of input and output through the `publish()` CLI function."
+%%| fig-alt: >-
+%%|   Diagram showing the flow of input and output from input to output. There
+%%|   are various shapes for each box, which is described at the top of the
+%%|   document.
+
+flowchart TD
+    draft[/"--draft"/]:::inputs
+    yes[/"--yes"/]:::inputs
+    sandbox[/"--sandbox"/]:::inputs
+    metadata_file[/"[metadata-file]"/]:::inputs
+    files[/"--file"/]:::inputs
+
+    token["get_token()"]
+    session[("Session::new()")]
+    confirm_publish["confirm_publish()"]
+    read_metadata["read_metadata()"]
+    metadata[("Metadata {...}")]
+    session_without_files[("Session {...}<br>Without files")]
+    create_deposit["create_deposit()"]
+    is_draft["is_draft()"]
+    create_new_version["create_new_version()"]
+    add_files["add_files()"]
+    delete_files["delete_files()"]
+    update_deposit["update_deposit()"]
+    publish["publish_deposit()"]
+    discard_deposit["discard_deposit()"]
+    output[/"Deposit<br>or nothing"/]
+
+    decision_publish{"publish?"}
+    decision_draft{"draft?"}
+    decision_editable{"editable?"}
+    decision_has_deposit{"has deposit?"}
+
+    sandbox --> token
+    sandbox & token -->
+      session
+
+    draft -->
+      decision_draft -->|true| output
+
+    files --> add_files
+
+    session -->
+      decision_has_deposit -->|Some| is_draft -->
+      decision_editable -->|false| create_new_version
+
+    decision_has_deposit -->|None| create_deposit
+    metadata -->
+      create_deposit -->
+      session_without_files
+
+    decision_editable --> |true| error[/Error/]
+
+    create_new_version -->
+      delete_files -->
+      session_without_files -->
+      add_files
+
+    add_files & metadata -->
+      update_deposit -->
+      decision_draft -->|false| decision_publish
+
+    decision_publish -->|true| publish -->
+      output
+
+    metadata_file -->
+      read_metadata -->
+      metadata
+
+    metadata -->|add ZendoID| session
+
+    yes -->
+      confirm_publish -->
+      decision_publish -->|false| discard_deposit -->
+      output
+
+    classDef inputs fill:lightgray,stroke-width:3px
+```
+
 ### {{< var wip >}} `sync()` {#cli-sync}
 
 Because of the wide variety of potential output formats, the internals of this
@@ -275,6 +370,21 @@ flowchart TD
     classDef inner fill:none
 ```
 
+### `confirm_publish()` {#lib-confirm-publish}
+
+The signature is:
+
+```rust
+pub fn confirm_publish(yes: bool) -> bool
+```
+
+A simple helper function to print a message confirming whether the Zenodo
+deposit should be published. The value of `yes` comes from the `--yes` CLI
+option and will only be the output if `yes` is given via the `--yes` flag (e.g.
+is `true`).
+
+<!-- TODO: Confirm whether response contains the deposit, then it can be added to `Deposit` -->
+
 `Deposit {...}`
 
 :   A struct that represents the JSON response received from Zenodo. Mainly
@@ -306,13 +416,76 @@ flowchart TD
     synchronous connection. The fields `zendo_id` and `deposit` are `Option`
     types.
 
-`Session::discard_deposit(self: mut self) -> Result<mut self, Error>`
+### `Session::add_files()` {#lib-add-files}
 
-:   This `impl` method on `Session` sends a
-    [discard](https://developers.zenodo.org/?shell#discard) request to Zenodo.
-    If the request succeeds, the `Session.deposit` field is set to `None`. If
-    the current deposit on Zenodo needs to be retrieved, do `Session::new()`
-    again to start over.
+The signature is:
+
+```rust
+impl Session {
+    pub fn add_files(self: &self, files: NonEmptyVec<&Path>) -> Result<Self, Error>
+}
+```
+
+Adds files to a Zenodo deposit by sending a `POST` request. Must have the
+`"submitted"` field be false (i.e. is unsubmitted). Needs one API call per file.
+
+### `Session::create_new_version()` {#lib-create-new-version}
+
+The signature is:
+
+```rust
+impl Session {
+    pub fn create_new_version(self: &mut self) -> Result<&mut Self, Error>
+}
+```
+
+This converts an existing deposit into a ["new
+version"](https://developers.zenodo.org/#new-version). It is needed if new files
+are going to be added to the deposit. Sends a post request and then needs to
+take the response and add it to the `Session.deposit` field.
+
+### `Session::create_deposit()` {#lib-create-deposit}
+
+The signature is:
+
+```rust
+impl Session {
+    pub fn create_deposit(self: &mut self, metadata: &Metadata) -> Result<&mut Self, Error>`
+}
+```
+
+This method on creates a new deposit from the `Metadata` in the Zenodo TOML file
+by sending a `POST` request to Zenodo. Will add the `deposit` details from the
+Zenodo API response.
+
+### `Session::delete_files()` {#lib-delete-files}
+
+The signature is:
+
+```rust
+impl Session {
+    pub fn delete_files(self: &mut self) -> Result<&mut Self, Error>
+}
+```
+
+This deletes all files in a deposit by sending delete requests to Zenodo. Gets
+the list of files from the `Session.deposit.` fields. Needs one API call per
+file.
+
+### `Session::discard_deposit()` {#lib-discard-deposit}
+
+The signature is:
+
+```rust
+impl Session {
+    pub fn discard_deposit(self: mut self) -> Result<mut self, Error>
+}
+```
+
+This method sends a [discard](https://developers.zenodo.org/?shell#discard)
+request to Zenodo. If the request succeeds, the `Session.deposit` field is set
+to `None`. If the current deposit on Zenodo needs to be retrieved, do
+`Session::new()` again to start over.
 
 ### `Session::get_deposit()` {#lib-get-deposit}
 
@@ -331,19 +504,54 @@ response into our `Deposit` struct. Uses the Zenodo API `q` query parameter on
 the Zenodo `GET` API to list deposits that have the `ZendoId` in the
 [`related_identifier`](inputs.qmd#sec-zendo-id) field. If no deposit is found,
 the `Session.deposit` field will be kept as `None`. If multiple deposits are
-found, it will fail.
+found, it will fail. This is used internally in `Session::new()`, described
+[below](#lib-session-new).
 
-Is a `impl` method on `Session`. This is used internally in `Session::new()`,
-described [below](#lib-session-new).
+### `Session::is_draft()` {#lib-is-draft}
 
 <!-- TODO: Unsure if this should be a `Result` type instead... -->
 
-`Session::is_draft(self: &self) -> bool`
+The signature is:
 
-:   Checks the
-    [`deposit.state`](https://developers.zenodo.org/?shell#representation) field
-    if it is "inprogress", or if the `state` is not "error" and the
-    `deposit.submitted` field is false. Is an `impl` method on `Session`.
+```rust
+impl Session {
+    pub fn is_draft(self: &self) -> bool
+}
+```
+
+Checks the
+[`Session.deposit.state`](https://developers.zenodo.org/?shell#representation)
+field if it is "inprogress", or if the `state` is not "error" and the
+`Session.deposit.submitted` field is false.
+
+### `Session::publish_deposit()` {#lib-publish-deposit}
+
+The signature is:
+
+```rust
+impl Session {
+    pub fn publish_deposit(self: &self) -> Result<(), Error>
+}
+```
+
+This method sends a [publish](https://developers.zenodo.org/?shell#publish)
+request to Zenodo on the deposit. Returns nothing to indicate the end of the
+pipeline.
+
+### `Session::update_deposit()` {#lib-update-deposit}
+
+The signature is:
+
+```rust
+impl Session {
+    pub fn update_deposit(self: &mut self, metadata: &Metadata) -> Result<&mut Self, Error>
+}
+```
+
+This method takes the `Metadata` from the Zenodo TOML file and sends an update
+request to Zenodo. The response from Zenodo contains the `Deposit`, which will
+be added to `Session.deposit` to keep those states between the current session
+and the Zenodo server aligned.
 
 ### `Session::list_deposits()` {#lib-list-deposit}
 
