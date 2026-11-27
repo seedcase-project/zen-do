@@ -149,7 +149,7 @@ pub struct RelatedIdentifier {
     pub scheme: Option<String>,
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq, Default)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub enum RelatedIdentifierRelation {
     IsCitedBy,
