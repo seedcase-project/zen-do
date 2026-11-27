@@ -2150,6 +2150,7 @@ dependencies = [
  "indexmap",
  "toml_datetime",
  "toml_parser",
+ "toml_writer",
  "winnow",
 ]
 
@@ -2703,6 +2704,7 @@ dependencies = [
  "temp-env",
  "tempfile",
  "toml",
+ "toml_edit",
 ]
 
 [[package]]

@@ -28,6 +28,7 @@ include = ["src/*.rs", "CHANGELOG.md", "README.md", "CITATION.cff"]
 [dependencies]
 serde = { version = "1.0.229", features = ["derive"] }
 toml = "1.1.4"
+toml_edit = "0.25.20"
 clap = { version = "4.6.6", features = ["derive"] }
 keyring = "4.2.0"
 keyring-core = "1.0.0"

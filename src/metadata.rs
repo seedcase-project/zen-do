@@ -70,6 +70,10 @@ pub struct Metadata {
     /// The title of the deposit.
     pub title: String,
 
+    /// Optional version label of the deposit. Any string is accepted.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub version: Option<String>,
+
     // TODO: Create an UploadType enum.
     /// The type of the deposit.
     pub upload_type: String,
@@ -263,6 +267,33 @@ pub fn read_metadata(path: &Path) -> Result<Metadata, Box<dyn Error>> {
 pub fn write_metadata(metadata: &Metadata, path: &Path) -> Result<(), Box<dyn Error>> {
     let toml_str: String = toml::to_string_pretty(metadata)?;
     fs::write(path, toml_str)?;
+    Ok(())
+}
+
+/// Sets the version in an existing Zenodo TOML metadata file.
+///
+/// Preserves other fields, comments, and formatting. The file only needs to
+/// be valid TOML; it does not need to contain complete deposit metadata.
+///
+/// # Arguments
+///
+/// - `version`: The version label to set, without restricting its format.
+/// - `path`: The path to the TOML metadata file.
+///
+/// # Errors
+///
+/// Returns an error if the file cannot be read, parsed as TOML, or written.
+pub fn set_version(version: &str, path: &Path) -> Result<(), Box<dyn Error>> {
+    let contents = fs::read_to_string(path)?;
+    let mut document = contents.parse::<toml_edit::DocumentMut>()?;
+    let mut version_value = toml_edit::Value::from(version);
+
+    if let Some(existing) = document.get("version").and_then(toml_edit::Item::as_value) {
+        *version_value.decor_mut() = existing.decor().clone();
+    }
+
+    document["version"] = toml_edit::Item::Value(version_value);
+    fs::write(path, document.to_string())?;
     Ok(())
 }
 
