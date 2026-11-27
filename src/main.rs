@@ -476,7 +476,7 @@ mod tests {
 
         let zenodo_json = ZenodoJson {
             title: "Zenodo JSON Test Project".into(),
-            version: Some("existing".into()),
+            version: Some("0.0.1".into()),
             upload_type: "poster".into(),
             creators: vec![JsonCreator {
                 name: "Zenodo JSON User".into(),
