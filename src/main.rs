@@ -241,7 +241,10 @@ mod tests {
     use super::*;
     use ::zen_do::metadata::{Creator, RelatedIdentifier, ZendoId, read_metadata};
     use std::{collections::BTreeMap, fs};
-    use zen_do::sync::{FormatFileName, JsonCreator, JsonRelatedIdentifier};
+    use zen_do::sync::{
+        CffAuthor, CffIdentifier, CffIdentifierType, CitationCff, FormatFileName, JsonCreator,
+        JsonRelatedIdentifier,
+    };
 
     #[test]
     fn test_init_command_no_prior_file() {
@@ -410,6 +413,104 @@ mod tests {
         assert_eq!(zenodo_json.extra, BTreeMap::new());
     }
 
+    #[test]
+    fn sync_metadata_to_new_citation_cff() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let (metadata_path, metadata) = create_zenodo_toml(temp_dir.path());
+
+        sync(&SyncArgs {
+            metadata_file: MetadataFileArg {
+                metadata_file: metadata_path.clone(),
+            },
+            to: ToFormats::CitationCff,
+        })
+        .unwrap();
+
+        let citation_cff_path = metadata_path.parent().unwrap().join(CitationCff::FILE_NAME);
+        let citation_cff = read_citation_cff(&citation_cff_path);
+
+        assert_citation_cff_matches_metadata(&citation_cff, &metadata);
+        assert_eq!(citation_cff.extra, BTreeMap::new());
+    }
+
+    #[test]
+    fn sync_metadata_to_existing_citation_cff_no_extra_fields() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let (metadata_path, metadata) = create_zenodo_toml(temp_dir.path());
+        let (citation_cff_path, old_citation_cff) = create_citation_cff(temp_dir.path(), None);
+
+        sync(&SyncArgs {
+            metadata_file: MetadataFileArg {
+                metadata_file: metadata_path.clone(),
+            },
+            to: ToFormats::CitationCff,
+        })
+        .unwrap();
+
+        let citation_cff = read_citation_cff(&citation_cff_path);
+
+        assert_citation_cff_matches_metadata(&citation_cff, &metadata);
+        assert_eq!(citation_cff.extra, old_citation_cff.extra);
+    }
+
+    #[test]
+    fn sync_metadata_to_existing_citation_cff_with_extra_fields() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let (metadata_path, metadata) = create_zenodo_toml(temp_dir.path());
+        let extra = BTreeMap::from([
+            ("repository-code".into(), "https://example.com".into()),
+            (
+                "keywords".into(),
+                serde_yaml::Value::Sequence(vec!["test".into()]),
+            ),
+        ]);
+        let (citation_cff_path, old_citation_cff) =
+            create_citation_cff(temp_dir.path(), Some(extra));
+
+        sync(&SyncArgs {
+            metadata_file: MetadataFileArg {
+                metadata_file: metadata_path.clone(),
+            },
+            to: ToFormats::CitationCff,
+        })
+        .unwrap();
+
+        let citation_cff = read_citation_cff(&citation_cff_path);
+
+        assert_citation_cff_matches_metadata(&citation_cff, &metadata);
+        assert_eq!(citation_cff.extra, old_citation_cff.extra);
+    }
+
+    #[test]
+    fn sync_metadata_to_existing_citation_cff_with_missing_fields() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let (metadata_path, metadata) = create_zenodo_toml(temp_dir.path());
+        let citation_cff_path = temp_dir.path().join(CitationCff::FILE_NAME);
+        fs::write(
+            &citation_cff_path,
+            // Missing affiliation and ORCID
+            r#"
+authors:
+  - given-names: Old
+    family-names: User
+"#,
+        )
+        .unwrap();
+
+        sync(&SyncArgs {
+            metadata_file: MetadataFileArg {
+                metadata_file: metadata_path.clone(),
+            },
+            to: ToFormats::CitationCff,
+        })
+        .unwrap();
+
+        let citation_cff = read_citation_cff(&citation_cff_path);
+
+        assert_citation_cff_matches_metadata(&citation_cff, &metadata);
+        assert_eq!(citation_cff.extra, BTreeMap::new());
+    }
+
     fn create_zenodo_toml(temp_dir: &Path) -> (PathBuf, Metadata) {
         let metadata_path = temp_dir.join(".zenodo.toml");
 
@@ -420,14 +521,40 @@ mod tests {
             creators: vec![Creator {
                 name: "Test User".into(),
                 affiliation: "Test Affiliation".into(),
-                orcid: "ABC".into(),
+                orcid: "0000-0000-0000-0000".into(),
             }],
-            related_identifiers: vec![RelatedIdentifier {
-                identifier: "abcd123".into(),
-                relation: "isIdenticalTo".into(),
-                resource_type: "book".into(),
-                scheme: None,
-            }],
+            related_identifiers: vec![
+                RelatedIdentifier {
+                    identifier: "abcd123".into(),
+                    relation: "isIdenticalTo".into(),
+                    resource_type: "book".into(),
+                    scheme: None,
+                },
+                RelatedIdentifier {
+                    identifier: "10.1000/111".into(),
+                    relation: "isIdenticalTo".into(),
+                    resource_type: "book".into(),
+                    scheme: Some("doi".into()),
+                },
+                RelatedIdentifier {
+                    identifier: "https://example.com/project".into(),
+                    relation: "isIdenticalTo".into(),
+                    resource_type: "book".into(),
+                    scheme: Some("url".into()),
+                },
+                RelatedIdentifier {
+                    identifier: "swh:1:dir:0123456789abcdef0123456789abcdef01234567".into(),
+                    relation: "isIdenticalTo".into(),
+                    resource_type: "book".into(),
+                    scheme: Some("swh".into()),
+                },
+                RelatedIdentifier {
+                    identifier: "10.1000/112".into(),
+                    relation: "IsDerivedFrom".into(),
+                    resource_type: "book".into(),
+                    scheme: Some("doi".into()),
+                },
+            ],
         };
         write_metadata(&metadata, &metadata_path).unwrap();
 
@@ -481,23 +608,102 @@ mod tests {
                 orcid: metadata.creators[0].orcid.clone(),
             }]
         );
-        let expected_related_identifiers = vec![
-            JsonRelatedIdentifier {
-                identifier: metadata.related_identifiers[0].identifier.clone(),
-                relation: metadata.related_identifiers[0].relation.clone(),
-                resource_type: metadata.related_identifiers[0].resource_type.clone(),
-                scheme: metadata.related_identifiers[0].scheme.clone(),
-            },
-            JsonRelatedIdentifier {
-                identifier: format!("urn:zendo:{}", metadata.zendo_id.as_str()),
-                relation: "isIdenticalTo".into(),
-                resource_type: metadata.upload_type.clone(),
-                scheme: Some("urn".into()),
-            },
-        ];
+        let mut expected_related_identifiers = metadata
+            .related_identifiers
+            .iter()
+            .map(|related_identifier| JsonRelatedIdentifier {
+                identifier: related_identifier.identifier.clone(),
+                relation: related_identifier.relation.clone(),
+                resource_type: related_identifier.resource_type.clone(),
+                scheme: related_identifier.scheme.clone(),
+            })
+            .collect::<Vec<_>>();
+
+        expected_related_identifiers.push(JsonRelatedIdentifier {
+            identifier: metadata.zendo_id.to_urn(),
+            relation: "isIdenticalTo".into(),
+            resource_type: metadata.upload_type.clone(),
+            scheme: Some("urn".into()),
+        });
         assert_eq!(
             zenodo_json.related_identifiers,
             expected_related_identifiers
+        );
+    }
+
+    fn create_citation_cff(
+        temp_dir: &Path,
+        extra: Option<BTreeMap<String, serde_yaml::Value>>,
+    ) -> (PathBuf, CitationCff) {
+        let citation_cff_path = temp_dir.join(CitationCff::FILE_NAME);
+
+        let citation_cff = CitationCff {
+            title: "CFF Test Project".into(),
+            authors: vec![CffAuthor {
+                given_names: "CFF".into(),
+                family_names: "Test User".into(),
+                affiliation: "CFF Test Affiliation".into(),
+                orcid: "https://orcid.org/0000-0000-0000-0000".into(),
+            }],
+            identifiers: vec![CffIdentifier {
+                value: "https://example.com".into(),
+                identifier_type: CffIdentifierType::Url,
+            }],
+            extra: extra.unwrap_or_default(),
+        };
+
+        fs::write(
+            &citation_cff_path,
+            serde_yaml::to_string(&citation_cff).unwrap(),
+        )
+        .unwrap();
+
+        (citation_cff_path, citation_cff)
+    }
+
+    fn read_citation_cff(path: &Path) -> CitationCff {
+        assert!(path.is_file());
+        let contents = fs::read_to_string(path).unwrap();
+        serde_yaml::from_str(&contents).unwrap()
+    }
+
+    fn assert_citation_cff_matches_metadata(citation_cff: &CitationCff, metadata: &Metadata) {
+        assert_eq!(citation_cff.title, metadata.title);
+
+        assert_eq!(
+            citation_cff.authors,
+            vec![CffAuthor {
+                given_names: metadata.creators[0].name.clone(),
+                family_names: metadata.creators[0].name.clone(),
+                affiliation: metadata.creators[0].affiliation.clone(),
+                orcid: format!("https://orcid.org/{}", metadata.creators[0].orcid),
+            }]
+        );
+
+        assert_eq!(
+            citation_cff.identifiers,
+            vec![
+                CffIdentifier {
+                    value: metadata.related_identifiers[0].identifier.clone(),
+                    identifier_type: CffIdentifierType::Other,
+                },
+                CffIdentifier {
+                    value: metadata.related_identifiers[1].identifier.clone(),
+                    identifier_type: CffIdentifierType::Doi,
+                },
+                CffIdentifier {
+                    value: metadata.related_identifiers[2].identifier.clone(),
+                    identifier_type: CffIdentifierType::Url,
+                },
+                CffIdentifier {
+                    value: metadata.related_identifiers[3].identifier.clone(),
+                    identifier_type: CffIdentifierType::Swh,
+                },
+                CffIdentifier {
+                    value: metadata.zendo_id.to_urn(),
+                    identifier_type: CffIdentifierType::Other,
+                },
+            ]
         );
     }
 }
