@@ -6,7 +6,7 @@ pre_bump_hooks = [
   # Quiet the log output of git-cliff, it is noisy.
   "RUST_LOG='none' uvx git-cliff --tag {{version}}",
   "cargo set-version {{version}}",
-  "yq '.context.version = \"{{version}}\"' -i -Y recipe.yaml",
+  "yq -i '.context.version = \"{{version}}\"' recipe.yaml",
   "uvx --from panache-cli panache format CHANGELOG.md --quiet",
   "git commit CHANGELOG.md Cargo.toml Cargo.lock recipe.yaml -m 'build: 🔖 update version to {{version}}'",
 ]
