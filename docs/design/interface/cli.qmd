@@ -1,5 +1,6 @@
 ---
 title: "Command line"
+order: 3
 ---
 
 This documents the command-line interface (CLI) and its Rust counterparts,
@@ -36,7 +37,7 @@ deposit exists or not.
 ## {{< var wip >}} `get` {#cli-get}
 
 ```bash {filename="Terminal"}
-zen-do get [METADATA-FILE] --sandbox
+zen-do get [METADATA_PATH] --sandbox
 ```
 
 The `get` command will get the Zenodo deposit JSON based on the metadata file
@@ -50,7 +51,7 @@ matches the content of the metadata file using the `zendo_id`.
 ## {{< var wip >}} `sync` {#cli-sync}
 
 ```bash {filename="Terminal"}
-zen-do sync [METADATA-FILE] --to [FORMAT]
+zen-do sync [METADATA_PATH] --to [FORMAT]
 ```
 
 There are many different file formats and standards that contain similar or even
@@ -106,7 +107,7 @@ similar "converter" packages, e.g. [pandoc](https://pandoc.org).
 ## {{< var planned >}} `update` {#cli-update}
 
 ```bash
-zen-do update [METADATA-FILE] --sandbox --draft --yes
+zen-do update [METADATA_PATH] --sandbox --draft --yes
 ```
 
 The `update` command takes a `.zenodo.toml` metadata file and updates the
@@ -116,7 +117,7 @@ metadata. This command is useful if you have a typo in one of the fields or
 forgot to add some information, but you don't want to re-upload the same file
 and create a new DOI.
 
-`update` has one required argument, `[METADATA-FILE]` which is the path to the
+`update` has one required argument, `[METADATA_PATH]` which is the path to the
 `.zenodo.toml` file. By default, it looks for the file in the working directory.
 The optional argument `--sandbox` tells the command to update a deposit in the
 sandbox environment instead of updating it in Zenodo's main environment. The
@@ -132,7 +133,7 @@ published as a record (e.g., with `publish`) before any content can be updated.
 ## {{< var planned >}} `discard` {#cli-discard}
 
 ```bash
-zen-do discard [METADATA-FILE] --sandbox
+zen-do discard [METADATA_PATH] --sandbox
 ```
 
 The `discard` command cancels a deposit that is in the "editable" state. This
@@ -144,7 +145,7 @@ in the editable state for deposits on the Zenodo sandbox.
 ## {{< var planned >}} `publish` {#cli-publish}
 
 ```bash
-zen-do publish [METADATA-FILE] --file [FILE1,FILE2] --draft --sandbox --yes
+zen-do publish [METADATA_PATH] --file [FILE1,FILE2] --draft --sandbox --yes
 ```
 
 The `publish` command takes a metadata file (`.zenodo.toml`) as well as some
