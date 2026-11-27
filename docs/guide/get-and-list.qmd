@@ -25,7 +25,7 @@ Name your token `ZENODO_TOKEN` (for the production environment) or
 system keyring or as an environment variable.
 :::
 
-### Listing all deposits
+## Listing all deposits
 
 The `list` command retrieves all deposits associated with your Zenodo account.
 To list deposits in your Zenodo account, run:
@@ -42,7 +42,7 @@ Zenodo website at [zenodo.org](https://zenodo.org):
 zen-do list --sandbox
 ```
 
-### Getting a specific deposit
+## Getting a specific deposit
 
 While `list` will list *all* deposits in your account, the `get` command only
 retrieves information about a specific Zenodo deposit in your account matching
