@@ -61,7 +61,7 @@ orcid = ""
 
 [[related_identifiers]]
 identifier = ""
-relation = ""
+relation = "isSourceOf"
 resource_type = ""
 scheme = ""
 ```
@@ -90,6 +90,14 @@ In our case, you can update the value with:
 ```toml {filename=".zenodo.toml"}
 zendo_id = "seedcase-project:zen-do:report-pdf"
 ```
+
+`zendo init` also adds a `related_identifiers` section, which links your deposit
+to related resources such as a GitHub repository. Its `relation` field describes
+how the deposit relates to that resource, and it defaults to `isSourceOf`. See
+the `related_identifiers` field under deposit metadata in [Zenodo's
+documentation](https://developers.zenodo.org/#representation) for the list of
+allowed relations. That list is incomplete, unfortunately: Zenodo also accepts
+`hasVersion`, `isVersionOf`, and `isPublishedIn`.
 
 All the fields available from the [Zenodo
 metadata](https://developers.zenodo.org/#representation) are available to be
