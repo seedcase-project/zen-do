@@ -354,6 +354,9 @@ mod tests {
         let zenodo_json = read_zenodo_json(&zenodo_json_path);
         assert_zenodo_json_matches_metadata(&zenodo_json, &metadata);
         assert_eq!(zenodo_json.extra, BTreeMap::new());
+        let json: serde_json::Value =
+            serde_json::from_str(&fs::read_to_string(&zenodo_json_path).unwrap()).unwrap();
+        assert!(json.get("version").is_none());
     }
 
     #[test]
@@ -373,6 +376,7 @@ mod tests {
         let zenodo_json = read_zenodo_json(&zenodo_json_path);
         assert_zenodo_json_matches_metadata(&zenodo_json, &metadata);
         assert_eq!(zenodo_json.extra, old_zenodo_json.extra);
+        assert_eq!(zenodo_json.version, old_zenodo_json.version);
     }
 
     #[test]
@@ -472,7 +476,7 @@ mod tests {
 
         let zenodo_json = ZenodoJson {
             title: "Zenodo JSON Test Project".into(),
-            version: None,
+            version: Some("existing".into()),
             upload_type: "poster".into(),
             creators: vec![JsonCreator {
                 name: "Zenodo JSON User".into(),
