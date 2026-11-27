@@ -237,7 +237,9 @@ fn main() {
 mod tests {
     // To import all code from above in this file.
     use super::*;
-    use ::zen_do::metadata::{Creator, RelatedIdentifier, ZendoId, read_metadata};
+    use ::zen_do::metadata::{
+        Creator, RelatedIdentifier, RelatedIdentifierRelation, ZendoId, read_metadata,
+    };
     use std::{collections::BTreeMap, fs};
     use zen_do::sync::{FormatFileName, JsonCreator, JsonRelatedIdentifier};
 
@@ -422,7 +424,7 @@ mod tests {
             }],
             related_identifiers: vec![RelatedIdentifier {
                 identifier: "abcd123".into(),
-                relation: "isIdenticalTo".into(),
+                relation: RelatedIdentifierRelation::IsIdenticalTo,
                 resource_type: "book".into(),
                 scheme: None,
             }],
@@ -447,7 +449,7 @@ mod tests {
             }],
             related_identifiers: vec![JsonRelatedIdentifier {
                 identifier: "efg789".into(),
-                relation: "isIdenticalTo".into(),
+                relation: RelatedIdentifierRelation::IsIdenticalTo,
                 resource_type: "poster".into(),
                 scheme: None,
             }],
@@ -488,7 +490,7 @@ mod tests {
             },
             JsonRelatedIdentifier {
                 identifier: format!("urn:zendo:{}", metadata.zendo_id.as_str()),
-                relation: "isIdenticalTo".into(),
+                relation: RelatedIdentifierRelation::IsIdenticalTo,
                 resource_type: metadata.upload_type.clone(),
                 scheme: Some("urn".into()),
             },
