@@ -10,6 +10,9 @@ on:
       plan:
         required: true
         type: string
+  push:
+    branches:
+      - main
 
 jobs:
   build-website:
