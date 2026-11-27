@@ -2,17 +2,26 @@ name: Build website
 
 on:
   # Defining workflow_call means that this workflow can be called from
-  # your main workflow job
+  # another workflow job, such as building the website after release
   workflow_call:
     # dist exposes the plan from the plan step, as a JSON string,
     # to your job if it needs it
     inputs:
       plan:
-        required: true
+        required: false
         type: string
+  push:
+    branches:
+      - main
+
+# Limit token permissions for security
+permissions: read-all
 
 jobs:
   build-website:
+    concurrency:
+      group: build-website-group
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     steps:
       # This is a useful security step to check for unexpected outbound calls from the runner,
