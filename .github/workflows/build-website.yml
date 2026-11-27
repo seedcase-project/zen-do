@@ -8,7 +8,7 @@ on:
     # to your job if it needs it
     inputs:
       plan:
-        required: false
+        required: true
         type: string
 
 # Limit token permissions for security
@@ -16,9 +16,6 @@ permissions: read-all
 
 jobs:
   build-website:
-    concurrency:
-      group: build-website-group
-      cancel-in-progress: true
     runs-on: ubuntu-latest
     steps:
       # This is a useful security step to check for unexpected outbound calls from the runner,
