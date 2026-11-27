@@ -38,24 +38,9 @@ website:
         - CHANGELOG.md
         - CONTRIBUTING.md
     - id: design
-      contents:
-        - text: "Design"
-          href: docs/design/index.qmd
-        - docs/design/architecture.qmd
-        - section: "Interface"
-          href: docs/design/interface/index.qmd
-          contents:
-            - docs/design/interface/inputs.qmd
-            - docs/design/interface/outputs.qmd
-            - docs/design/interface/cli.qmd
-            - docs/design/interface/rust.qmd
+      contents: docs/design
     - id: guide
-      contents:
-        - section: "Guide"
-          href: docs/guide/index.qmd
-          contents:
-            - docs/guide/installation.qmd
-            - docs/guide/publishing.qmd
+      contents: docs/guide
 
 format:
   seedcase-theme-html:

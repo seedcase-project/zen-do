@@ -1,4 +1,4 @@
-use crate::metadata::{Creator, Metadata, RelatedIdentifier};
+use crate::metadata::{Creator, Metadata, RelatedIdentifier, RelatedIdentifierRelation};
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, error::Error, fs, path::Path};
 
@@ -64,7 +64,7 @@ impl From<&Creator> for JsonCreator {
 #[serde(default)]
 pub struct JsonRelatedIdentifier {
     pub identifier: String,
-    pub relation: String,
+    pub relation: RelatedIdentifierRelation,
     pub resource_type: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scheme: Option<String>,
@@ -99,7 +99,7 @@ impl From<&Metadata> for ZenodoJson {
     fn from(metadata: &Metadata) -> Self {
         let zendo_id = JsonRelatedIdentifier {
             identifier: metadata.zendo_id.to_urn(),
-            relation: "isIdenticalTo".into(),
+            relation: RelatedIdentifierRelation::IsIdenticalTo,
             resource_type: metadata.upload_type.clone(),
             scheme: Some("urn".into()),
         };
@@ -238,7 +238,7 @@ impl From<&Metadata> for CitationCff {
         let mut identifiers = metadata
             .related_identifiers
             .iter()
-            .filter(|rel_id| rel_id.relation == "isIdenticalTo")
+            .filter(|rel_id| rel_id.relation == RelatedIdentifierRelation::IsIdenticalTo)
             .map(|rel_id| CffIdentifier {
                 value: rel_id.identifier.clone(),
                 identifier_type: rel_id.scheme.as_deref().into(),
