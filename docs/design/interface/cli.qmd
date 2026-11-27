@@ -104,6 +104,22 @@ The `--to` argument takes a single format only, so `sync` must be used multiple
 times to sync to multiple formats---one time for each format. This matches
 similar "converter" packages, e.g. [pandoc](https://pandoc.org).
 
+## {{< var done >}} `set-version` {#cli-set-version}
+
+```bash {filename="Terminal"}
+zen-do set-version <VERSION> [--metadata-path <METADATA_PATH>]
+```
+
+Sets the `version` field in an existing `.zenodo.toml` file. `VERSION` is a
+required string; SemVer is recommended, but other version labels are accepted.
+The optional `--metadata-path` argument (or `-f`) defaults to `.zenodo.toml` in
+the current working directory.
+
+The command preserves other metadata fields, comments, and formatting. It is
+useful in continuous release workflows for setting an explicit version before
+using `sync` or publishing. See the [guide](/docs/guide/set-version.qmd) for
+examples.
+
 ## {{< var planned >}} `update` {#cli-update}
 
 ```bash

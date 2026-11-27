@@ -70,6 +70,10 @@ pub struct Metadata {
     /// The title of the deposit.
     pub title: String,
 
+    /// Optional version label of the deposit. Any string is accepted.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub version: Option<String>,
+
     // TODO: Create an UploadType enum.
     /// The type of the deposit.
     pub upload_type: String,
@@ -266,6 +270,33 @@ pub fn write_metadata(metadata: &Metadata, path: &Path) -> Result<(), Box<dyn Er
     Ok(())
 }
 
+/// Sets the version in an existing Zenodo TOML metadata file.
+///
+/// Preserves other fields, comments, and formatting. The file only needs to
+/// be valid TOML; it does not need to contain complete deposit metadata.
+///
+/// # Arguments
+///
+/// - `version`: The version label to set, without restricting its format.
+/// - `path`: The path to the TOML metadata file.
+///
+/// # Errors
+///
+/// Returns an error if the file cannot be read, parsed as TOML, or written.
+pub fn set_version(version: &str, path: &Path) -> Result<(), Box<dyn Error>> {
+    let contents = fs::read_to_string(path)?;
+    let mut document = contents.parse::<toml_edit::DocumentMut>()?;
+    let mut version_value = toml_edit::Value::from(version);
+
+    if let Some(existing) = document.get("version").and_then(toml_edit::Item::as_value) {
+        *version_value.decor_mut() = existing.decor().clone();
+    }
+
+    document["version"] = toml_edit::Item::Value(version_value);
+    fs::write(path, document.to_string())?;
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     // To import all code from above in this file.
@@ -311,6 +342,46 @@ mod tests {
 
         assert!(write_result.is_ok());
         assert_eq!(example, actual.unwrap());
+    }
+
+    #[test]
+    fn set_version_preserves_other_fields_and_comments() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let metadata_path = temp_dir.path().join(".zenodo.toml");
+        let original = "# Metadata\nversion = \"old\" # Release label\nlicense = \"mit\"\n";
+        fs::write(&metadata_path, original).unwrap();
+
+        set_version("1.2.3", &metadata_path).unwrap();
+
+        assert_eq!(
+            fs::read_to_string(&metadata_path).unwrap(),
+            "# Metadata\nversion = \"1.2.3\" # Release label\nlicense = \"mit\"\n"
+        );
+    }
+
+    #[test]
+    fn set_version_adds_a_root_field() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let metadata_path = temp_dir.path().join(".zenodo.toml");
+        fs::write(&metadata_path, "[custom]\nversion = \"nested\"\n").unwrap();
+
+        set_version("nightly build", &metadata_path).unwrap();
+
+        let contents = fs::read_to_string(&metadata_path).unwrap();
+        let updated: toml::Value = toml::from_str(&contents).unwrap();
+        assert_eq!(updated["version"].as_str(), Some("nightly build"));
+        assert_eq!(updated["custom"]["version"].as_str(), Some("nested"));
+    }
+
+    #[test]
+    fn set_version_leaves_invalid_toml_untouched() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let metadata_path = temp_dir.path().join(".zenodo.toml");
+        let original = "title = \"unterminated\n";
+        fs::write(&metadata_path, original).unwrap();
+
+        assert!(set_version("1.2.3", &metadata_path).is_err());
+        assert_eq!(fs::read_to_string(&metadata_path).unwrap(), original);
     }
 
     #[test]

@@ -86,6 +86,8 @@ impl From<&RelatedIdentifier> for JsonRelatedIdentifier {
 #[serde(default)]
 pub struct ZenodoJson {
     pub title: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub version: Option<String>,
     pub upload_type: String,
     pub creators: Vec<JsonCreator>,
     pub related_identifiers: Vec<JsonRelatedIdentifier>,
@@ -111,6 +113,7 @@ impl From<&Metadata> for ZenodoJson {
         related_identifiers.push(zendo_id);
         Self {
             title: metadata.title.clone(),
+            version: metadata.version.clone(),
             upload_type: metadata.upload_type.clone(),
             creators: metadata.creators.iter().map(JsonCreator::from).collect(),
             related_identifiers,
@@ -143,6 +146,7 @@ impl LeftJoin for ZenodoJson {
     fn left_join(self, right: Option<Self>) -> Self {
         match right {
             Some(right) => Self {
+                version: self.version.or(right.version),
                 extra: right.extra,
                 ..self
             },

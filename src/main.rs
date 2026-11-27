@@ -3,7 +3,8 @@
 use clap::{Args, Parser, Subcommand};
 use std::error::Error;
 use std::path::{Path, PathBuf};
-use zen_do::metadata::{Metadata, read_metadata, write_metadata};
+use std::process::ExitCode;
+use zen_do::metadata::{Metadata, read_metadata, set_version, write_metadata};
 use zen_do::sync::{ZenodoJson, sync_format};
 
 // TODO: Include `verbose` flag everywhere with `clap-verbosity-flag`?
@@ -28,6 +29,9 @@ enum Commands {
 
     /// Sync `.zenodo.toml` into other formats (e.g. `CITATION.cff`).
     Sync(SyncArgs),
+
+    /// Set the version in `.zenodo.toml`.
+    SetVersion(SetVersionArgs),
 
     /// Discards deposit draft changes.
     ///
@@ -146,6 +150,16 @@ struct SyncArgs {
     to: ToFormats,
 }
 
+#[derive(Args, Debug)]
+struct SetVersionArgs {
+    /// The version to set. Any string is accepted.
+    version: String,
+
+    /// The path to `.zenodo.toml`.
+    #[arg(long, short = 'f', default_value = ".zenodo.toml")]
+    metadata_path: PathBuf,
+}
+
 /// Create a `.zenodo.toml` file with all deposit metadata fields
 ///
 /// # Arguments
@@ -190,7 +204,7 @@ fn sync(args: &SyncArgs) -> Result<(), Box<dyn Error>> {
     }
 }
 
-fn main() {
+fn main() -> ExitCode {
     let args = Cli::parse();
 
     match &args.command {
@@ -219,6 +233,20 @@ fn main() {
             }
         },
 
+        Commands::SetVersion(args) => match set_version(&args.version, &args.metadata_path) {
+            Ok(()) => {
+                println!(
+                    "Set version to {} in {}.",
+                    args.version,
+                    args.metadata_path.display()
+                );
+            }
+            Err(err) => {
+                eprintln!("Error: {}: {err}", args.metadata_path.display());
+                return ExitCode::FAILURE;
+            }
+        },
+
         // TODO: Remove once implemented
         #[allow(unused_variables)]
         Commands::Discard(args) => todo!("Not started yet"),
@@ -231,6 +259,8 @@ fn main() {
         #[allow(unused_variables)]
         Commands::Update(args) => todo!("Not started yet"),
     }
+
+    ExitCode::SUCCESS
 }
 
 #[cfg(test)]
@@ -324,6 +354,9 @@ mod tests {
         let zenodo_json = read_zenodo_json(&zenodo_json_path);
         assert_zenodo_json_matches_metadata(&zenodo_json, &metadata);
         assert_eq!(zenodo_json.extra, BTreeMap::new());
+        let json: serde_json::Value =
+            serde_json::from_str(&fs::read_to_string(&zenodo_json_path).unwrap()).unwrap();
+        assert!(json.get("version").is_none());
     }
 
     #[test]
@@ -343,6 +376,7 @@ mod tests {
         let zenodo_json = read_zenodo_json(&zenodo_json_path);
         assert_zenodo_json_matches_metadata(&zenodo_json, &metadata);
         assert_eq!(zenodo_json.extra, old_zenodo_json.extra);
+        assert_eq!(zenodo_json.version, old_zenodo_json.version);
     }
 
     #[test]
@@ -415,6 +449,7 @@ mod tests {
 
         let metadata = Metadata {
             title: "Test Project".into(),
+            version: None,
             upload_type: "book".into(),
             zendo_id: ZendoId::try_from("test:test-project:book".to_string()).unwrap(),
             creators: vec![Creator {
@@ -441,6 +476,7 @@ mod tests {
 
         let zenodo_json = ZenodoJson {
             title: "Zenodo JSON Test Project".into(),
+            version: Some("0.0.1".into()),
             upload_type: "poster".into(),
             creators: vec![JsonCreator {
                 name: "Zenodo JSON User".into(),
