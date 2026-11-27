@@ -4,7 +4,7 @@ use clap::{Args, Parser, Subcommand};
 use std::error::Error;
 use std::path::{Path, PathBuf};
 use zen_do::metadata::{Metadata, read_metadata, write_metadata};
-use zen_do::sync::{ZenodoJson, sync_format};
+use zen_do::sync::{CitationCff, ZenodoJson, sync_format};
 
 // TODO: Include `verbose` flag everywhere with `clap-verbosity-flag`?
 /// Common publishing tasks with Zenodo from the terminal.
@@ -134,6 +134,7 @@ struct PublishArgs {
 #[derive(clap::ValueEnum, Clone, Debug)]
 enum ToFormats {
     ZenodoJson,
+    CitationCff,
 }
 
 #[derive(Args, Debug)]
@@ -187,6 +188,7 @@ fn sync(args: &SyncArgs) -> Result<(), Box<dyn Error>> {
 
     match args.to {
         ToFormats::ZenodoJson => sync_format::<ZenodoJson>(&metadata, parent),
+        ToFormats::CitationCff => sync_format::<CitationCff>(&metadata, parent),
     }
 }
 

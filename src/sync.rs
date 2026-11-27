@@ -161,6 +161,139 @@ impl Write for ZenodoJson {
     }
 }
 
+/// Represents an author in the `CITATION.cff` file format.
+#[derive(Debug, Default, PartialEq, Deserialize, Serialize)]
+#[serde(default, rename_all = "kebab-case")]
+pub struct CffAuthor {
+    pub given_names: String,
+    pub family_names: String,
+    pub affiliation: String,
+    /// The ORCID of the author in the form of a URL.
+    pub orcid: String,
+}
+
+impl From<&Creator> for CffAuthor {
+    fn from(creator: &Creator) -> Self {
+        Self {
+            // TODO: Not sure how to handle the name
+            given_names: creator.name.clone(),
+            family_names: creator.name.clone(),
+            affiliation: creator.affiliation.clone(),
+            orcid: format!("https://orcid.org/{}", creator.orcid),
+        }
+    }
+}
+
+#[derive(Debug, Default, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum CffIdentifierType {
+    Doi,
+    Url,
+    Swh,
+    #[default]
+    Other,
+}
+
+/// Represents an identifier in the `CITATION.cff` file format.
+/// As of v1.2.0, only identifiers with an `isIdenticalTo` relation are
+/// supported.
+#[derive(Debug, Default, PartialEq, Deserialize, Serialize)]
+#[serde(default, rename_all = "kebab-case")]
+pub struct CffIdentifier {
+    pub value: String,
+    #[serde(rename = "type")]
+    pub identifier_type: CffIdentifierType,
+}
+
+impl From<Option<&str>> for CffIdentifierType {
+    fn from(scheme: Option<&str>) -> Self {
+        match scheme {
+            Some("doi") => Self::Doi,
+            Some("url") => Self::Url,
+            Some("swh") => Self::Swh,
+            _ => Self::Other,
+        }
+    }
+}
+
+/// Represents the `CITATION.cff` file format.
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(default, rename_all = "kebab-case")]
+pub struct CitationCff {
+    pub title: String,
+    pub authors: Vec<CffAuthor>,
+    pub identifiers: Vec<CffIdentifier>,
+
+    // Any other fields in CITATION.cff
+    #[serde(flatten)]
+    pub extra: BTreeMap<String, serde_yaml::Value>,
+}
+
+impl From<&Metadata> for CitationCff {
+    fn from(metadata: &Metadata) -> Self {
+        let zendo_id = CffIdentifier {
+            value: metadata.zendo_id.to_urn(),
+            identifier_type: CffIdentifierType::Other,
+        };
+        let mut identifiers = metadata
+            .related_identifiers
+            .iter()
+            .filter(|rel_id| rel_id.relation == "isIdenticalTo")
+            .map(|rel_id| CffIdentifier {
+                value: rel_id.identifier.clone(),
+                identifier_type: rel_id.scheme.as_deref().into(),
+            })
+            .collect::<Vec<_>>();
+        identifiers.push(zendo_id);
+        Self {
+            title: metadata.title.clone(),
+            authors: metadata.creators.iter().map(CffAuthor::from).collect(),
+            identifiers,
+            extra: BTreeMap::new(),
+        }
+    }
+}
+
+impl FormatFileName for CitationCff {
+    const FILE_NAME: &str = "CITATION.cff";
+}
+
+impl Read for CitationCff {
+    fn read(parent: &Path) -> Result<Option<Self>, Box<dyn Error>> {
+        let path = parent.join(Self::FILE_NAME);
+        let contents = match fs::read_to_string(path) {
+            Ok(contents) => contents,
+            // If the target file doesn't exist, there is nothing to join
+            Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
+                return Ok(None);
+            }
+            Err(err) => return Err(err.into()),
+        };
+
+        Ok(Some(serde_yaml::from_str(&contents)?))
+    }
+}
+
+impl LeftJoin for CitationCff {
+    fn left_join(self, right: Option<Self>) -> Self {
+        match right {
+            Some(right) => Self {
+                extra: right.extra,
+                ..self
+            },
+            None => self,
+        }
+    }
+}
+
+impl Write for CitationCff {
+    fn write(self, parent: &Path) -> Result<(), Box<dyn Error>> {
+        let path = parent.join(Self::FILE_NAME);
+        fs::write(path, serde_yaml::to_string(&self)?)?;
+        Ok(())
+    }
+}
+
 /// Syncs the specified format with the metadata.
 ///
 /// # Arguments
