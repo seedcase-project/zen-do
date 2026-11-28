@@ -21,7 +21,7 @@ orcid = "12345"
 
 [[related_identifiers]]
 identifier = "random"
-relation = "link"
+relation = "isIdenticalTo"
 resource_type = "test"
 "#;
 
@@ -124,10 +124,9 @@ pub struct RelatedIdentifier {
     /// The value of the identifier (meaning, the identifier itself).
     pub identifier: String,
 
-    // TODO: Create a Relation enum.
     /// The relationship between the deposit and the other piece of work
     /// identified by the identifier.
-    pub relation: String,
+    pub relation: RelatedIdentifierRelation,
 
     // TODO: Create a ResourceType enum.
     /// The type of the work identified by the identifier.
@@ -137,10 +136,51 @@ pub struct RelatedIdentifier {
     pub scheme: Option<String>,
 }
 
+#[derive(Debug, Deserialize, Serialize, PartialEq, Default, Clone)]
+#[serde(rename_all = "camelCase")]
+pub enum RelatedIdentifierRelation {
+    IsCitedBy,
+    Cites,
+    IsSupplementTo,
+    IsSupplementedBy,
+    IsContinuedBy,
+    Continues,
+    IsDescribedBy,
+    Describes,
+    HasMetadata,
+    IsMetadataFor,
+    HasVersion,
+    IsVersionOf,
+    IsNewVersionOf,
+    IsPreviousVersionOf,
+    IsPartOf,
+    HasPart,
+    IsPublishedIn,
+    IsReferencedBy,
+    References,
+    IsDocumentedBy,
+    Documents,
+    IsCompiledBy,
+    Compiles,
+    IsVariantFormOf,
+    IsOriginalFormOf,
+    IsIdenticalTo,
+    IsAlternateIdentifier,
+    IsReviewedBy,
+    Reviews,
+    IsDerivedFrom,
+    #[default]
+    IsSourceOf,
+    Requires,
+    IsRequiredBy,
+    IsObsoletedBy,
+    Obsoletes,
+}
+
 #[derive(Debug, Deserialize)]
 struct RelatedIdentifierCheck {
     pub identifier: String,
-    pub relation: String,
+    pub relation: RelatedIdentifierRelation,
     pub resource_type: String,
     pub scheme: Option<String>,
 }
@@ -151,7 +191,7 @@ impl TryFrom<RelatedIdentifierCheck> for RelatedIdentifier {
 
     fn try_from(related_identifier: RelatedIdentifierCheck) -> Result<Self, Self::Error> {
         if related_identifier.identifier.starts_with(ZendoId::PREFIX)
-            && related_identifier.relation == "isIdenticalTo"
+            && related_identifier.relation == RelatedIdentifierRelation::IsIdenticalTo
         {
             return Err(
                 "Manual setup of zen-do URN is not allowed. Please use the field `zendo_id` (an example is given when using the `init` command)."

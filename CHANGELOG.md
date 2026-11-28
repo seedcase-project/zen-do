@@ -19,6 +19,143 @@ releases we've made so far, along with what was changed within each release.
 Commits from bots, like `dependabot` or `pre-commit-ci`, are not included in the
 changelog.
 
+## [0.15.0](https://github.com/seedcase-project/zen-do/compare/0.14.2..0.15.0) - 2026-11-27
+
+### ✨ Features
+
+- Add `sync()` to `.zenodo.json`
+  [#299](https://github.com/seedcase-project/zen-do/pull/299) by
+  [`@fruvago`](https://github.com/fruvago)
+  ([2c52dbd](https://github.com/seedcase-project/zen-do/commit/2c52dbd5fe629d1c9e0c206f5bec4c6b26d9fef6))
+- Add `Deposit` struct
+  [#308](https://github.com/seedcase-project/zen-do/pull/308) by
+  [`@signekb`](https://github.com/signekb)
+  ([4ce2cb7](https://github.com/seedcase-project/zen-do/commit/4ce2cb7c82d4b18f91fa698fe45a4b936cf5b864))
+- Add `Session` struct
+  [#309](https://github.com/seedcase-project/zen-do/pull/309) by
+  [`@signekb`](https://github.com/signekb)
+  ([e225566](https://github.com/seedcase-project/zen-do/commit/e22556694e3c9ae0b6ea40e8aaa661a4d104cc53))
+- Add `Session::new()` without `get_deposit()`
+  [#316](https://github.com/seedcase-project/zen-do/pull/316) by
+  [`@signekb`](https://github.com/signekb)
+  ([a7f2f13](https://github.com/seedcase-project/zen-do/commit/a7f2f13863331b14ffb2bf689badf8b920f75dfd))
+
+### ♻️ Refactor
+
+- Ensure deterministic ordering of extra fields in `sync`
+  [#315](https://github.com/seedcase-project/zen-do/pull/315) by
+  [`@fruvago`](https://github.com/fruvago)
+  ([8d36210](https://github.com/seedcase-project/zen-do/commit/8d36210e1a7bfdb4ae1ed78bfbd6995a83a4a062))
+- Change variable name `METADATA-FILE` to `METADATA_PATH`
+  [#317](https://github.com/seedcase-project/zen-do/pull/317) by
+  [`@joelostblom`](https://github.com/joelostblom)
+  ([8a254f5](https://github.com/seedcase-project/zen-do/commit/8a254f564e7958a706187fa7b2eb17f86e499ced))
+- Add enum for `RelatedIdentifierRelation` to `RelatedIdentifier`
+  [#305](https://github.com/seedcase-project/zen-do/pull/305) by
+  [`@signekb`](https://github.com/signekb)
+  ([3a765ea](https://github.com/seedcase-project/zen-do/commit/3a765eabedc58e047ed8556d34d753e9b62550b8))
+
+### 📝 Documentation
+
+- Add Rust interface design of `sync()`
+  [#245](https://github.com/seedcase-project/zen-do/pull/245) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([d583f5f](https://github.com/seedcase-project/zen-do/commit/d583f5f283743ffa53169a370d3580ed773cfe73))
+- Fix minor issues during edit review
+  [#256](https://github.com/seedcase-project/zen-do/pull/256) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([700e886](https://github.com/seedcase-project/zen-do/commit/700e886806fe1dbd51e280d8619b88be728281ce))
+- Add crates.io README badge
+  [#297](https://github.com/seedcase-project/zen-do/pull/297) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([ef892d1](https://github.com/seedcase-project/zen-do/commit/ef892d156052ba0eb2a54e0aa7ce96d60d09f587))
+- Add Rust interface design for `discard()`
+  [#246](https://github.com/seedcase-project/zen-do/pull/246) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([27973b0](https://github.com/seedcase-project/zen-do/commit/27973b0c0d4f598bdcb7a3b4fb7663ca1e1ef8db))
+- Fix typos throughout docs
+  [#300](https://github.com/seedcase-project/zen-do/pull/300) by
+  [`@joelostblom`](https://github.com/joelostblom)
+  ([162c48e](https://github.com/seedcase-project/zen-do/commit/162c48e359f9f2d6cf499d918b9b1171f306a0c0))
+- Add Joel to contributors
+  [#310](https://github.com/seedcase-project/zen-do/pull/310) by
+  [`@signekb`](https://github.com/signekb)
+  ([882b524](https://github.com/seedcase-project/zen-do/commit/882b52406044e717fb8fd9f0f9471d381cad4696))
+- Simplify sidebar management
+  [#304](https://github.com/seedcase-project/zen-do/pull/304) by
+  [`@joelostblom`](https://github.com/joelostblom)
+  ([0ad5755](https://github.com/seedcase-project/zen-do/commit/0ad57554fd22bbd71665176d4b76e905a9db2dfc))
+- Centralize installation instructions and add uv
+  [#302](https://github.com/seedcase-project/zen-do/pull/302) by
+  [`@joelostblom`](https://github.com/joelostblom)
+  ([41441ba](https://github.com/seedcase-project/zen-do/commit/41441baf7c05efc9dc5877924c609ecbbf31879a))
+- Add sync guide [#291](https://github.com/seedcase-project/zen-do/pull/291) by
+  [`@fruvago`](https://github.com/fruvago)
+  ([af16400](https://github.com/seedcase-project/zen-do/commit/af164009f3bbda9be3aa2aa85069fbc79b7e0727))
+- Add Rust interface design for `get()`
+  [#247](https://github.com/seedcase-project/zen-do/pull/247) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([a10f3e0](https://github.com/seedcase-project/zen-do/commit/a10f3e00ce229b2c3742b712d571a21882393c4b))
+- Add Rust interface design for `list()`
+  [#248](https://github.com/seedcase-project/zen-do/pull/248) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([e4d6439](https://github.com/seedcase-project/zen-do/commit/e4d64395bc33e7cd4a571934adcb44d71f36d9f8))
+- Add guide for using `get` and `list`
+  [#306](https://github.com/seedcase-project/zen-do/pull/306) by
+  [`@DanMazJen`](https://github.com/DanMazJen)
+  ([07bb7e0](https://github.com/seedcase-project/zen-do/commit/07bb7e0c5607ba28a0c4d2b8e2a6a5b2d10bbe99))
+- Add guide to update Zenodo deposit
+  [#307](https://github.com/seedcase-project/zen-do/pull/307) by
+  [`@DanMazJen`](https://github.com/DanMazJen)
+  ([8ef9599](https://github.com/seedcase-project/zen-do/commit/8ef9599585c8cb3ec032c648934c4521abfb937e))
+
+### 👷 CI/CD
+
+- Add publish to Prefix workflow
+  [#294](https://github.com/seedcase-project/zen-do/pull/294) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([a72620d](https://github.com/seedcase-project/zen-do/commit/a72620dc7692b87026bdf43053b42867f0682d34))
+- Add environment for PyPI publishing
+  [#298](https://github.com/seedcase-project/zen-do/pull/298) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([9ce59b5](https://github.com/seedcase-project/zen-do/commit/9ce59b574b8d86fdc2ac475c2dbdc77a9f5b2de3))
+- Build website on push and during release
+  [#321](https://github.com/seedcase-project/zen-do/pull/321) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([27ae7db](https://github.com/seedcase-project/zen-do/commit/27ae7dbc8ed2d863b8d0119cde49b5fad8daf41e))
+- Use `yq` to update `recipe.yaml` version
+  [#322](https://github.com/seedcase-project/zen-do/pull/322) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([0a450d3](https://github.com/seedcase-project/zen-do/commit/0a450d3b2fefe509b693213ebfe9e720f7f35686))
+- Use `sudo` to install `yq` in workflow
+  [#323](https://github.com/seedcase-project/zen-do/pull/323) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([3a40b5b](https://github.com/seedcase-project/zen-do/commit/3a40b5bda5cf09528d3d1cb39cc15298a313a7b4))
+- Use latest `yq` syntax
+  [#324](https://github.com/seedcase-project/zen-do/pull/324) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([9a6806c](https://github.com/seedcase-project/zen-do/commit/9a6806cd385490b246dc39e641cba52e251c32bd))
+
+### 👩‍💻 Miscellaneous
+
+- Set explicit Cargo settings via `rust-toolchain.toml`
+  [#295](https://github.com/seedcase-project/zen-do/pull/295) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([6db5752](https://github.com/seedcase-project/zen-do/commit/6db575238db4ad2d4b61927cace3e8a0047ac520))
+- Remove deprecated `pyproject.toml` license classifier
+  [#296](https://github.com/seedcase-project/zen-do/pull/296) by
+  [`@lwjohnst86`](https://github.com/lwjohnst86)
+  ([6522d0f](https://github.com/seedcase-project/zen-do/commit/6522d0f173d43816c74a56712141471d164ac3e8))
+- Add contents in guide for progression links
+  [#301](https://github.com/seedcase-project/zen-do/pull/301) by
+  [`@joelostblom`](https://github.com/joelostblom)
+  ([c37a316](https://github.com/seedcase-project/zen-do/commit/c37a316921538c287b4f06dd96ed5977ad694dcb))
+
+### ❤️ New contributors
+
+- [`@joelostblom`](https://github.com/joelostblom) made their first contribution
+  in [#317](https://github.com/seedcase-project/zen-do/pull/317)
+
 ## [0.14.2](https://github.com/seedcase-project/zen-do/compare/0.14.1..0.14.2) - 2026-11-10
 
 ### ♻️ Refactor

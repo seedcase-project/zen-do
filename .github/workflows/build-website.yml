@@ -2,7 +2,7 @@ name: Build website
 
 on:
   # Defining workflow_call means that this workflow can be called from
-  # your main workflow job
+  # another workflow job, such as building the website after release
   workflow_call:
     # dist exposes the plan from the plan step, as a JSON string,
     # to your job if it needs it
@@ -10,6 +10,9 @@ on:
       plan:
         required: true
         type: string
+  push:
+    branches:
+      - main
 
 jobs:
   build-website:

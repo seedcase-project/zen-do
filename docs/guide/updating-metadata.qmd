@@ -1,0 +1,61 @@
+---
+title: "Updating the metadata on Zenodo"
+description: |
+  Use the `update` command to update metadata on an existing Zenodo deposit without changing its files or DOI.
+order: 3
+---
+
+Have you published a record on Zenodo but afterwards discovered a typo, need to
+correct information, or want to add missing metadata after publishing a deposit?
+
+Instead of making a new record, you just want to update the metadata without
+having to upload the files again or create a new DOI.
+
+The `update` command updates the metadata of an existing Zenodo deposit based on
+the `.zenodo.toml` file.
+
+::: {.callout-caution}
+Note that `update` requires an existing Zenodo deposit. If no deposit exists,
+the command will fail. The deposit must first be published as a record (see [the
+*publishing a record* guide](publishing.qmd)) before its metadata can be
+updated.
+
+You can always get an overview of all your Zenodo deposits using [the `list` and
+`get` commands](get-and-list.qmd).
+:::
+
+Unlike the `publish` command, update only changes the metadata associated with
+an existing deposit. The files in the deposit remain unchanged, and the existing
+DOI is preserved.
+
+The `update` command has three important arguments:
+
+- `[METADATA_PATH]`: The path to the `.zenodo.toml` file. If no path is
+  provided, it defaults to `.zenodo.toml` in the working directory.
+- `--sandbox`: Update the deposit in the Zenodo sandbox instead of the main
+  Zenodo website. This is useful for testing changes before updating a real
+  deposit.
+- `--draft`: Update the deposit without publishing the changes to the record.
+  This allows you to review the updated deposit before publishing it.
+
+For example, to update the metadata of a deposit using the default
+`.zenodo.toml` file and without publishing the changes, run:
+
+```bash {filename="Terminal"}
+zen-do update --draft
+```
+
+To update a deposit in the sandbox, run:
+
+```bash {filename="Terminal"}
+zen-do update --sandbox
+```
+
+::: {.callout-tip}
+By default, `update` asks for confirmation before making changes. To bypass this
+prompt, for example in a CI/CD workflow, run:
+
+```bash {filename="Terminal"}
+zen-do update --yes
+```
+:::
