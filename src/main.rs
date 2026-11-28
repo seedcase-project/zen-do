@@ -228,7 +228,9 @@ fn main() {
 mod tests {
     // To import all code from above in this file.
     use super::*;
-    use ::zen_do::metadata::{Creator, RelatedIdentifier, ZendoId, read_metadata, write_metadata, Metadata};
+    use ::zen_do::metadata::{
+        Creator, Metadata, RelatedIdentifier, ZendoId, read_metadata, write_metadata,
+    };
     use std::{collections::BTreeMap, fs};
     use zen_do::sync::{FormatFileName, JsonCreator, JsonRelatedIdentifier};
 
